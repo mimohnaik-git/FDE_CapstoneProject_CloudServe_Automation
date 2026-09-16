@@ -376,7 +376,11 @@ class ResponseGenerationEngine:
             document_id = result.get("document_id") or result.get("doc_id")
             chunk_id = result.get("chunk_id")
             passage = result.get("passage") or result.get("chunk_content")
-            if not all(isinstance(value, str) and value.strip() for value in (document_id, chunk_id, passage)):
+            if not isinstance(document_id, str) or not document_id.strip():
+                continue
+            if not isinstance(chunk_id, str) or not chunk_id.strip():
+                continue
+            if not isinstance(passage, str) or not passage.strip():
                 continue
             raw_score = result.get("similarity_score", result.get("relevance_score", 0.0))
             try:
