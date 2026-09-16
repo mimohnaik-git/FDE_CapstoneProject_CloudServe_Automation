@@ -38,11 +38,15 @@ python -m pip install -r requirements.txt
 cp .env.example .env
 ```
 
+`requirements.txt` applies the targeted compatibility constraints in
+`constraints.txt`; this is a tested constraints strategy, not a complete lockfile.
 `.env.example` contains placeholders and safe defaults only. Keep
-`GENERATION_PROVIDER=offline` for credential-free operation. To use the optional
-OpenRouter adapter, set `GENERATION_PROVIDER=openrouter` and provide
-`OPENROUTER_API_KEY` only in the untracked `.env` or process environment. Never
-commit credentials.
+`GENERATION_PROVIDER=offline` for credential-free operation. OpenRouter uses
+`GENERATION_PROVIDER=openrouter`, `OPENROUTER_API_KEY`,
+`OPENROUTER_MODEL_NAME`, and `OPENROUTER_BASE_URL`. Groq uses
+`GENERATION_PROVIDER=groq`, `GROQ_API_KEY`, `GROQ_MODEL_NAME`, and
+`GROQ_BASE_URL`. Store credentials only in the untracked `.env` or process
+environment; never commit them.
 
 The semantic retriever uses `sentence-transformers/all-MiniLM-L6-v2`. Normal first
 use may download that public model. Fully disconnected operation requires the same
@@ -86,6 +90,21 @@ python scripts/clean_checkout_smoke.py
 The smoke check imports the application and evaluation tooling and calls `/health`;
 it does not load validation data or initialize the embedding model.
 
+The ordinary Pytest suite establishes `GENERATION_PROVIDER=offline` before
+application settings are imported. It therefore remains deterministic when a
+developer's shell or `.env` selects offline, OpenRouter, or Groq. Provider and
+reliability tests use explicit injected providers. Development-only live component
+smokes require an explicit provider and use a synthetic fixture:
+
+```bash
+python scripts/live_provider_generation_smoke.py --live-provider openrouter --synthetic
+python scripts/live_provider_generation_smoke.py --live-provider groq --synthetic
+```
+
+These commands can make real external HTTP calls and require the matching provider
+credential. Their results are development component evidence, not validation or
+production-reliability evidence.
+
 ## Evaluation
 
 Run unattended evaluation with an explicitly classified dataset role:
@@ -118,6 +137,11 @@ production authentication, authorization, rate limiting, load, alert, and recove
 evidence remain incomplete. The owner's 30% future automation target is not a
 measured V1 result, and safety takes priority over automation.
 
-Latest hosted CI evidence: GitHub Actions run `34689311670` for commit
-`ec9c0fd736596f5e64fb14b52e0ca2d993991a9d` completed successfully. CI success is
-reproducibility evidence, not production availability evidence.
+Historical frozen CI evidence is GitHub Actions run `34773077234` for commit
+`6a80e91a3b7a82504f04afa98cdb8265f7617234`. The current post-freeze stabilized
+baseline is commit `7062f683e41a178e644713acee81478731dc9adc`; GitHub Actions
+run `34889316386` completed successfully with dependency installation, `pip check`,
+credential-free startup, and all 355 tests. The stabilized local suite also passed
+with zero warnings under offline, OpenRouter, and Groq parent environments. This
+work improved reproducibility and provider portability without rerunning validation
+or changing its results. CI success is not production availability evidence.

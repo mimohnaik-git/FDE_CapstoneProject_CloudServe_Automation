@@ -7,8 +7,8 @@ This workbook separates the original plan from actual execution. The plan is pre
 | Field | Value |
 |---|---|
 | Original planning period | Three-week capstone structure |
-| Actual evidenced activity dates | 4–12 September 2026 |
-| Actual effort | 42.0 hours — OWNER-RECONSTRUCTED ESTIMATE |
+| Actual evidenced activity dates | 4–13 September 2026 |
+| Actual effort | 51.5 hours — OWNER-RECONSTRUCTED ESTIMATE |
 | Frozen V1 fingerprint | ddf89e82e7340a0257ee0c2ae1ce340612070545bc04f559e1e4c3ad733f59c1 |
 | Final deployment state | Limited supervised pilot; NOT production-ready |
 
@@ -26,7 +26,7 @@ The earlier sprint-plan draft allocated 20 hours to week one, 22 hours to week t
 
 ### Actual effort boundary
 
-The owner confirmed approximately 3–5 hours per day in Claude before 10 September. The final effort log uses a 4-hour midpoint except 9 September at 5 hours. Total actual effort is an **OWNER-RECONSTRUCTED ESTIMATE of 42.0 hours**, based on AI-tool history, Git history, artifacts, CI evidence, and owner recollection. It was not automatically measured or contemporaneously tracked. Formal plan variance is therefore not calculable.
+The owner confirmed approximately 3–5 hours per day in Claude before 10 September. The final effort log uses a 4-hour midpoint except 9 September at 5 hours. Total actual effort is an **OWNER-RECONSTRUCTED ESTIMATE of 51.5 hours**, based on AI-tool history, Git history, artifacts, CI evidence, and owner recollection. It was not automatically measured or contemporaneously tracked. Formal plan variance is therefore not calculable.
 
 ## 3. Original backlog preserved
 
@@ -61,9 +61,9 @@ The original Word template also anticipated monitoring, CI, fairness, and final 
 | SQLite logger at src/logging.py | SQLite logger at src/logging_store.py | File name corrected | Actual repository structure. | src/logging_store.py; logging tests; 80/80 validation records |
 | FastAPI /api/v1/ticket | FastAPI POST /tickets/process; GET /health and /metrics | Route corrected | Actual tested API contract. | src/api.py; tests/test_api.py |
 | Evaluation over development and “120 validation tickets” | 500-ticket development evaluation; supplied validation contains 80; first attempt failed and was preserved; authorized 80-ticket technical rerun is authoritative | Count and sequence corrected | Harness is arbitrary-size; hidden final assessment expected up to 120 was not run or inspected. | Evaluation artifacts, harness tests, freeze manifests |
-| Unit tests ending at “75/75” | Current authoritative local result: 342 passed, 2 warnings | Test count grew materially | Coverage expanded across acceptance, reliability, monitoring, governance, API, reproducibility, and evaluation. | Current recorded local result |
+| Unit tests ending at “75/75” | Historical frozen result: 342 passed, 2 warnings. Post-freeze stabilized result: 355 passed, 0 warnings. | Test count grew materially | Coverage expanded across acceptance, reliability, monitoring, governance, API, reproducibility, provider isolation, and evaluation. | Historical and stabilized evidence are reported separately; validation was not rerun. |
 | No explicit monitoring/governance work in shortened backlog | Prometheus/Grafana configuration, risk/incident/kill-switch governance, and acceptance evidence | Added | Required operational visibility and governance outputs. | docs/governance.md, monitoring artifacts/tests |
-| CI as final packaging activity | GitHub Actions implemented and observed successful | Completed with hosted evidence | Clean-checkout reproducibility and assessment requirement. | Latest run 34689311670 at commit ec9c0fd736596f5e64fb14b52e0ca2d993991a9d: SUCCESS |
+| CI as final packaging activity | GitHub Actions implemented and observed successful | Completed with hosted evidence | Clean-checkout reproducibility and assessment requirement. | Historical frozen run 34773077234 at 6a80e91: SUCCESS. Current stabilized run 34889316386 at 7062f68: SUCCESS. |
 
 ## 5. Original detailed sprint sequence
 
@@ -145,14 +145,17 @@ Safety controls, A1–A12 evidence, evaluation separation, decision logging, gov
 | Monitoring/governance | Metrics/dashboard configuration, risk register, incident response, and kill switch completed/tested at capstone scope. | Monitoring and governance artifacts/tests |
 | API | FastAPI /tickets/process, /health, and /metrics implemented/tested. | src/api.py and API tests |
 | V2 experiment | Rejected; not validated or promoted. | Stage 20 development artifact |
-| CI | GitHub Actions observed successful. | Latest run 34689311670, commit ec9c0fd736596f5e64fb14b52e0ca2d993991a9d |
+| CI | GitHub Actions observed successful for the frozen and stabilized baselines. | Historical run 34773077234 at 6a80e91; current run 34889316386 at 7062f68 |
 | Owner review | Mimoh Naik signed off on 12 September 2026. | Owner review worksheet |
 | Workbook completion | Reconciliation progressed through discovery, PRD, prompt library, and sprint plan. | Submission-facing Markdown workbooks |
 
 ## 11. Test and CI evidence
 
-- Current authoritative local test result: **342 passed, 2 warnings**.
-- Latest hosted GitHub Actions: run **34689311670**, commit **ec9c0fd736596f5e64fb14b52e0ca2d993991a9d**, result **SUCCESS**.
+- Historical frozen local result: **342 passed, 2 warnings** at `6a80e91`.
+- Post-freeze stabilized local result: **355 passed, 0 warnings** at `7062f68`, including deterministic runs under offline, OpenRouter, and Groq parent environments.
+- Historical hosted GitHub Actions: run **34773077234**, commit **6a80e91a3b7a82504f04afa98cdb8265f7617234**, result **SUCCESS**.
+- Current stabilized hosted GitHub Actions: run **34889316386**, commit **7062f683e41a178e644713acee81478731dc9adc**, result **SUCCESS**.
+- Stabilization occurred after the original sprint and freeze. It did not rerun validation, alter thresholds or prompts, or change any frozen evaluation metric.
 - CI success supports reproducibility and the test workflow. It does not measure production availability, load behavior, alert performance, first-response time, FCR, or CSAT.
 
 ## 12. Sprint outcome and evidence boundaries
@@ -164,4 +167,4 @@ Safety controls, A1–A12 evidence, evaluation separation, decision logging, gov
 - DEVELOPMENT human evaluation only: hallucination 2%, semantic citation accuracy 98%, correctness 3.74/5, usefulness 2.87/5.
 - Validation hallucination and semantic citation accuracy are NOT MEASURED.
 - FCR, CSAT, customer first-response time, production availability, load/alert performance, backup/recovery, and production business outcomes are NOT MEASURED.
-- The 42.0 effort hours are an OWNER-RECONSTRUCTED ESTIMATE, not automatically measured or contemporaneously tracked.
+- The 51.5 effort hours are an OWNER-RECONSTRUCTED ESTIMATE, not automatically measured or contemporaneously tracked.

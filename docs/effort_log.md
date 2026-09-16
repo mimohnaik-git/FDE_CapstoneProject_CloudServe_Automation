@@ -7,7 +7,9 @@ history, project artifacts, GitHub/CI evidence, and owner recollection.
 
 The hours below were not automatically measured or contemporaneously tracked. They are
 the owner's approved reconstruction, not an engineering-performance metric. Planned
-hours were not formally recorded and formal variance is not calculable.
+hours were not formally recorded and formal variance is not calculable. Elapsed
+chat/project activity is not automatically measured active working time and is not used
+as a direct timekeeping measure.
 
 ## 1. Daily reconstructed effort
 
@@ -26,9 +28,10 @@ which uses 5 hours.
 | 10 September 2026 | 7.0 | Development evaluation, calibration, V1 freeze, preserved validation infrastructure failure, cache-only remediation, and authorized technical rerun. |
 | 11 September 2026 | 6.0 | Reproducibility/clean-checkout work, evidence reconciliation, GitHub/CI setup, hosted CI evidence, and live-provider component smoke checks. |
 | 12 September 2026 | 4.0 | Owner interpretation/sign-off, workbook/effort-log completion, and hosted CI confirmation. |
-| **Total** | **42.0** | **Owner-approved reconstructed effort.** |
+| 13 September 2026 | 9.5 | Full-project sanity audit and defect reconciliation; workbook/export QA; source-package preparation and assembly; final Git/CI freeze; submission-readiness audit and final artifact review. |
+| **Total** | **51.5** | **Owner-approved reconstructed effort.** |
 
-Arithmetic: `4 + 4 + 4 + 4 + 4 + 5 + 7 + 6 + 4 = 42.0` hours.
+Arithmetic: `4 + 4 + 4 + 4 + 4 + 5 + 7 + 6 + 4 + 9.5 = 51.5` hours.
 
 ## 2. Stage allocation
 
@@ -41,10 +44,10 @@ Arithmetic: `4 + 4 + 4 + 4 + 4 + 5 + 7 + 6 + 4 = 42.0` hours.
 | Stages 5–8: Build/Guardrails | 9.0 | Not formally recorded | Not calculable | Modular ingestion, TF-IDF logistic-regression classification, MiniLM/NumPy retrieval, routing, generation, blocking guardrails, and SQLite audit logging. |
 | Stages 9–18: Evaluation/Reliability/Governance | 10.0 | Not formally recorded | Not calculable | Orchestration, evaluation harness, calibration, freeze, validation, fairness, human review, API, monitoring, governance, and acceptance work. |
 | Stages 19–23: Reproducibility/V2/CI/Evidence | 5.0 | Not formally recorded | Not calculable | Clean-checkout evidence, rejected V2 development experiment, CI, and submission evidence reconciliation. |
-| Stages 24–30: Owner Review/Workbooks | 4.0 | Not formally recorded | Not calculable | Owner review/sign-off and workbook/effort-log audits. |
-| **Total** | **42.0** | **Not formally recorded** | **Not calculable** | **Owner-approved reconstructed effort.** |
+| Stages 24–30: Owner Review/Workbooks/Submission Finalization | 13.5 | Not formally recorded | Not calculable | Owner review/sign-off; workbook/effort-log audits and exports; sanity/defect reconciliation; source-package preparation/assembly; final Git/CI freeze; and submission-readiness review. |
+| **Total** | **51.5** | **Not formally recorded** | **Not calculable** | **Owner-approved reconstructed effort.** |
 
-Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 4 = 42.0` hours.
+Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 13.5 = 51.5` hours.
 
 ## 3. Recovered technical and project milestones
 
@@ -58,7 +61,8 @@ Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 4 = 42.0` hours.
 | Development only | Rejected V2 | Calibration improved in development, but the best candidate produced 18 false automatic responses. V2 was not validated or promoted. |
 | 11 September 2026 | GitHub/CI and clean-checkout work | Repository commits recorded clean-checkout corrections, evidence readiness, and hosted CI evidence. |
 | Development only | Live-provider sandbox limitation | Groq/OpenRouter checks were component smoke tests only. They did not access validation data, did not change frozen V1, and do not establish production or end-to-end performance. |
-| 12 September 2026 | Latest hosted CI result | Commit `ec9c0fd736596f5e64fb14b52e0ca2d993991a9d`; GitHub Actions run `34689311670`: **SUCCESS**. This is CI evidence, not production-availability evidence. |
+| 13 September 2026 | Historical frozen hosted CI result | Commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`; GitHub Actions run `34773077234`: **SUCCESS**. |
+| Post-freeze stabilization | Current stabilized hosted CI result | Commit `7062f683e41a178e644713acee81478731dc9adc`; GitHub Actions run `34889316386`: **SUCCESS**, with 355 tests and zero warnings. This is reproducibility evidence, not production-availability evidence. |
 
 ## 4. Evidence boundaries and owner decision
 
@@ -76,10 +80,13 @@ Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 4 = 42.0` hours.
 ## 5. Owner verification
 
 - Owner name: Mimoh Naik
-- Verification date: 12 September 2026
-- Total verified/reconstructed effort: 42.0 hours
+- Verification date: 13 September 2026
+- Total verified/reconstructed effort: 51.5 hours
 - Approval: Approved by owner
 
-No additional timekeeping fields remain unresolved. This log identifies the effort as a
-reconstruction and does not represent it as automatically measured or contemporaneously
-tracked.
+No additional timekeeping fields remain unresolved. This log identifies the effort as
+an **OWNER-RECONSTRUCTED ESTIMATE** and does not represent elapsed chat/project activity
+as automatically measured active working time or as contemporaneously tracked effort.
+Post-freeze stabilization occurred after the approved reconstructed timekeeping period.
+Its additional duration was not formally measured and is not included in the 51.5-hour
+total.

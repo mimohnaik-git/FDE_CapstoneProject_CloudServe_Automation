@@ -361,7 +361,46 @@ The kill switch is an additional operational control. The file-based setting sup
 
 Prometheus-compatible `/metrics` exposes bounded operational measurements without ticket bodies, customer identifiers, response text, retrieved passages, or secrets. Prometheus configuration and a Grafana dashboard cover ticket outcomes, latency, guardrail events, and confidence distribution. Governance artifacts provide a risk register, incident-response procedure, ownership roles, and kill-switch operation.
 
-GitHub Actions CI was observed **SUCCESS** on run `34689311670` for commit `ec9c0fd736596f5e64fb14b52e0ca2d993991a9d`. It covered checkout, Python 3.12, dependency installation, `pip check`, offline clean-checkout smoke, and the complete Pytest suite. This is reproducibility evidence, not production availability evidence.
+Historical frozen GitHub Actions CI was **SUCCESS** on run `34773077234` for
+commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`. Current post-freeze stabilized
+CI was **SUCCESS** on run `34889316386` for commit
+`7062f683e41a178e644713acee81478731dc9adc`. The current run covered checkout,
+Python 3.12, dependency installation, `pip check`, credential-free startup, and
+the complete 355-test suite with zero warnings. This is reproducibility evidence,
+not production availability evidence.
+
+### Post-Freeze Engineering Stabilization
+
+Engineering was reopened after the V1 freeze to correct provider-configuration
+leakage into deterministic tests, add complete Groq configuration, resolve
+provider-specific model handling, stabilize compatibility-sensitive dependencies,
+remove two warnings, and improve smoke-output and repository hygiene. The work was
+implementation hardening rather than model or product tuning.
+
+The stabilized baseline is commit
+`7062f683e41a178e644713acee81478731dc9adc`. The complete suite contains 355
+tests and passes with zero warnings when the parent environment selects offline,
+OpenRouter, or Groq. A clean source export without `.env` also passed all 355 tests.
+Dependencies use `requirements.txt` plus targeted `constraints.txt`; this is not
+described as a complete lockfile. Unused direct LangChain, LangGraph, and LiteLLM
+dependencies were removed because frozen V1 uses explicit Python orchestration and
+the shared provider adapter directly.
+
+OpenRouter now has provider-specific model resolution, while Groq is a first-class
+provider with explicit credential, model, and base-URL configuration. The latest
+successful live evidence for both providers remains a synthetic DEVELOPMENT
+component smoke from Phase 4: each returned HTTP 200, valid structured output,
+valid retrieved citations, and grounded content, then correctly failed closed on
+`CONFIDENCE_FAILURE`. A later OpenRouter refresh was prevented by the execution
+environment; this is not evidence of provider regression. These checks do not
+establish end-to-end production provider reliability.
+
+Stabilization did not rerun validation, access hidden data, change the 0.80/0.30
+thresholds, modify `generation-v1.0.0`, weaken guardrails, or alter historical
+evaluation artifacts. Therefore it creates no new validation-performance,
+automation, routing-quality, hallucination, citation-quality, fairness, or business
+outcome claim. The owner recommendation remains **LIMITED SUPERVISED PILOT — NOT
+PRODUCTION-READY**.
 
 The AI-use declaration records ChatGPT, Codex in VS Code, and Claude. The owner corrected or rejected suggestions that conflicted with evidence, safety, or project requirements, and retained final accountability.
 

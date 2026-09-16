@@ -404,7 +404,7 @@ This reflects the actual project skeleton already created. Treat it as authorita
     ├── src/
     │   ├── api.py
     │   ├── classify.py
-    │   ├── config.py          # NEW — see note below
+    │   ├── config.py
     │   ├── generate.py
     │   ├── guardrails.py
     │   ├── ingest.py
@@ -417,12 +417,12 @@ This reflects the actual project skeleton already created. Treat it as authorita
     │   └── .gitkeep
     │
     ├── tests/
-    │   ├── test_api.py         # NEW — see note below
+    │   ├── test_api.py
     │   ├── test_classify.py
-    │   ├── test_generate.py    # NEW — see note below
+    │   ├── test_generate.py
     │   ├── test_guardrails.py
     │   ├── test_ingest.py
-    │   ├── test_logging_store.py  # NEW — see note below
+    │   ├── test_logging_store.py
     │   ├── test_pipeline.py
     │   ├── test_retrieve.py
     │   ├── test_route.py
@@ -433,18 +433,10 @@ This reflects the actual project skeleton already created. Treat it as authorita
     ├── README.md
     └── requirements.txt
 
-Two gaps relative to a 1:1 mapping between `src/` and `tests/`, and between
-config handling and the rest of the stack:
-
-- `src/config.py` does not yet exist. Centralize environment-variable loading
-  and validation here (fail loudly on a missing required variable, per the
-  Setup Guide's pattern) rather than scattering `os.environ` calls across
-  modules. Build this in Stage 1.
-- `tests/test_api.py`, `tests/test_generate.py`, and `tests/test_logging_store.py`
-  do not yet exist. Every module in `src/` should have a corresponding test
-  module. Create these when their respective stage is built (Stage 6 for
-  generate, Stage 8 for logging_store, Stage 14/17 for api), not retrofitted
-  at the end.
+The original skeleton gaps have been resolved: `src/config.py` centralizes
+environment-variable loading and validation, and `tests/test_api.py`,
+`tests/test_generate.py`, and `tests/test_logging_store.py` cover their
+respective modules. The general test-coverage policy remains applicable.
 
 `docs/` and `evaluation/` are split more granularly here than the pack's own
 suggested layout (separate `evaluation.md`, `governance.md`,
@@ -461,16 +453,30 @@ departure from it.
 
     OPENROUTER_API_KEY=
     MODEL_NAME=meta-llama/llama-3.1-8b-instruct
+    OPENROUTER_MODEL_NAME=openrouter/free
+    GENERATION_PROVIDER=offline
+    OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+    GROQ_API_KEY=
+    GROQ_MODEL_NAME=openai/gpt-oss-20b
+    GROQ_BASE_URL=https://api.groq.com/openai/v1
+    GENERATION_TIMEOUT_SECONDS=30
     EMBEDDING_MODEL=all-MiniLM-L6-v2
     CHROMA_PATH=./storage/chroma
     DATABASE_URL=sqlite:///./storage/decisions.db
     LOG_LEVEL=INFO
     CONFIDENCE_THRESHOLD=0.80
+    RETRIEVAL_ROUTING_THRESHOLD=0.30
     RETRIEVAL_TOP_K=5
 
 These are illustrative starting values, not validated defaults. As stated in
 Section 11 (Routing), the confidence threshold in particular must be set from
 evaluation evidence, not left at the illustrative value.
+
+The post-freeze stabilized implementation supports `offline`, `openrouter`, and
+`groq`. OpenRouter and Groq use their provider-specific credential, model, and
+base-URL variables. Deterministic tests establish offline mode independently of a
+developer's `.env`; explicitly injected provider tests and explicitly opted-in live
+smokes remain separate.
 
 `src/config.py` should read all of the above via `load_dotenv()` and expose
 them as typed, validated settings. Provider credentials must fail loudly

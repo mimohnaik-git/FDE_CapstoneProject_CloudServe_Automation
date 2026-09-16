@@ -158,3 +158,13 @@ Explicitly excluded are pre-existing report/document edits, generated PDFs/DOCX/
 ## Stop condition
 
 Phase 5 stops here. No validation run, hidden-data access, report regeneration, Phase 6 work, staging, commit, or push was performed.
+
+## Subsequent baseline confirmation
+
+After this Phase 5 record was completed, the owner approved the audited allowlist as
+a new post-freeze commit. Commit
+`7062f683e41a178e644713acee81478731dc9adc` was created without amending frozen
+commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`. GitHub Actions run
+`34889316386` completed successfully for the stabilized commit. This subsequent
+confirmation does not change the Phase 5 execution record above, rerun validation,
+or alter frozen evaluation evidence.

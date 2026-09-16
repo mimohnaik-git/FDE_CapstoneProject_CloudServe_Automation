@@ -126,7 +126,7 @@ The owner set 30% as a minimum worthwhile future automation target. This is an *
 | Embeddings | MiniLM | MiniLM | Retained. |
 | Retrieval store/search | Chroma; earlier BM25 option | NumPy exact cosine | Simpler for small corpus while retaining ranking, source IDs, no-result behavior, and evaluation evidence. |
 | Orchestration | LangChain/LangGraph | Explicit Python | Directly inspectable fail-closed decisions without unnecessary dependency. |
-| Generation | OpenRouter/Groq examples | Provider-neutral grounded interface | Avoids single-provider coupling; live-provider evidence remains component-level only. |
+| Generation | OpenRouter/Groq examples | Provider-neutral grounded interface with offline, OpenRouter, and Groq implementations | Avoids single-provider coupling. Post-freeze hardening added provider-specific model resolution and first-class Groq credential/model/base-URL configuration; live-provider evidence remains synthetic development component evidence only. |
 | API / log / tests | FastAPI / SQLite / Pytest | FastAPI / SQLite / Pytest | Baseline retained. |
 
 ## 10. API and operations
@@ -164,4 +164,10 @@ The completed owner decision is **LIMITED SUPERVISED PILOT** and **NOT PRODUCTIO
 | 1.0 | 4 September 2026 | Original discovery-derived implementation baseline. | Historical baseline. |
 | 2.0 | 12 September 2026 | Reconciled with Stage 1, frozen V1, authoritative validation, DEVELOPMENT human evaluation, governance/monitoring, hosted CI, and final owner decision. | Owner review/sign-off complete — Mimoh Naik. |
 
-Latest hosted CI evidence: GitHub Actions run 34689311670, commit ec9c0fd736596f5e64fb14b52e0ca2d993991a9d, result SUCCESS. This is CI evidence, not availability evidence.
+Historical frozen CI evidence: GitHub Actions run 34773077234, commit
+6a80e91a3b7a82504f04afa98cdb8265f7617234, result SUCCESS. Current post-freeze
+implementation-hardening evidence: run 34889316386, commit
+7062f683e41a178e644713acee81478731dc9adc, result SUCCESS, with 355 tests and
+zero warnings. This hardening changed no product requirement, threshold, prompt,
+guardrail policy, or validation result. CI is reproducibility evidence, not
+availability evidence.

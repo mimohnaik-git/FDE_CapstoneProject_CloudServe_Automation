@@ -27,7 +27,7 @@ source-pack workbooks remain historical inputs and are not altered.
 | FR-07 to FR-09 safety | Block private data, injection effects, and unsupported financial commitments | Retain blocking controls and mandatory escalation. Production claims require deployed security and abuse-control evidence. | Unit/integration evidence demonstrates blocking; validation guardrail coverage and private-data release rate were ineligible because no response was released. | Owner prioritizes safety over automation. Deployed security controls and evidence remain required before production. |
 | FR-11 audit logging | Persistent and complete decision records | Retain. Require deployed durability, access control, retention, backup, and recovery evidence before production. | Validation reconciled 80 source/evaluated/terminal/logged records and achieved 100% decision-log coverage. SQLite production durability remains unmeasured. | Required: name the accountable owner and retention/recovery policy. |
 | FR-12 evaluation | Unattended automated metrics | Retain arbitrary-size unattended evaluation and explicit evidence classes. Human and operational metrics must never be inferred from automated results. | Evaluation harness, frozen manifests, validation reports, fairness analysis, and human-review artifacts exist. | Owner approved the final evidence interpretation. No new validation run is required. |
-| NFR operational readiness | Latency, availability, security, testability, and local operation | Separate locally demonstrated controls from production evidence. Monitoring, governance, CI configuration, and clean-checkout work are complete locally. Latest GitHub Actions CI was observed successful: run `34689311670` for commit `ec9c0fd736596f5e64fb14b52e0ca2d993991a9d`. Production availability, load, alerts, access control, and recovery remain gaps. | Governance, monitoring, traceability, clean-checkout, and hosted CI evidence. | Owner selected a limited supervised pilot. Production remains blocked by the unresolved operational and security limitations. |
+| NFR operational readiness | Latency, availability, security, testability, and local operation | Separate locally demonstrated controls from production evidence. Historical frozen CI run `34773077234` at `6a80e91` succeeded. Post-freeze implementation hardening is recorded by stabilized commit `7062f68` and successful CI run `34889316386`, including dependency installation, consistency checks, offline startup, and 355 tests with zero warnings. Production availability, load, alerts, access control, and recovery remain gaps. | Governance, monitoring, traceability, clean-checkout, provider isolation, dependency constraints, and hosted CI evidence. | Owner selected a limited supervised pilot. Production remains blocked by the unresolved operational and security limitations. |
 
 ## Assumptions reconciled
 
@@ -48,6 +48,22 @@ source-pack workbooks remain historical inputs and are not altered.
   technical rerun is the authoritative validation evidence.
 - V2 remains development-only and rejected; it was not run on validation.
 - Historical source workbooks remain source evidence even where their claims are superseded here.
+
+## Post-freeze implementation hardening
+
+Post-freeze work improved implementation quality without changing the product
+requirements. Provider portability now covers explicit offline, OpenRouter, and Groq
+selection; OpenRouter and Groq have provider-specific model, credential, and base-URL
+configuration. Deterministic tests are isolated from developer `.env` provider values.
+The dependency contract now combines `requirements.txt` with targeted
+`constraints.txt`, and warning-producing compatibility issues were resolved without
+warning filters. Provider-smoke output protection, sanitization, and repository/runtime
+hygiene were also strengthened.
+
+This hardening created no PRD V3. No business requirement, routing threshold,
+generation prompt, guardrail policy, validation result, or frozen V1 metric changed.
+Validation was not rerun, and the development-only V2 remains rejected, not validated,
+and not promoted.
 
 ## Final owner decision and unresolved production limitations
 
