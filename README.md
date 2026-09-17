@@ -137,11 +137,22 @@ production authentication, authorization, rate limiting, load, alert, and recove
 evidence remain incomplete. The owner's 30% future automation target is not a
 measured V1 result, and safety takes priority over automation.
 
-Historical frozen CI evidence is GitHub Actions run `34773077234` for commit
-`6a80e91a3b7a82504f04afa98cdb8265f7617234`. The current post-freeze stabilized
-baseline is commit `7062f683e41a178e644713acee81478731dc9adc`; GitHub Actions
-run `34889316386` completed successfully with dependency installation, `pip check`,
-credential-free startup, and all 355 tests. The stabilized local suite also passed
-with zero warnings under offline, OpenRouter, and Groq parent environments. This
-work improved reproducibility and provider portability without rerunning validation
-or changing its results. CI success is not production availability evidence.
+Repository provenance is tracked as three distinct states:
+
+- **Frozen evaluated V1:** commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`;
+  GitHub Actions run `34773077234`. This is the authoritative evaluated V1
+  engineering baseline.
+- **Post-freeze stabilization:** commit
+  `7062f683e41a178e644713acee81478731dc9adc`; GitHub Actions run `34889316386`
+  completed successfully with dependency installation, `pip check`,
+  credential-free startup, and all 355 tests. Stabilization improved
+  reproducibility and provider portability without rerunning validation or
+  changing its results.
+- **Final delivery repository state:** limited to repository hygiene, delivery
+  provenance, and non-behavioral documentation cleanup. Frozen V1 runtime behavior,
+  thresholds, prompts, guardrails, authoritative validation artifacts/results, and
+  the rejected V2 status remain unchanged. Validation is not rerun for this delivery
+  state. The exact final delivery commit and hosted CI run are recorded after the
+  delivery commit exists.
+
+CI success is engineering evidence only; it is not production availability evidence.

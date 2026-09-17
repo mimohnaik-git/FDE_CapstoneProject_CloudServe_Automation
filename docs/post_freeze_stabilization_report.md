@@ -47,6 +47,15 @@ to:
 
 The builder now resolves the asset repository-relatively. Its SHA-256 is `D3F2AF1E6AB9A72594E4820EEAA8B4DCAC4795708F8037ACF38AF983ED707039` (recorded from the moved file; the move did not alter content). Both report scripts use repository-relative inputs/outputs. No report, workbook, DOCX, or PDF was regenerated in this phase.
 
+> **Final-delivery hygiene note (2026-09-17):** This section records the historical
+> Phase 5 stabilization state. After report production was completed and the final
+> report/workbook set was separated into the submission deliverables, the report-only
+> builder and formatted DOCX source asset were removed from the final engineering
+> repository. That later cleanup did not modify frozen V1 runtime behavior,
+> evaluation artifacts, thresholds, prompts, guardrails, validation results, or the
+> stabilized engineering baseline.
+
+
 ## Verification results
 
 ### Deterministic suite
