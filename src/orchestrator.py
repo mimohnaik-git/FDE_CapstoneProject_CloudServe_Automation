@@ -15,7 +15,13 @@ from src.guardrails import GuardrailEngine
 from src.ingest import TicketNormalizationEngine
 from src.logging_store import DecisionLoggingEngine
 from src.retrieve import DocumentationRetrievalEngine
-from src.route import ROUTE_ESCALATE, REASON_GUARDRAIL_BLOCKED, REASON_MESSAGES, TicketRoutingEngine
+from src.route import (
+    ROUTE_ESCALATE,
+    ROUTING_THRESHOLD_STATUS,
+    REASON_GUARDRAIL_BLOCKED,
+    REASON_MESSAGES,
+    TicketRoutingEngine,
+)
 
 ACTION_AUTO_RESPOND = "AUTO_RESPOND"
 ACTION_ESCALATE = "ESCALATE"
@@ -99,6 +105,7 @@ class SupportAutomationOrchestrator:
         self.ingester = ingester or TicketNormalizationEngine()
         self.classifier = classifier or TicketClassificationEngine()
         self.retriever = retriever or DocumentationRetrievalEngine()
+        self.retrieval_top_k = settings.RETRIEVAL_TOP_K
         self.router = router or TicketRoutingEngine(
             confidence_threshold=threshold, retrieval_threshold=retrieval_routing_threshold
         )
@@ -163,7 +170,7 @@ class SupportAutomationOrchestrator:
                     "thresholds": {
                         "classification_confidence": self.router.confidence_threshold,
                         "retrieval_routing": self.router.retrieval_threshold,
-                        "status": "PROVISIONAL_PENDING_STAGE_11_CALIBRATION",
+                        "status": ROUTING_THRESHOLD_STATUS,
                     },
                 }
                 return self._finish(
@@ -176,7 +183,9 @@ class SupportAutomationOrchestrator:
                 )
 
             retrieval = run_stage(
-                "retrieval", lambda: self.retriever.query_authoritative_knowledge(content, top_k=5)
+                "retrieval", lambda: self.retriever.query_authoritative_knowledge(
+                    content, top_k=self.retrieval_top_k
+                )
             )
             routing = run_stage("routing", lambda: self.router.route(classification, retrieval))
             if routing["action"] == ROUTE_ESCALATE:

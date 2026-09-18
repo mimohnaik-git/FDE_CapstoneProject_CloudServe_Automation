@@ -20,7 +20,7 @@ class AppConfig:
         self.GROQ_API_KEY = os.getenv("GROQ_API_KEY")
             
         # Target Large Language and Vector Embedding Infrastructure Models
-        self.MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/llama-3.1-8b-instruct")
+        self.MODEL_NAME = os.getenv("MODEL_NAME", "openrouter/free")
         self.OPENROUTER_MODEL_NAME = os.getenv("OPENROUTER_MODEL_NAME", self.MODEL_NAME)
         self.EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
         self.GENERATION_PROVIDER = os.getenv("GENERATION_PROVIDER", "offline").strip().lower()
@@ -51,8 +51,9 @@ class AppConfig:
         # Observability Metrics Level
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
         
-        # Provisional routing controls. Stage 11 owns final calibration and
-        # threshold selection; the legacy environment name remains supported.
+        # Stage 11-selected baseline routing controls. V1.1 development may
+        # supersede them only with measured development evidence; the legacy
+        # environment name remains supported.
         confidence_value = os.getenv(
             "CLASSIFICATION_CONFIDENCE_THRESHOLD",
             os.getenv("CONFIDENCE_THRESHOLD", "0.80"),
@@ -68,8 +69,14 @@ class AppConfig:
             
         try:
             self.RETRIEVAL_TOP_K = int(os.getenv("RETRIEVAL_TOP_K", "5"))
-        except ValueError:
-            raise ValueError("CONFIGURATION EXCEPTION: 'RETRIEVAL_TOP_K' must be a valid integer value.")
+        except ValueError as exc:
+            raise ValueError(
+                "CONFIGURATION EXCEPTION: 'RETRIEVAL_TOP_K' must be a valid integer value."
+            ) from exc
+        if self.RETRIEVAL_TOP_K <= 0:
+            raise ValueError(
+                "CONFIGURATION EXCEPTION: 'RETRIEVAL_TOP_K' must be greater than zero."
+            )
 
     @staticmethod
     def _probability_setting(name: str, value: str) -> float:

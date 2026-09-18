@@ -65,3 +65,9 @@ def test_routing_threshold_configuration_fails_closed(name, value):
     with patch.dict(os.environ, {name: value}, clear=True):
         with pytest.raises(ValueError, match=name):
             AppConfig()
+
+@pytest.mark.parametrize("value", ["0", "-1", "not-an-integer"])
+def test_retrieval_top_k_must_be_a_positive_integer(value):
+    with patch.dict(os.environ, {"RETRIEVAL_TOP_K": value}, clear=True):
+        with pytest.raises(ValueError, match="RETRIEVAL_TOP_K"):
+            AppConfig()

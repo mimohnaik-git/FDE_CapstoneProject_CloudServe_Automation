@@ -351,3 +351,7 @@ def test_route_batch_contains_one_route_failure():
         REASON_PIPELINE_FAILURE,
         REASON_AUTO_RESPOND,
     ]
+
+def test_routing_metadata_reports_selected_stage11_baseline(router):
+    decision = router.route(_valid_classification(), _strong_retrieval())
+    assert decision["thresholds"]["status"] == "SELECTED_STAGE_11_BASELINE"

@@ -10,6 +10,7 @@ from src.config import settings
 
 ROUTE_AUTO_RESPOND = "AUTO_RESPOND"
 ROUTE_ESCALATE = "ESCALATE"
+ROUTING_THRESHOLD_STATUS = "SELECTED_STAGE_11_BASELINE"
 
 # The development policy labels mark every ticket in these canonical intents as
 # must-not-auto-respond. Feature requests and unclear requests are handled as
@@ -32,11 +33,11 @@ REASON_MISSING_CONFIDENCE = REASON_INVALID_CLASSIFICATION
 
 REASON_MESSAGES = {
     REASON_INVALID_CLASSIFICATION: "Classification output is missing or invalid.",
-    REASON_LOW_CONFIDENCE: "Classification confidence is below the provisional routing threshold.",
+    REASON_LOW_CONFIDENCE: "Classification confidence is below the selected routing threshold.",
     REASON_HIGH_RISK_INTENT: "The predicted intent requires human review under the risk policy.",
     REASON_UNANSWERABLE_INTENT: "The predicted intent is not answerable from the authoritative corpus.",
     REASON_NO_RETRIEVAL: "No authoritative documentation was retrieved.",
-    REASON_WEAK_RETRIEVAL: "Retrieved evidence is below the provisional routing evidence threshold.",
+    REASON_WEAK_RETRIEVAL: "Retrieved evidence is below the selected routing evidence threshold.",
     REASON_GUARDRAIL_BLOCKED: "A guardrail blocked automated handling.",
     REASON_VALIDATION_FAILED: "Available validation state did not pass.",
     REASON_PIPELINE_FAILURE: "An upstream pipeline failure prevents safe automated handling.",
@@ -54,8 +55,8 @@ class TicketRoutingEngine:
 
     Routing considers classification validity/confidence, intent risk and
     answerability, identifiable retrieval evidence, and any available failure,
-    guardrail, or validation state. The final threshold is selected in Stage 11;
-    defaults here are explicitly provisional.
+    guardrail, or validation state. The current baseline thresholds were selected
+    in Stage 11 and remain explicit, auditable configuration values.
     """
 
     def __init__(
@@ -229,7 +230,7 @@ class TicketRoutingEngine:
                 "classification_confidence": self.confidence_threshold,
                 "retrieval_routing": self.retrieval_threshold,
                 "minimum_retrieval_results": self.min_retrieval_results,
-                "status": "PROVISIONAL_PENDING_STAGE_11_CALIBRATION",
+                "status": ROUTING_THRESHOLD_STATUS,
             },
             # Compatibility fields consumed by the existing decision store.
             "confidence": confidence,

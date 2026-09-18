@@ -244,3 +244,26 @@ def test_no_or_weak_retrieval_terminal_paths_are_audited(valid_tech_ticket, retr
     assert result["reason_code"] == expected_reason
     assert result["audit_record"]["terminal_reason_code"] == expected_reason
     assert result["audit_record"]["response_released"] is False
+
+def test_orchestrator_honors_configured_retrieval_top_k(monkeypatch, valid_tech_ticket):
+    class RecordingRetriever(ControlledRetrievalEngine):
+        def __init__(self):
+            self.seen_top_k = None
+
+        def query_authoritative_knowledge(self, query, top_k=5):
+            self.seen_top_k = top_k
+            return super().query_authoritative_knowledge(query, top_k=top_k)
+
+    retriever = RecordingRetriever()
+    monkeypatch.setattr("src.orchestrator.settings.RETRIEVAL_TOP_K", 3)
+    pipeline = SupportPipelineOrchestrator(
+        classifier=ControlledRoutingClassifier(),
+        retriever=retriever,
+        generator=ResponseGenerationEngine(provider=OfflineGroundedProvider()),
+        db_url="sqlite:///:memory:",
+    )
+
+    result = pipeline.process_ticket(valid_tech_ticket)
+
+    assert retriever.seen_top_k == 3
+    assert result["status"] in (ROUTE_AUTO_RESPOND, ROUTE_ESCALATE)

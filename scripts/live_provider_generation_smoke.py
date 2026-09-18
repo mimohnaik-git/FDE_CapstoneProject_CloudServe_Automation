@@ -309,7 +309,9 @@ def run(
     for raw_ticket in selected_raw:
         ticket = ingester.normalize_ticket(raw_ticket)
         classification = classifier.process_classification(ticket)
-        retrieval = retriever.query_authoritative_knowledge(ticket["raw_content"], top_k=5)
+        retrieval = retriever.query_authoritative_knowledge(
+            ticket["raw_content"], top_k=settings.RETRIEVAL_TOP_K
+        )
         original_routing = router.route(classification, retrieval)
         top_score = max((float(item["relevance_score"]) for item in retrieval), default=None)
         case: dict[str, Any] = {
