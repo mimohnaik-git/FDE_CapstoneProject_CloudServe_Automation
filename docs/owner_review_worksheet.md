@@ -184,6 +184,6 @@ above; those remain required before pilot or production use as applicable.
 - Evidence reviewed: Yes
 - Confirmed owner input reviewed: Yes
 - Final interpretation approved: Yes
-- Deployment recommendation approved: Yes â€” limited supervised pilot only
+- Deployment recommendation approved: Yes — limited supervised pilot only
 - Production approval: No
 - Required changes or caveats: The unresolved production limitations and pilot-entry gates listed above remain in force.
