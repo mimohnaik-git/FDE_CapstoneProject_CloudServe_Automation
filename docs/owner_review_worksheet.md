@@ -1,4 +1,4 @@
-# Owner Review Worksheet — Stage 27
+﻿# Owner Review Worksheet — Stage 27
 
 ## Purpose and evidence boundary
 
@@ -172,9 +172,10 @@ they do not change the measured evidence above.
 
 ## Remaining owner input
 
-No remaining owner input is required for this worksheet. The owner has confirmed the
-deployment choice and positions above, and completed the name/date and approval record
-below.
+No additional owner input is required to complete this worksheet's evidence interpretation
+and limited supervised pilot recommendation. This does not resolve the deployment gates,
+open questions, accountable-owner assignments, or production-entry controls identified
+above; those remain required before pilot or production use as applicable.
 
 ## Owner sign-off
 
@@ -183,5 +184,6 @@ below.
 - Evidence reviewed: Yes
 - Confirmed owner input reviewed: Yes
 - Final interpretation approved: Yes
-- Deployment recommendation approved: Yes
-- Required changes or caveats: None
+- Deployment recommendation approved: Yes â€” limited supervised pilot only
+- Production approval: No
+- Required changes or caveats: The unresolved production limitations and pilot-entry gates listed above remain in force.

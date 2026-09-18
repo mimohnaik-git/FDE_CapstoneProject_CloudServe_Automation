@@ -127,7 +127,7 @@ Safety controls, A1–A12 evidence, evaluation separation, decision logging, gov
 | 6 September 2026 | Continued design, requirements, prompt-library/planning, and early build work according to the owner-approved effort reconstruction. | Modular implementation and testing. | NOT RECORDED |
 | 8 September 2026 | Continued pipeline, guardrail, and evaluation-preparation work according to the owner-approved effort reconstruction. | Development evaluation, calibration, freeze, and validation. | NOT RECORDED |
 | 10 September 2026 | Development evaluation, calibration, V1 freeze, preserved validation failure, cache remediation, and authorized 80-ticket rerun. | Reproducibility, evidence reconciliation, CI, and live-provider component checks. | Embedding-cache/infrastructure failure during first validation attempt |
-| 12 September 2026 | Owner interpretation/sign-off, workbook and effort-log work, and latest hosted CI confirmation. | Submission export/package completion. | Remaining export/package work; no engineering blocker asserted |
+| 12 September 2026 | Owner evidence interpretation and limited supervised pilot recommendation review, workbook and effort-log work, and latest hosted CI confirmation. | Submission export/package completion. | Remaining export/package work; no engineering blocker asserted |
 
 ## 10. Milestones and evidence
 
@@ -146,7 +146,7 @@ Safety controls, A1–A12 evidence, evaluation separation, decision logging, gov
 | API | FastAPI /tickets/process, /health, and /metrics implemented/tested. | src/api.py and API tests |
 | V2 experiment | Rejected; not validated or promoted. | Stage 20 development artifact |
 | CI | GitHub Actions observed successful for the frozen and stabilized baselines. | Historical run 34773077234 at 6a80e91; current run 34889316386 at 7062f68 |
-| Owner review | Mimoh Naik signed off on 12 September 2026. | Owner review worksheet |
+| Owner review | Mimoh Naik approved the evidence interpretation and limited supervised pilot recommendation on 12 September 2026; production was not approved. | Owner review worksheet |
 | Workbook completion | Reconciliation progressed through discovery, PRD, prompt library, and sprint plan. | Submission-facing Markdown workbooks |
 
 ## 11. Test and CI evidence

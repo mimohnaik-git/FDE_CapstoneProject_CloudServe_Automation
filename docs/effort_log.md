@@ -27,7 +27,7 @@ which uses 5 hours.
 | 9 September 2026 | 5.0 | Continued build/evaluation preparation; this is the approved higher daily reconstruction. |
 | 10 September 2026 | 7.0 | Development evaluation, calibration, V1 freeze, preserved validation infrastructure failure, cache-only remediation, and authorized technical rerun. |
 | 11 September 2026 | 6.0 | Reproducibility/clean-checkout work, evidence reconciliation, GitHub/CI setup, hosted CI evidence, and live-provider component smoke checks. |
-| 12 September 2026 | 4.0 | Owner interpretation/sign-off, workbook/effort-log completion, and hosted CI confirmation. |
+| 12 September 2026 | 4.0 | Owner evidence interpretation and limited supervised pilot recommendation review, workbook/effort-log completion, and hosted CI confirmation. |
 | 13 September 2026 | 9.5 | Full-project sanity audit and defect reconciliation; workbook/export QA; source-package preparation and assembly; final Git/CI freeze; submission-readiness audit and final artifact review. |
 | **Total** | **51.5** | **Owner-approved reconstructed effort.** |
 
@@ -44,7 +44,7 @@ Arithmetic: `4 + 4 + 4 + 4 + 4 + 5 + 7 + 6 + 4 + 9.5 = 51.5` hours.
 | Stages 5–8: Build/Guardrails | 9.0 | Not formally recorded | Not calculable | Modular ingestion, TF-IDF logistic-regression classification, MiniLM/NumPy retrieval, routing, generation, blocking guardrails, and SQLite audit logging. |
 | Stages 9–18: Evaluation/Reliability/Governance | 10.0 | Not formally recorded | Not calculable | Orchestration, evaluation harness, calibration, freeze, validation, fairness, human review, API, monitoring, governance, and acceptance work. |
 | Stages 19–23: Reproducibility/V2/CI/Evidence | 5.0 | Not formally recorded | Not calculable | Clean-checkout evidence, rejected V2 development experiment, CI, and submission evidence reconciliation. |
-| Stages 24–30: Owner Review/Workbooks/Submission Finalization | 13.5 | Not formally recorded | Not calculable | Owner review/sign-off; workbook/effort-log audits and exports; sanity/defect reconciliation; source-package preparation/assembly; final Git/CI freeze; and submission-readiness review. |
+| Stages 24–30: Owner Review/Workbooks/Submission Finalization | 13.5 | Not formally recorded | Not calculable | Owner evidence interpretation and limited supervised pilot decision review; workbook/effort-log audits and exports; sanity/defect reconciliation; source-package preparation/assembly; final Git/CI freeze; and submission-readiness review. |
 | **Total** | **51.5** | **Not formally recorded** | **Not calculable** | **Owner-approved reconstructed effort.** |
 
 Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 13.5 = 51.5` hours.
@@ -82,7 +82,7 @@ Arithmetic: `4 + 4 + 3 + 3 + 9 + 10 + 5 + 13.5 = 51.5` hours.
 - Owner name: Mimoh Naik
 - Verification date: 13 September 2026
 - Total verified/reconstructed effort: 51.5 hours
-- Approval: Approved by owner
+- Effort reconstruction: Approved by owner
 
 No additional timekeeping fields remain unresolved. This log identifies the effort as
 an **OWNER-RECONSTRUCTED ESTIMATE** and does not represent elapsed chat/project activity
