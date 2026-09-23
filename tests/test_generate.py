@@ -548,7 +548,11 @@ def test_orchestrator_escalates_and_logs_generation_failure():
     assert result["action"] == "ESCALATE"
     assert result["reason_code"] == REASON_GENERATION_FAILED
     assert result["response"]["failure_reason"] == FAILURE_PROVIDER_UNAVAILABLE
-    assert result["routing"]["action"] == "AUTO_RESPOND"
+    assert result["routing"]["action"] == "ESCALATE"
+    assert (
+        result["routing"]["reason_code"]
+        == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+    )
     assert result["decision_id"]
     assert result["audit_record"]["routing_action"] == "ESCALATE"
     assert result["audit_record"]["metadata"]["generation"]["supported"] is False

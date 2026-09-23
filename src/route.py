@@ -10,21 +10,26 @@ from src.config import settings
 
 ROUTE_AUTO_RESPOND = "AUTO_RESPOND"
 ROUTE_ESCALATE = "ESCALATE"
-ROUTING_THRESHOLD_STATUS = "SELECTED_STAGE_11_BASELINE"
+ROUTING_THRESHOLD_STATUS = "DEFAULTS_RETAINED_INSUFFICIENT_EVIDENCE"
 
 # The development policy labels mark every ticket in these canonical intents as
 # must-not-auto-respond. Feature requests and unclear requests are handled as
 # unsupported rather than being misclassified as security risks.
 HIGH_RISK_INTENTS = frozenset({"security_incident", "compliance_request"})
 UNANSWERABLE_INTENTS = frozenset({"feature_request", "unclear_request"})
+HIGH_URGENCY_OPERATIONAL_INTENTS = frozenset(
+    {"database_issue", "performance_degradation"}
+)
 
 # Stable reason codes. The legacy constant names remain import-compatible.
 REASON_INVALID_CLASSIFICATION = "INVALID_CLASSIFICATION"
 REASON_LOW_CONFIDENCE = "LOW_CLASSIFICATION_CONFIDENCE"
 REASON_HIGH_RISK_INTENT = "HIGH_RISK_INTENT"
 REASON_UNANSWERABLE_INTENT = "UNANSWERABLE_INTENT"
+REASON_HIGH_URGENCY_OPERATIONAL = "HIGH_URGENCY_OPERATIONAL"
 REASON_NO_RETRIEVAL = "NO_RETRIEVAL"
 REASON_WEAK_RETRIEVAL = "WEAK_RETRIEVAL"
+REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED = "EVIDENCE_SUFFICIENCY_UNVERIFIED"
 REASON_GUARDRAIL_BLOCKED = "GUARDRAIL_BLOCKED"
 REASON_VALIDATION_FAILED = "VALIDATION_FAILED"
 REASON_PIPELINE_FAILURE = "PIPELINE_FAILURE"
@@ -36,8 +41,15 @@ REASON_MESSAGES = {
     REASON_LOW_CONFIDENCE: "Classification confidence is below the selected routing threshold.",
     REASON_HIGH_RISK_INTENT: "The predicted intent requires human review under the risk policy.",
     REASON_UNANSWERABLE_INTENT: "The predicted intent is not answerable from the authoritative corpus.",
+    REASON_HIGH_URGENCY_OPERATIONAL: (
+        "High-urgency database or performance incidents require human review."
+    ),
     REASON_NO_RETRIEVAL: "No authoritative documentation was retrieved.",
     REASON_WEAK_RETRIEVAL: "Retrieved evidence is below the selected routing evidence threshold.",
+    REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED: (
+        "Retrieved evidence has not been independently verified as sufficient "
+        "to answer this specific customer request."
+    ),
     REASON_GUARDRAIL_BLOCKED: "A guardrail blocked automated handling.",
     REASON_VALIDATION_FAILED: "Available validation state did not pass.",
     REASON_PIPELINE_FAILURE: "An upstream pipeline failure prevents safe automated handling.",
@@ -99,6 +111,7 @@ class TicketRoutingEngine:
         guardrail_passed: bool = True,
         validation_passed: Optional[bool] = None,
         failure_state: Optional[Any] = None,
+        evidence_sufficient: Optional[bool] = None,
     ) -> Dict[str, Any]:
         """Return a deterministic route from structured production signals."""
         if failure_state:
@@ -123,6 +136,19 @@ class TicketRoutingEngine:
                 REASON_UNANSWERABLE_INTENT, classification, confidence=confidence, urgency=urgency,
                 risk="standard", answerable=False,
             )
+        if (
+            intent in HIGH_URGENCY_OPERATIONAL_INTENTS
+            and urgency == "high"
+        ):
+            return self._decision(
+                REASON_HIGH_URGENCY_OPERATIONAL,
+                classification,
+                confidence=confidence,
+                urgency=urgency,
+                risk="high",
+                answerable=False,
+            )
+
         if confidence < self.confidence_threshold:
             return self._decision(
                 REASON_LOW_CONFIDENCE, classification, confidence=confidence, urgency=urgency,
@@ -144,6 +170,17 @@ class TicketRoutingEngine:
                 REASON_WEAK_RETRIEVAL, classification, confidence=confidence, urgency=urgency,
                 risk="standard", answerable=False, **evidence,
             )
+        if evidence_sufficient is not True:
+            return self._decision(
+                REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED,
+                classification,
+                confidence=confidence,
+                urgency=urgency,
+                risk="standard",
+                answerable=False,
+                **evidence,
+            )
+
         return self._decision(
             REASON_AUTO_RESPOND, classification, confidence=confidence, urgency=urgency,
             risk="standard", answerable=True, **evidence,
@@ -250,6 +287,7 @@ class TicketRoutingEngine:
                         guardrail_passed=request.get("guardrail_passed", True),
                         validation_passed=request.get("validation_passed"),
                         failure_state=request.get("failure_state"),
+                        evidence_sufficient=request.get("evidence_sufficient"),
                     )
                 )
             except Exception:

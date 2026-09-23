@@ -87,22 +87,39 @@ def injection_ticket():
     }
 
 
-def test_end_to_end_successful_auto_respond_flow(routing_contract_orchestrator, valid_tech_ticket):
-    """Standard technical ticket with matching documentation should AUTO_RESPOND."""
-    result = routing_contract_orchestrator.process_ticket(valid_tech_ticket)
+def test_end_to_end_safe_response_fails_closed_without_verified_evidence_sufficiency(
+    routing_contract_orchestrator,
+    valid_tech_ticket,
+):
+    """Safe generated output is not released without verified evidence sufficiency."""
 
-    assert result["status"] == ROUTE_AUTO_RESPOND
+    result = routing_contract_orchestrator.process_ticket(
+        valid_tech_ticket
+    )
+
+    assert result["status"] == ROUTE_ESCALATE
     assert result["ticket_id"] == "DEV-E2E-001"
     assert result["decision_id"] is not None
-    assert result["response"] is not None
-    assert result["response"]["grounded"] is True
-    assert len(result["response"]["citations"]) > 0
+    assert result["response"] is None
+    assert result["response_text"] is None
+    assert result["response_released"] is False
 
-    # Verify audit record stored
-    stored_audit = routing_contract_orchestrator.logging_store.get_decision_by_id(result["decision_id"])
+    assert result["guardrails"]["passed"] is True
+    assert (
+        result["reason_code"]
+        == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+    )
+
+    stored_audit = (
+        routing_contract_orchestrator
+        .logging_store
+        .get_decision_by_id(
+            result["decision_id"]
+        )
+    )
+
     assert stored_audit is not None
-    assert stored_audit["routing_action"] == ROUTE_AUTO_RESPOND
-
+    assert stored_audit["routing_action"] == ROUTE_ESCALATE
 
 def test_end_to_end_escalation_flow_high_risk_intent(routing_contract_orchestrator, high_risk_ticket):
     """Security incident must ESCALATE even if confidence is high."""
@@ -149,19 +166,38 @@ def test_end_to_end_malformed_input_graceful_escalation(orchestrator):
     assert stored_audit["routing_action"] == ROUTE_ESCALATE
 
 
-def test_end_to_end_audit_log_persisted_for_all_outcomes(routing_contract_orchestrator, valid_tech_ticket, high_risk_ticket):
-    """Every processed ticket creates a persistent decision record in the store."""
-    res1 = routing_contract_orchestrator.process_ticket(valid_tech_ticket)
-    res2 = routing_contract_orchestrator.process_ticket(high_risk_ticket)
+def test_end_to_end_audit_log_persisted_for_all_outcomes(
+    routing_contract_orchestrator,
+    valid_tech_ticket,
+    high_risk_ticket,
+):
+    """Every processed ticket creates a persistent decision record."""
 
-    all_decisions = routing_contract_orchestrator.logging_store.list_all_decisions()
+    routing_contract_orchestrator.process_ticket(
+        valid_tech_ticket
+    )
+
+    routing_contract_orchestrator.process_ticket(
+        high_risk_ticket
+    )
+
+    all_decisions = (
+        routing_contract_orchestrator
+        .logging_store
+        .list_all_decisions()
+    )
+
     assert len(all_decisions) == 2
 
-    stats = routing_contract_orchestrator.logging_store.get_summary_stats()
-    assert stats["total_decisions"] == 2
-    assert stats["auto_responded"] == 1
-    assert stats["escalated"] == 1
+    stats = (
+        routing_contract_orchestrator
+        .logging_store
+        .get_summary_stats()
+    )
 
+    assert stats["total_decisions"] == 2
+    assert stats["auto_responded"] == 0
+    assert stats["escalated"] == 2
 
 def test_orchestrator_handles_real_tickets(orchestrator):
     """Process real development_tickets.json tickets through the complete pipeline without crashing."""

@@ -136,9 +136,25 @@ def evaluate_policy(
     predictions: Sequence[Mapping[str, Any]], retrievals: Sequence[Sequence[Mapping[str, Any]]],
     tickets: Sequence[Mapping[str, Any]], classification_threshold: float, retrieval_threshold: float,
 ) -> Dict[str, Any]:
-    """Evaluate one threshold pair through the unchanged production router."""
-    router = TicketRoutingEngine(confidence_threshold=classification_threshold, retrieval_threshold=retrieval_threshold)
-    routes = [router.route(prediction, retrieval) for prediction, retrieval in zip(predictions, retrievals)]
+    """Evaluate one threshold pair conditional on independently verified evidence.
+
+    This is a counterfactual development-policy simulation used to measure
+    classification/retrieval threshold behavior. It does not represent the
+    production release gate, which fails closed when evidence sufficiency is
+    unavailable.
+    """
+    router = TicketRoutingEngine(
+        confidence_threshold=classification_threshold,
+        retrieval_threshold=retrieval_threshold,
+    )
+    routes = [
+        router.route(
+            prediction,
+            retrieval,
+            evidence_sufficient=True,
+        )
+        for prediction, retrieval in zip(predictions, retrievals)
+    ]
     expected = [str(ticket["labels"]["expected_route"]).upper() for ticket in tickets]
     actual = [route["action"] for route in routes]
     auto_indices = [index for index, route in enumerate(actual) if route == ROUTE_AUTO_RESPOND]

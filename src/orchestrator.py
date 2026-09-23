@@ -19,6 +19,7 @@ from src.route import (
     ROUTE_ESCALATE,
     ROUTING_THRESHOLD_STATUS,
     REASON_GUARDRAIL_BLOCKED,
+    REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED,
     REASON_MESSAGES,
     TicketRoutingEngine,
 )
@@ -187,8 +188,21 @@ class SupportAutomationOrchestrator:
                     content, top_k=self.retrieval_top_k
                 )
             )
-            routing = run_stage("routing", lambda: self.router.route(classification, retrieval))
-            if routing["action"] == ROUTE_ESCALATE:
+            routing = run_stage(
+                "routing",
+                lambda: self.router.route(classification, retrieval),
+            )
+
+            provisional_evidence_escalation = (
+                routing["action"] == ROUTE_ESCALATE
+                and routing.get("reason_code")
+                == REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+            )
+
+            if (
+                routing["action"] == ROUTE_ESCALATE
+                and not provisional_evidence_escalation
+            ):
                 return self._finish(
                     ticket_id=ticket_id, ticket=normalized, classification=classification,
                     retrieval=retrieval, routing=routing, generation={}, guardrails=guardrails,
@@ -231,6 +245,23 @@ class SupportAutomationOrchestrator:
                     reason_code=guardrails["primary_reason"], run_id=run_id, started=started,
                     stage_latencies=stage_latencies,
                     failure_state="GUARDRAIL_INTERNAL_ERROR" if guardrails["primary_reason"] == "GUARDRAIL_INTERNAL_ERROR" else None,
+                )
+
+            if provisional_evidence_escalation:
+                return self._finish(
+                    ticket_id=ticket_id,
+                    ticket=normalized,
+                    classification=classification,
+                    retrieval=retrieval,
+                    routing=routing,
+                    generation=generation,
+                    guardrails=guardrails,
+                    action=ACTION_ESCALATE,
+                    reason=routing["reason"],
+                    reason_code=routing["reason_code"],
+                    run_id=run_id,
+                    started=started,
+                    stage_latencies=stage_latencies,
                 )
 
             return self._finish(

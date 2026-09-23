@@ -144,7 +144,7 @@ def test_mixed_batch_continues_and_reconciles_truthfully(tmp_path, capsys):
     assert report["reconciliation"]["terminal_result_count"] == len(FAILURE_CASES)
     assert report["reconciliation"]["decision_log_count"] == len(FAILURE_CASES) - 1
     assert not report["reconciliation"]["reconciled"]
-    assert records[-1]["predicted_route"] == "AUTO_RESPOND"
+    assert records[-1]["predicted_route"] == "ESCALATE"
     for (_, expected), record in zip(FAILURE_CASES, records):
         if expected:
             assert record["predicted_route"] == "ESCALATE"

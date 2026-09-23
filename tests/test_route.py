@@ -2,6 +2,7 @@ import pytest
 from src.route import (
     HIGH_RISK_INTENTS,
     UNANSWERABLE_INTENTS,
+    HIGH_URGENCY_OPERATIONAL_INTENTS,
     TicketRoutingEngine,
     ROUTE_AUTO_RESPOND,
     ROUTE_ESCALATE,
@@ -14,6 +15,8 @@ from src.route import (
     REASON_INVALID_CLASSIFICATION,
     REASON_PIPELINE_FAILURE,
     REASON_UNANSWERABLE_INTENT,
+    REASON_HIGH_URGENCY_OPERATIONAL,
+    REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED,
     REASON_VALIDATION_FAILED,
     REASON_WEAK_RETRIEVAL,
 )
@@ -37,7 +40,11 @@ def test_auto_respond_when_all_criteria_met(router):
     }
     retrieval = [{"doc_id": "DOC-001", "chunk_content": "...", "relevance_score": 0.8, "rank": 1}]
 
-    decision = router.route(classification, retrieval_results=retrieval)
+    decision = router.route(
+        classification,
+        retrieval_results=retrieval,
+        evidence_sufficient=True,
+    )
 
     assert decision["action"] == ROUTE_AUTO_RESPOND
     assert decision["escalate"] is False
@@ -78,7 +85,11 @@ def test_escalate_when_confidence_exactly_at_threshold(router):
     classification = {"intent": "authentication_failure", "urgency": "low", "confidence": 0.80}
     retrieval = [{"doc_id": "DOC-001", "chunk_content": "...", "relevance_score": 0.8, "rank": 1}]
 
-    decision = router.route(classification, retrieval_results=retrieval)
+    decision = router.route(
+        classification,
+        retrieval_results=retrieval,
+        evidence_sufficient=True,
+    )
 
     # Exactly at threshold: passes (>= logic)
     assert decision["action"] == ROUTE_AUTO_RESPOND
@@ -124,7 +135,11 @@ def test_account_access_is_not_blanket_high_risk(router):
     classification = {"intent": "account_access", "urgency": "high", "confidence": 0.98}
     retrieval = [{"doc_id": "DOC-004", "chunk_content": "...", "relevance_score": 0.85, "rank": 1}]
 
-    decision = router.route(classification, retrieval_results=retrieval)
+    decision = router.route(
+        classification,
+        retrieval_results=retrieval,
+        evidence_sufficient=True,
+    )
 
     assert decision["action"] == ROUTE_AUTO_RESPOND
     assert decision["reason_code"] == REASON_AUTO_RESPOND
@@ -178,7 +193,11 @@ def test_routing_decision_contains_required_keys(router):
     classification = {"intent": "authentication_failure", "urgency": "medium", "confidence": 0.90}
     retrieval = [{"doc_id": "DOC-001", "chunk_content": "...", "relevance_score": 0.8, "rank": 1}]
 
-    decision = router.route(classification, retrieval_results=retrieval)
+    decision = router.route(
+        classification,
+        retrieval_results=retrieval,
+        evidence_sufficient=True,
+    )
 
     required_keys = {
         "action", "reason_code", "reason", "classification_confidence",
@@ -326,7 +345,11 @@ def test_target_labels_do_not_affect_inference_route(router):
 
 def test_router_is_direct_python_and_requires_no_llm_client(router):
     assert not hasattr(router, "client")
-    assert router.route(_valid_classification(), _strong_retrieval())["action"] == ROUTE_AUTO_RESPOND
+    assert router.route(
+        _valid_classification(),
+        _strong_retrieval(),
+        evidence_sufficient=True,
+    )["action"] == ROUTE_AUTO_RESPOND
 
 
 def test_route_batch_contains_one_route_failure():
@@ -342,7 +365,11 @@ def test_route_batch_contains_one_route_failure():
             return super().route(*args, **kwargs)
 
     requests = [
-        {"classification": _valid_classification(), "retrieval_results": _strong_retrieval()}
+        {
+            "classification": _valid_classification(),
+            "retrieval_results": _strong_retrieval(),
+            "evidence_sufficient": True,
+        }
         for _ in range(3)
     ]
     decisions = FailingOnceRouter().route_batch(requests)
@@ -352,6 +379,136 @@ def test_route_batch_contains_one_route_failure():
         REASON_AUTO_RESPOND,
     ]
 
-def test_routing_metadata_reports_selected_stage11_baseline(router):
-    decision = router.route(_valid_classification(), _strong_retrieval())
-    assert decision["thresholds"]["status"] == "SELECTED_STAGE_11_BASELINE"
+def test_routing_metadata_reports_defaults_retained_for_insufficient_evidence(router):
+    decision = router.route(
+        _valid_classification(),
+        _strong_retrieval(),
+    )
+
+    assert (
+        decision["thresholds"]["status"]
+        == "DEFAULTS_RETAINED_INSUFFICIENT_EVIDENCE"
+    )
+
+
+
+# ---------------------------------------------------------------------------
+# Evidence sufficiency / recovered policy
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "intent",
+    ["database_issue", "performance_degradation"],
+)
+def test_high_urgency_operational_intents_always_escalate(router, intent):
+    classification = {
+        "intent": intent,
+        "urgency": "high",
+        "confidence": 0.99,
+    }
+
+    decision = router.route(
+        classification,
+        _strong_retrieval(),
+        evidence_sufficient=True,
+    )
+
+    assert decision["action"] == ROUTE_ESCALATE
+    assert decision["reason_code"] == REASON_HIGH_URGENCY_OPERATIONAL
+    assert decision["risk"] == "high"
+    assert decision["answerable"] is False
+
+
+@pytest.mark.parametrize(
+    "intent",
+    ["database_issue", "performance_degradation"],
+)
+@pytest.mark.parametrize(
+    "urgency",
+    ["low", "medium"],
+)
+def test_non_high_operational_ticket_can_continue_when_evidence_is_verified(
+    router,
+    intent,
+    urgency,
+):
+    classification = {
+        "intent": intent,
+        "urgency": urgency,
+        "confidence": 0.99,
+    }
+
+    decision = router.route(
+        classification,
+        _strong_retrieval(),
+        evidence_sufficient=True,
+    )
+
+    assert decision["action"] == ROUTE_AUTO_RESPOND
+    assert decision["answerable"] is True
+
+
+def test_missing_evidence_sufficiency_fails_closed(router):
+    decision = router.route(
+        _valid_classification(confidence=0.99),
+        _strong_retrieval(0.90),
+    )
+
+    assert decision["action"] == ROUTE_ESCALATE
+    assert (
+        decision["reason_code"]
+        == REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+    )
+    assert decision["answerable"] is False
+
+
+def test_explicit_insufficient_evidence_fails_closed(router):
+    decision = router.route(
+        _valid_classification(confidence=0.99),
+        _strong_retrieval(0.90),
+        evidence_sufficient=False,
+    )
+
+    assert decision["action"] == ROUTE_ESCALATE
+    assert (
+        decision["reason_code"]
+        == REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+    )
+    assert decision["answerable"] is False
+
+
+@pytest.mark.parametrize(
+    "value",
+    [False, None, 0, 1, "true", "false"],
+)
+def test_only_literal_true_verifies_evidence(router, value):
+    decision = router.route(
+        _valid_classification(confidence=0.99),
+        _strong_retrieval(0.90),
+        evidence_sufficient=value,
+    )
+
+    assert decision["action"] == ROUTE_ESCALATE
+    assert (
+        decision["reason_code"]
+        == REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+    )
+
+
+def test_explicit_verified_evidence_allows_auto_response(router):
+    decision = router.route(
+        _valid_classification(confidence=0.99),
+        _strong_retrieval(0.90),
+        evidence_sufficient=True,
+    )
+
+    assert decision["action"] == ROUTE_AUTO_RESPOND
+    assert decision["reason_code"] == REASON_AUTO_RESPOND
+    assert decision["answerable"] is True
+
+
+def test_recovered_operational_policy_intents_are_exact():
+    assert HIGH_URGENCY_OPERATIONAL_INTENTS == {
+        "database_issue",
+        "performance_degradation",
+    }

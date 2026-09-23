@@ -54,7 +54,11 @@ def route_metrics(tickets: Sequence[Mapping[str, Any]], predictions: Sequence[Ma
                   retrieval: Sequence[Sequence[Mapping[str, Any]]], class_threshold: float,
                   retrieval_threshold: float) -> Dict[str, Any]:
     router = TicketRoutingEngine(class_threshold, retrieval_threshold)
-    decisions = [router.route(prediction, evidence) for prediction, evidence in zip(predictions, retrieval)]
+    decisions = [router.route(
+            prediction,
+            evidence,
+            evidence_sufficient=True,
+        ) for prediction, evidence in zip(predictions, retrieval)]
     predicted_auto = [d["action"] == "AUTO_RESPOND" for d in decisions]
     expected_auto = [t["labels"]["expected_route"] == "auto_respond" for t in tickets]
     tp = sum(p and e for p, e in zip(predicted_auto, expected_auto)); fp = sum(p and not e for p, e in zip(predicted_auto, expected_auto))

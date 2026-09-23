@@ -410,17 +410,31 @@ def production_ticket(ticket_id):
     }
 
 
-def test_safe_valid_response_reaches_auto_response_path(valid_generated_response):
-    result = production_orchestrator(valid_generated_response).process_ticket(
+def test_safe_valid_response_is_checked_but_not_released_without_verified_sufficiency(
+    valid_generated_response,
+):
+    result = production_orchestrator(
+        valid_generated_response
+    ).process_ticket(
         production_ticket("SAFE-001")
     )
 
-    assert result["action"] == "AUTO_RESPOND"
-    assert result["status"] == "AUTO_RESPOND"
-    assert result["response_text"] == valid_generated_response["response_text"]
-    assert result["guardrails"]["passed"] is True
-    assert result["audit_record"]["routing_action"] == "AUTO_RESPOND"
+    assert result["action"] == "ESCALATE"
+    assert result["status"] == "ESCALATE"
+    assert result["response_text"] is None
+    assert result["response"] is None
+    assert result["response_released"] is False
 
+    assert result["guardrails"]["passed"] is True
+    assert (
+        result["reason_code"]
+        == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+    )
+
+    assert (
+        result["audit_record"]["routing_action"]
+        == "ESCALATE"
+    )
 
 def test_unsafe_output_is_blocked_escalated_logged_and_not_released(valid_generated_response):
     unsafe = copy.deepcopy(valid_generated_response)
@@ -439,8 +453,15 @@ def test_unsafe_output_is_blocked_escalated_logged_and_not_released(valid_genera
         {key: value for key, value in result.items() if key not in {"decision_record", "audit_record"}}
     )
     assert result["reason_code"] == REASON_SECRET_DISCLOSURE
-    assert result["routing"]["action"] == "AUTO_RESPOND"
-    assert result["routing"]["post_route_guardrail_action"] == "BLOCK"
+    assert result["routing"]["action"] == "ESCALATE"
+    assert (
+        result["routing"]["reason_code"]
+        == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+    )
+    assert (
+        result["routing"]["post_route_guardrail_action"]
+        == "BLOCK"
+    )
     assert result["audit_record"]["routing_action"] == "ESCALATE"
     logged_guardrails = result["audit_record"]["metadata"]["guardrails"]
     assert REASON_SECRET_DISCLOSURE in logged_guardrails["reason_codes"]
