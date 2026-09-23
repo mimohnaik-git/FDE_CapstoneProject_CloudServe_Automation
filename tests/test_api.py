@@ -114,6 +114,32 @@ def test_guardrail_blocked_result_is_safe_escalation(client, stub):
     assert body["citations"] == []
 
 
+def test_internal_escalation_handoff_is_not_exposed_by_public_api(client, stub):
+    stub.result = {
+        **_result(reason_code="EVIDENCE_SUFFICIENCY_UNVERIFIED"),
+        "escalation_context": {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "review_draft": "PRIVATE REVIEW DRAFT - DO NOT RELEASE",
+            "citations": [
+                {
+                    "document_id": "DOC-AUTH-001",
+                    "chunk_id": "DOC-AUTH-001-1",
+                }
+            ],
+        },
+    }
+
+    response = client.post("/tickets/process", json=_ticket())
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["terminal_action"] == "ESCALATE"
+    assert body["response_text"] is None
+    assert body["citations"] == []
+    assert "escalation_context" not in body
+    assert "PRIVATE REVIEW DRAFT" not in response.text
+
+
 def test_pipeline_exception_is_suppressed_and_cannot_crash_api(client, stub):
     secret = "sk-secret-provider-key"
     stub.error = RuntimeError(f"database failed; key={secret}; system prompt=private")

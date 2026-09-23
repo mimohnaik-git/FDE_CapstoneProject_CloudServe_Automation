@@ -337,6 +337,57 @@ class SupportAutomationOrchestrator:
                 error_type=type(exc).__name__, error_category=failure_code,
             )
 
+    @staticmethod
+    def _build_escalation_context(
+        *,
+        action: str,
+        reason_code: str,
+        routing: Mapping[str, Any],
+        generation: Mapping[str, Any],
+        guardrails: Mapping[str, Any],
+    ) -> Optional[Dict[str, Any]]:
+        """Build an internal-only reviewer handoff for safe evidence escalations."""
+        if (
+            action != ACTION_ESCALATE
+            or reason_code != REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+            or generation.get("supported") is not True
+            or guardrails.get("passed") is not True
+        ):
+            return None
+
+        draft = generation.get("response_text") or generation.get("answer")
+        if not isinstance(draft, str) or not draft.strip():
+            return None
+
+        citations = []
+        for citation in generation.get("citations") or []:
+            if not isinstance(citation, Mapping):
+                continue
+            document_id = citation.get("document_id")
+            chunk_id = citation.get("chunk_id")
+            if isinstance(document_id, str) and isinstance(chunk_id, str):
+                citations.append({
+                    "document_id": document_id,
+                    "chunk_id": chunk_id,
+                })
+
+        evidence = routing.get("evidence_sufficiency")
+        evidence = evidence if isinstance(evidence, Mapping) else {}
+
+        return {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "review_draft": draft.strip(),
+            "citations": citations,
+            "routing_reason_code": reason_code,
+            "evidence_status": evidence.get("status"),
+            "evidence_reason_code": evidence.get("reason_code"),
+            "guardrails_passed": True,
+            "generation_source": generation.get("generation_source"),
+            "provider": generation.get("provider"),
+            "model": generation.get("model_name") or generation.get("model"),
+            "prompt_version": generation.get("prompt_version"),
+        }
+
     def _finish(
         self, *, ticket_id: str, ticket: Dict[str, Any], classification: Dict[str, Any],
         retrieval: List[Dict[str, Any]], routing: Dict[str, Any], generation: Dict[str, Any],
@@ -348,6 +399,14 @@ class SupportAutomationOrchestrator:
         total_ms = round((time.perf_counter() - started) * 1000, 6)
         if failure_state == "GUARDRAIL_INTERNAL_ERROR":
             error_category = failure_state
+        escalation_context = self._build_escalation_context(
+            action=action,
+            reason_code=reason_code,
+            routing=routing if isinstance(routing, Mapping) else {},
+            generation=generation if isinstance(generation, Mapping) else {},
+            guardrails=guardrails if isinstance(guardrails, Mapping) else {},
+        )
+
         # Preserve malformed input IDs and suppress all blocked/failed answer text
         # even in the diagnostic result. No customer content is needed in fallback logs.
         ticket = {**ticket, "ticket_id": ticket_id}
@@ -387,6 +446,7 @@ class SupportAutomationOrchestrator:
                 "run_id": run_id, "confidence": None,
                 "error_type": type(exc).__name__, "error_category": REASON_AUDIT_FAILURE,
                 "processing_status": "FAILED", "total_latency_ms": total_ms,
+                "escalation_context": None,
             }
 
         response_released = action == ACTION_AUTO_RESPOND
@@ -402,6 +462,7 @@ class SupportAutomationOrchestrator:
             "run_id": run_id, "error_type": error_type, "error_category": error_category,
             "processing_status": "FAILED" if failure_state or error_type else "COMPLETED",
             "total_latency_ms": round((time.perf_counter() - started) * 1000, 6),
+            "escalation_context": escalation_context,
         }
 
     def _build_decision_record(

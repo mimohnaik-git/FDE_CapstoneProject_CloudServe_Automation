@@ -104,6 +104,20 @@ def test_end_to_end_safe_response_fails_closed_without_verified_evidence_suffici
     assert result["response_text"] is None
     assert result["response_released"] is False
 
+    handoff = result["escalation_context"]
+    assert handoff is not None
+    assert handoff["visibility"] == "INTERNAL_REVIEW_ONLY"
+    assert "Clear stale login credentials" in handoff["review_draft"]
+    assert handoff["guardrails_passed"] is True
+    assert handoff["routing_reason_code"] == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+    assert handoff["evidence_status"] == "UNVERIFIED"
+    assert handoff["citations"] == [
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-test",
+        }
+    ]
+
     assert result["guardrails"]["passed"] is True
     assert (
         result["reason_code"]
@@ -128,6 +142,7 @@ def test_end_to_end_escalation_flow_high_risk_intent(routing_contract_orchestrat
     assert result["status"] == ROUTE_ESCALATE
     assert result["reason_code"] == REASON_HIGH_RISK_INTENT
     assert result["response"] is None
+    assert result["escalation_context"] is None
 
     # Verify audit record stored
     stored_audit = routing_contract_orchestrator.logging_store.get_decision_by_id(result["decision_id"])
