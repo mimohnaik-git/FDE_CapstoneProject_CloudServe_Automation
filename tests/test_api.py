@@ -8,6 +8,11 @@ from fastapi.testclient import TestClient
 import src.api as api_module
 from src.ingest import TicketNormalizationEngine
 from src.logging_store import DecisionLoggingEngine
+from src.security import api_rate_limiter
+
+
+TEST_API_KEY = "synthetic-test-api-key"
+AUTH_HEADERS = {"Authorization": f"Bearer {TEST_API_KEY}"}
 
 
 def _ticket(channel: str = "email") -> dict:
@@ -50,6 +55,17 @@ class StubOrchestrator:
         return result
 
 
+@pytest.fixture(autouse=True)
+def api_security_defaults(monkeypatch):
+    monkeypatch.setenv("SUPPORT_API_KEY", TEST_API_KEY)
+    monkeypatch.setenv("SUPPORT_API_RATE_LIMIT_PER_MINUTE", "60")
+    api_rate_limiter.reset()
+
+    yield
+
+    api_rate_limiter.reset()
+
+
 @pytest.fixture
 def stub():
     return StubOrchestrator()
@@ -59,6 +75,7 @@ def stub():
 def client(stub):
     api_module.app.dependency_overrides[api_module.get_orchestrator] = lambda: stub
     with TestClient(api_module.app) as test_client:
+        test_client.headers.update(AUTH_HEADERS)
         yield test_client
     api_module.app.dependency_overrides.clear()
 
@@ -83,6 +100,146 @@ def test_all_four_channels_are_accepted(client, stub, channel):
     response = client.post("/tickets/process", json=_ticket(channel))
     assert response.status_code == 200
     assert stub.calls[-1]["channel"] == channel
+
+
+def test_health_remains_available_without_api_credential():
+    with TestClient(api_module.app) as public_client:
+        response = public_client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
+def test_processing_fails_closed_when_server_authentication_is_not_configured(
+    client,
+    stub,
+    monkeypatch,
+):
+    monkeypatch.delenv("SUPPORT_API_KEY", raising=False)
+
+    response = client.post("/tickets/process", json=_ticket())
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == "API authentication is not configured."
+    assert stub.calls == []
+
+
+@pytest.mark.parametrize(
+    "authorization",
+    [
+        "",
+        "Basic synthetic-test-api-key",
+        "Bearer wrong-api-key",
+    ],
+)
+def test_processing_rejects_missing_or_invalid_api_credentials(
+    client,
+    stub,
+    authorization,
+):
+    response = client.post(
+        "/tickets/process",
+        json=_ticket(),
+        headers={"Authorization": authorization},
+    )
+
+    assert response.status_code == 401
+    assert response.headers["www-authenticate"] == "Bearer"
+    assert response.json()["detail"] == "Invalid or missing API credential."
+    assert stub.calls == []
+
+
+def test_failed_authentication_does_not_resolve_pipeline_dependency(
+    monkeypatch,
+):
+    dependency_calls = []
+
+    def forbidden_orchestrator_resolution():
+        dependency_calls.append("resolved")
+        return StubOrchestrator()
+
+    api_module.app.dependency_overrides[
+        api_module.get_orchestrator
+    ] = forbidden_orchestrator_resolution
+
+    try:
+        with TestClient(api_module.app) as test_client:
+            response = test_client.post(
+                "/tickets/process",
+                json=_ticket(),
+                headers={"Authorization": "Bearer wrong-api-key"},
+            )
+    finally:
+        api_module.app.dependency_overrides.clear()
+
+    assert response.status_code == 401
+    assert dependency_calls == []
+
+
+def test_api_secret_is_never_exposed_by_http_surfaces(
+    monkeypatch,
+):
+    secret = "SYNTHETIC-PRIVATE-API-KEY-DO-NOT-EXPOSE"
+    monkeypatch.setenv("SUPPORT_API_KEY", secret)
+    api_rate_limiter.reset()
+
+    with TestClient(api_module.app) as test_client:
+        unauthorized = test_client.post(
+            "/tickets/process",
+            json=_ticket(),
+            headers={"Authorization": "Bearer wrong-api-key"},
+        )
+        metrics = test_client.get("/metrics")
+        openapi = test_client.get("/openapi.json")
+
+    combined = (
+        unauthorized.text
+        + metrics.text
+        + openapi.text
+    )
+
+    assert unauthorized.status_code == 401
+    assert secret not in combined
+    assert "SYNTHETIC-PRIVATE-API-KEY" not in combined
+
+
+def test_processing_rate_limit_is_enforced_per_authenticated_identity(
+    client,
+    stub,
+    monkeypatch,
+):
+    monkeypatch.setenv("SUPPORT_API_RATE_LIMIT_PER_MINUTE", "2")
+    api_rate_limiter.reset()
+
+    first = client.post("/tickets/process", json=_ticket())
+    second = client.post("/tickets/process", json=_ticket())
+    third = client.post("/tickets/process", json=_ticket())
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert third.status_code == 429
+    assert third.json()["detail"] == "API rate limit exceeded."
+    assert len(stub.calls) == 2
+
+
+def test_invalid_server_rate_limit_configuration_fails_closed(
+    client,
+    stub,
+    monkeypatch,
+):
+    monkeypatch.setenv(
+        "SUPPORT_API_RATE_LIMIT_PER_MINUTE",
+        "not-an-integer",
+    )
+    api_rate_limiter.reset()
+
+    response = client.post("/tickets/process", json=_ticket())
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "API rate limiting is not configured correctly."
+    )
+    assert stub.calls == []
 
 
 @pytest.mark.parametrize("payload", [
@@ -172,7 +329,11 @@ def test_production_support_pipeline_orchestrator_entry_point_is_called(monkeypa
     api_module.app.dependency_overrides.clear()
     api_module.get_orchestrator.cache_clear()
     with TestClient(api_module.app) as production_client:
-        response = production_client.post("/tickets/process", json=_ticket())
+        response = production_client.post(
+            "/tickets/process",
+            json=_ticket(),
+            headers=AUTH_HEADERS,
+        )
     api_module.get_orchestrator.cache_clear()
     assert response.status_code == 200
     assert len(calls) == 1
@@ -242,7 +403,11 @@ def test_kill_switch_suppresses_auto_response_escalates_and_persists_audit(monke
     api_module.app.dependency_overrides[api_module.get_orchestrator] = lambda: orchestrator
     try:
         with TestClient(api_module.app) as test_client:
-            body = test_client.post("/tickets/process", json=_ticket()).json()
+            body = test_client.post(
+                "/tickets/process",
+                json=_ticket(),
+                headers=AUTH_HEADERS,
+            ).json()
     finally:
         api_module.app.dependency_overrides.clear()
     assert orchestrator.calls == []
@@ -263,7 +428,11 @@ def test_normal_behavior_is_preserved_when_kill_switch_disabled(monkeypatch, tmp
     api_module.app.dependency_overrides[api_module.get_orchestrator] = lambda: orchestrator
     try:
         with TestClient(api_module.app) as test_client:
-            body = test_client.post("/tickets/process", json=_ticket()).json()
+            body = test_client.post(
+                "/tickets/process",
+                json=_ticket(),
+                headers=AUTH_HEADERS,
+            ).json()
     finally:
         api_module.app.dependency_overrides.clear()
     assert len(orchestrator.calls) == 1

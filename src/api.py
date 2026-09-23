@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from src.pipeline import SupportPipelineOrchestrator
 from src.monitoring import observe_ticket, prometheus_payload
 from src.operations import is_kill_switch_enabled, kill_switch_escalation
+from src.security import require_api_access
 
 
 class TicketRequest(BaseModel):
@@ -70,6 +71,7 @@ def get_orchestrator() -> SupportPipelineOrchestrator:
 
 
 PipelineDependency = Annotated[SupportPipelineOrchestrator, Depends(get_orchestrator)]
+ApiAccessDependency = Annotated[None, Depends(require_api_access)]
 
 app = FastAPI(
     title="CloudServe Support Pipeline API",
@@ -92,7 +94,11 @@ def metrics() -> Response:
 
 
 @app.post("/tickets/process", response_model=TicketResponse)
-def process_ticket(ticket: TicketRequest, orchestrator: PipelineDependency) -> TicketResponse:
+def process_ticket(
+    ticket: TicketRequest,
+    _api_access: ApiAccessDependency,
+    orchestrator: PipelineDependency,
+) -> TicketResponse:
     """Process one ticket and return only the safe public result projection."""
 
     payload = ticket.model_dump(exclude_none=True)
