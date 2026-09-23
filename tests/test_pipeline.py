@@ -112,6 +112,15 @@ def test_end_to_end_safe_response_fails_closed_without_verified_evidence_suffici
     assert handoff["guardrails_passed"] is True
     assert handoff["routing_reason_code"] == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
     assert handoff["evidence_status"] == "UNVERIFIED"
+
+    eligibility = handoff["resolution_eligibility"]
+
+    assert eligibility is not None
+    assert eligibility["status"] == "SELF_SERVICE_CANDIDATE"
+    assert eligibility["document_id"] == "DOC-AUTH-001"
+    assert eligibility["customer_tier"] == "standard"
+    assert eligibility["blocking_flags"] == []
+
     assert handoff["citations"] == [
         {
             "document_id": "DOC-AUTH-001",

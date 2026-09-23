@@ -374,6 +374,15 @@ class SupportAutomationOrchestrator:
         evidence = routing.get("evidence_sufficiency")
         evidence = evidence if isinstance(evidence, Mapping) else {}
 
+        resolution_eligibility = evidence.get(
+            "resolution_eligibility"
+        )
+        resolution_eligibility = (
+            dict(resolution_eligibility)
+            if isinstance(resolution_eligibility, Mapping)
+            else None
+        )
+
         return {
             "visibility": "INTERNAL_REVIEW_ONLY",
             "approval_required": True,
@@ -382,6 +391,7 @@ class SupportAutomationOrchestrator:
             "routing_reason_code": reason_code,
             "evidence_status": evidence.get("status"),
             "evidence_reason_code": evidence.get("reason_code"),
+            "resolution_eligibility": resolution_eligibility,
             "guardrails_passed": True,
             "generation_source": generation.get("generation_source"),
             "provider": generation.get("provider"),
