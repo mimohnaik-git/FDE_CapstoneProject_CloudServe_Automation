@@ -51,9 +51,9 @@ class AppConfig:
         # Observability Metrics Level
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
         
-        # Stage 11-selected baseline routing controls. V1.1 development may
-        # supersede them only with measured development evidence; the legacy
-        # environment name remains supported.
+        # Routing defaults retained after development evaluation found insufficient
+        # evidence for a safe threshold change. Future changes require measured
+        # development evidence; the legacy environment name remains supported.
         confidence_value = os.getenv(
             "CLASSIFICATION_CONFIDENCE_THRESHOLD",
             os.getenv("CONFIDENCE_THRESHOLD", "0.80"),
