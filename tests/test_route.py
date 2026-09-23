@@ -355,29 +355,83 @@ def test_router_is_direct_python_and_requires_no_llm_client(router):
 def test_route_batch_contains_one_route_failure():
     class FailingOnceRouter(TicketRoutingEngine):
         def __init__(self):
-            super().__init__(confidence_threshold=0.80, retrieval_threshold=0.30)
+            super().__init__(
+                confidence_threshold=0.80,
+                retrieval_threshold=0.30,
+            )
             self.calls = 0
 
         def route(self, *args, **kwargs):
             self.calls += 1
+
             if self.calls == 2:
-                raise RuntimeError("isolated route failure")
-            return super().route(*args, **kwargs)
+                raise RuntimeError(
+                    "isolated route failure"
+                )
+
+            return super().route(
+                *args,
+                **kwargs,
+            )
 
     requests = [
         {
             "classification": _valid_classification(),
             "retrieval_results": _strong_retrieval(),
-            "evidence_sufficient": True,
         }
         for _ in range(3)
     ]
-    decisions = FailingOnceRouter().route_batch(requests)
-    assert [decision["reason_code"] for decision in decisions] == [
-        REASON_AUTO_RESPOND,
+
+    decisions = (
+        FailingOnceRouter().route_batch(
+            requests
+        )
+    )
+
+    assert [
+        decision["reason_code"]
+        for decision in decisions
+    ] == [
+        REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED,
         REASON_PIPELINE_FAILURE,
-        REASON_AUTO_RESPOND,
+        REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED,
     ]
+
+
+def test_route_batch_cannot_accept_caller_asserted_evidence_sufficiency(
+    router,
+):
+    requests = [
+        {
+            "classification": _valid_classification(
+                confidence=0.99
+            ),
+            "retrieval_results": _strong_retrieval(
+                0.90
+            ),
+            "evidence_sufficient": True,
+        }
+    ]
+
+    decisions = router.route_batch(
+        requests
+    )
+
+    assert len(decisions) == 1
+
+    decision = decisions[0]
+
+    assert (
+        decision["action"]
+        == ROUTE_ESCALATE
+    )
+
+    assert (
+        decision["reason_code"]
+        == REASON_EVIDENCE_SUFFICIENCY_UNVERIFIED
+    )
+
+    assert decision["answerable"] is False
 
 def test_routing_metadata_reports_defaults_retained_for_insufficient_evidence(router):
     decision = router.route(

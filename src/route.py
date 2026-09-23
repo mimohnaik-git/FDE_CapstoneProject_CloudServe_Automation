@@ -276,21 +276,45 @@ class TicketRoutingEngine:
         }
 
     def route_batch(self, requests: Sequence[Mapping[str, Any]]) -> List[Dict[str, Any]]:
-        """Route every request independently; one failure cannot end the batch."""
+        """Route untrusted batch requests without accepting evidence-trust claims.
+
+        ``evidence_sufficient`` is intentionally not propagated from request
+        mappings. Evidence sufficiency is a trusted internal decision signal,
+        not caller-controlled input. Batch requests therefore fail closed at
+        the evidence gate unless routing terminates earlier for another reason.
+        """
         decisions: List[Dict[str, Any]] = []
+
         for request in requests:
             try:
                 decisions.append(
                     self.route(
                         request.get("classification"),
                         request.get("retrieval_results"),
-                        guardrail_passed=request.get("guardrail_passed", True),
-                        validation_passed=request.get("validation_passed"),
-                        failure_state=request.get("failure_state"),
-                        evidence_sufficient=request.get("evidence_sufficient"),
+                        guardrail_passed=request.get(
+                            "guardrail_passed",
+                            True,
+                        ),
+                        validation_passed=request.get(
+                            "validation_passed"
+                        ),
+                        failure_state=request.get(
+                            "failure_state"
+                        ),
                     )
                 )
             except Exception:
-                classification = request.get("classification") if isinstance(request, Mapping) else None
-                decisions.append(self._decision(REASON_PIPELINE_FAILURE, classification))
+                classification = (
+                    request.get("classification")
+                    if isinstance(request, Mapping)
+                    else None
+                )
+
+                decisions.append(
+                    self._decision(
+                        REASON_PIPELINE_FAILURE,
+                        classification,
+                    )
+                )
+
         return decisions
