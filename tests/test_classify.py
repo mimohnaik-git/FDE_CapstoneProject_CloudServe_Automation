@@ -8,7 +8,10 @@ from src.classify import (
     CANONICAL_URGENCIES,
     FEATURE_FIELDS,
     MODEL_VERSION,
+    CALIBRATION_METHOD,
+    CALIBRATION_FOLDS,
     TicketClassificationEngine,
+    grouped_calibration_splits,
     load_training_tickets,
     stratified_group_holdout,
     text_group,
@@ -50,7 +53,7 @@ def test_exact_canonical_taxonomy_has_all_22_authoritative_intents():
 
 def test_fitted_model_supports_every_canonical_intent(classifier):
     bundle = classifier._get_bundle()
-    classes = set(bundle["intent_model"].named_steps["classifier"].classes_)
+    classes = set(bundle["intent_model"].classes_)
     assert classes == set(CANONICAL_INTENTS)
 
 
@@ -141,3 +144,139 @@ def test_training_loader_rejects_noncanonical_target(tmp_path):
     }]), encoding="utf-8")
     with pytest.raises(ValueError, match="unsupported intent"):
         load_training_tickets(bad_path)
+
+
+
+def test_group_safe_calibration_splits_are_deterministic(
+    development_tickets,
+):
+    labels = [
+        ticket["labels"]["intent"]
+        for ticket in development_tickets
+    ]
+
+    first = grouped_calibration_splits(
+        development_tickets,
+        labels,
+    )
+
+    second = grouped_calibration_splits(
+        development_tickets,
+        labels,
+    )
+
+    assert len(first) == CALIBRATION_FOLDS
+    assert len(second) == CALIBRATION_FOLDS
+
+    first_normalized = [
+        (
+            train.tolist(),
+            calibration.tolist(),
+        )
+        for train, calibration in first
+    ]
+
+    second_normalized = [
+        (
+            train.tolist(),
+            calibration.tolist(),
+        )
+        for train, calibration in second
+    ]
+
+    assert first_normalized == second_normalized
+
+
+def test_group_safe_calibration_splits_do_not_leak_duplicate_text(
+    development_tickets,
+):
+    labels = [
+        ticket["labels"]["intent"]
+        for ticket in development_tickets
+    ]
+
+    groups = [
+        text_group(ticket)
+        for ticket in development_tickets
+    ]
+
+    for train, calibration in grouped_calibration_splits(
+        development_tickets,
+        labels,
+    ):
+        train_groups = {
+            groups[int(index)]
+            for index in train
+        }
+
+        calibration_groups = {
+            groups[int(index)]
+            for index in calibration
+        }
+
+        assert not (
+            train_groups
+            & calibration_groups
+        )
+
+
+def test_model_bundle_reports_calibration_metadata(
+    classifier,
+):
+    bundle = classifier._get_bundle()
+
+    assert (
+        bundle["intent_calibration_method"]
+        == CALIBRATION_METHOD
+    )
+
+    assert (
+        bundle["intent_calibration_folds"]
+        == CALIBRATION_FOLDS
+    )
+
+    assert (
+        bundle["urgency_calibration_method"]
+        == "none"
+    )
+
+    assert bundle["training_data_sha256"]
+    assert bundle["model_fingerprint"]
+
+    assert len(
+        bundle["model_fingerprint"]
+    ) == 64
+
+def test_prediction_reports_calibration_provenance(
+    classifier,
+):
+    result = classifier.process_classification(
+        normalized_ticket(
+            "How do I configure SSO for our organization?"
+        )
+    )
+
+    assert result["intent"] in CANONICAL_INTENTS
+    assert result["urgency"] in CANONICAL_URGENCIES
+
+    assert (
+        result["intent_calibration_method"]
+        == CALIBRATION_METHOD
+    )
+
+    assert (
+        result["intent_calibration_folds"]
+        == CALIBRATION_FOLDS
+    )
+
+    assert (
+        result["urgency_calibration_method"]
+        == "none"
+    )
+
+    assert result["model_version"] == MODEL_VERSION
+    assert result["training_data_sha256"]
+    assert result["model_fingerprint"]
+
+    assert 0.0 <= result["confidence"] <= 1.0
+    assert 0.0 <= result["urgency_confidence"] <= 1.0

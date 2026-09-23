@@ -14,6 +14,7 @@ import threading
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedGroupKFold
@@ -46,8 +47,38 @@ CANONICAL_INTENTS: Tuple[str, ...] = (
 )
 CANONICAL_URGENCIES: Tuple[str, ...] = ("high", "low", "medium")
 FEATURE_FIELDS: Tuple[str, ...] = ("subject", "body")
-MODEL_VERSION = "tfidf-logreg-22-v1"
+MODEL_VERSION = "tfidf-logreg-intent-calibrated-22-v2"
 RANDOM_SEED = 42
+
+CALIBRATION_METHOD = "sigmoid"
+CALIBRATION_FOLDS = 3
+
+INTENT_WORD_TFIDF_CONFIG = {
+    "ngram_range": (1, 2),
+    "min_df": 1,
+    "sublinear_tf": True,
+}
+
+INTENT_CHAR_TFIDF_CONFIG = {
+    "analyzer": "char_wb",
+    "ngram_range": (3, 5),
+    "min_df": 2,
+    "sublinear_tf": True,
+}
+
+URGENCY_TFIDF_CONFIG = {
+    "ngram_range": (1, 1),
+    "min_df": 1,
+    "sublinear_tf": True,
+}
+
+LOGISTIC_REGRESSION_CONFIG = {
+    "class_weight": "balanced",
+    "max_iter": 2000,
+    "multi_class": "ovr",
+    "random_state": RANDOM_SEED,
+    "solver": "liblinear",
+}
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TRAINING_DATA_PATH = PROJECT_ROOT / "data" / "raw" / "development_tickets.json"
 PROTECTED_EVALUATION_FILENAMES = {"validation_tickets.json", "final_tickets.json", "hidden_tickets.json"}
@@ -105,17 +136,30 @@ def training_data_sha256(path: Path | str = DEFAULT_TRAINING_DATA_PATH) -> str:
 def _intent_pipeline() -> Pipeline:
     features = FeatureUnion(
         [
-            ("word", TfidfVectorizer(ngram_range=(1, 2), min_df=1, sublinear_tf=True)),
-            ("character", TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5), min_df=2, sublinear_tf=True)),
+            (
+                "word",
+                TfidfVectorizer(
+                    **INTENT_WORD_TFIDF_CONFIG
+                ),
+            ),
+            (
+                "character",
+                TfidfVectorizer(
+                    **INTENT_CHAR_TFIDF_CONFIG
+                ),
+            ),
         ]
     )
+
     return Pipeline(
         [
             ("features", features),
-            ("classifier", LogisticRegression(
-                class_weight="balanced", max_iter=2000, multi_class="ovr",
-                random_state=RANDOM_SEED, solver="liblinear",
-            )),
+            (
+                "classifier",
+                LogisticRegression(
+                    **LOGISTIC_REGRESSION_CONFIG
+                ),
+            ),
         ]
     )
 
@@ -123,40 +167,251 @@ def _intent_pipeline() -> Pipeline:
 def _urgency_pipeline() -> Pipeline:
     return Pipeline(
         [
-            ("features", TfidfVectorizer(ngram_range=(1, 1), min_df=1, sublinear_tf=True)),
-            ("classifier", LogisticRegression(
-                class_weight="balanced", max_iter=2000, multi_class="ovr",
-                random_state=RANDOM_SEED, solver="liblinear",
-            )),
+            (
+                "features",
+                TfidfVectorizer(
+                    **URGENCY_TFIDF_CONFIG
+                ),
+            ),
+            (
+                "classifier",
+                LogisticRegression(
+                    **LOGISTIC_REGRESSION_CONFIG
+                ),
+            ),
         ]
     )
 
 
-def build_model_bundle(tickets: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    """Fit one intent model and one urgency model from labelled tickets."""
-    texts = [ticket_text(ticket) for ticket in tickets]
-    intents = [ticket["labels"]["intent"] for ticket in tickets]
-    urgencies = [ticket["labels"]["urgency"] for ticket in tickets]
+def grouped_calibration_splits(
+    tickets: Sequence[Mapping[str, Any]],
+    labels: Sequence[str],
+    *,
+    folds: int = CALIBRATION_FOLDS,
+    random_seed: int = RANDOM_SEED,
+) -> List[Tuple[Any, Any]]:
+    """Create deterministic calibration folds with no duplicate-text leakage."""
+
+    if len(tickets) != len(labels):
+        raise ValueError(
+            "Tickets and labels must have identical lengths"
+        )
+
+    if folds < 2:
+        raise ValueError(
+            "Calibration requires at least two folds"
+        )
+
+    texts = [
+        ticket_text(ticket)
+        for ticket in tickets
+    ]
+
+    groups = [
+        text_group(ticket)
+        for ticket in tickets
+    ]
+
+    if any(not group for group in groups):
+        raise ValueError(
+            "Every calibration ticket must have a non-empty text group"
+        )
+
+    splitter = StratifiedGroupKFold(
+        n_splits=folds,
+        shuffle=True,
+        random_state=random_seed,
+    )
+
+    splits = list(
+        splitter.split(
+            texts,
+            list(labels),
+            groups,
+        )
+    )
+
+    expected_labels = set(labels)
+
+    for fold_number, (
+        train_indices,
+        calibration_indices,
+    ) in enumerate(splits, start=1):
+
+        train_groups = {
+            groups[int(index)]
+            for index in train_indices
+        }
+
+        calibration_groups = {
+            groups[int(index)]
+            for index in calibration_indices
+        }
+
+        if train_groups & calibration_groups:
+            raise RuntimeError(
+                "Duplicate text groups leaked across "
+                f"calibration fold {fold_number}"
+            )
+
+        train_labels = {
+            labels[int(index)]
+            for index in train_indices
+        }
+
+        if train_labels != expected_labels:
+            missing = sorted(
+                expected_labels - train_labels
+            )
+
+            raise ValueError(
+                f"Calibration fold {fold_number} training "
+                f"partition is missing labels: {missing}"
+            )
+
+    return splits
+
+
+def _calibrated_model(
+    tickets: Sequence[Mapping[str, Any]],
+    labels: Sequence[str],
+    estimator: Pipeline,
+) -> CalibratedClassifierCV:
+    """Fit one group-safe calibrated classifier."""
+
+    calibration_splits = grouped_calibration_splits(
+        tickets,
+        labels,
+    )
+
+    model = CalibratedClassifierCV(
+        estimator=estimator,
+        method=CALIBRATION_METHOD,
+        cv=calibration_splits,
+        ensemble=False,
+    )
+
+    model.fit(
+        [
+            ticket_text(ticket)
+            for ticket in tickets
+        ],
+        list(labels),
+    )
+
+    return model
+
+
+def _model_fingerprint(
+    training_sha256: str,
+) -> str:
+    """Fingerprint the exact training data and classifier specification."""
+
+    material = json.dumps(
+        {
+            "model_version": MODEL_VERSION,
+            "feature_fields": FEATURE_FIELDS,
+            "intent_word_tfidf": INTENT_WORD_TFIDF_CONFIG,
+            "intent_char_tfidf": INTENT_CHAR_TFIDF_CONFIG,
+            "urgency_tfidf": URGENCY_TFIDF_CONFIG,
+            "logistic_regression": LOGISTIC_REGRESSION_CONFIG,
+            "intent_calibration_method": CALIBRATION_METHOD,
+            "intent_calibration_folds": CALIBRATION_FOLDS,
+            "urgency_calibration_method": "none",
+            "training_data_sha256": training_sha256,
+        },
+        sort_keys=True,
+        default=list,
+    ).encode("utf-8")
+
+    return hashlib.sha256(material).hexdigest()
+
+
+def build_model_bundle(
+    tickets: Sequence[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Fit a calibrated intent model and unchanged urgency model."""
+
+    intents = [
+        str(ticket["labels"]["intent"])
+        for ticket in tickets
+    ]
+
+    urgencies = [
+        str(ticket["labels"]["urgency"])
+        for ticket in tickets
+    ]
+
     if set(intents) != set(CANONICAL_INTENTS):
-        missing = sorted(set(CANONICAL_INTENTS) - set(intents))
-        raise ValueError(f"Training partition does not support all canonical intents: {missing}")
+        missing = sorted(
+            set(CANONICAL_INTENTS)
+            - set(intents)
+        )
+        raise ValueError(
+            "Training partition does not support "
+            f"all canonical intents: {missing}"
+        )
+
     if set(urgencies) != set(CANONICAL_URGENCIES):
-        missing = sorted(set(CANONICAL_URGENCIES) - set(urgencies))
-        raise ValueError(f"Training partition does not support all canonical urgencies: {missing}")
-    intent_model = _intent_pipeline().fit(texts, intents)
-    urgency_model = _urgency_pipeline().fit(texts, urgencies)
+        missing = sorted(
+            set(CANONICAL_URGENCIES)
+            - set(urgencies)
+        )
+        raise ValueError(
+            "Training partition does not support "
+            f"all canonical urgencies: {missing}"
+        )
+
+    if any(
+        not ticket_text(ticket)
+        for ticket in tickets
+    ):
+        raise ValueError(
+            "Classifier training requires non-empty subject/body text"
+        )
+
+    intent_model = _calibrated_model(
+        tickets,
+        intents,
+        _intent_pipeline(),
+    )
+
+    urgency_model = _urgency_pipeline().fit(
+        [
+            ticket_text(ticket)
+            for ticket in tickets
+        ],
+        urgencies,
+    )
+
     return {
         "intent_model": intent_model,
         "urgency_model": urgency_model,
         "model_version": MODEL_VERSION,
         "training_size": len(tickets),
         "feature_fields": FEATURE_FIELDS,
+        "intent_calibration_method": CALIBRATION_METHOD,
+        "intent_calibration_folds": CALIBRATION_FOLDS,
+        "urgency_calibration_method": "none",
     }
 
 
-def _ranked_probabilities(model: Pipeline, text: str) -> List[Tuple[str, float]]:
+def _ranked_probabilities(model: Any, text: str) -> List[Tuple[str, float]]:
     probabilities = model.predict_proba([text])[0]
-    classes = model.named_steps["classifier"].classes_
+
+    classes = getattr(
+        model,
+        "classes_",
+        None,
+    )
+
+    if classes is None and hasattr(model, "named_steps"):
+        classes = model.named_steps["classifier"].classes_
+
+    if classes is None:
+        raise RuntimeError(
+            "Classifier does not expose fitted classes"
+        )
     return sorted(
         ((str(label), float(probability)) for label, probability in zip(classes, probabilities)),
         key=lambda item: (-item[1], item[0]),
@@ -179,12 +434,26 @@ def predict_with_bundle(bundle: Mapping[str, Any], ticket: Mapping[str, Any]) ->
         "urgency": urgency,
         "confidence": round(confidence, 6),
         "urgency_confidence": round(urgency_confidence, 6),
-        "reasoning": "Deterministic TF-IDF logistic-regression prediction from subject and body text.",
+        "reasoning": (
+            "Intent confidence uses group-safe sigmoid calibration; urgency "
+            "uses the unchanged TF-IDF logistic-regression head. Both use "
+            "subject and body text only."
+        ),
         "alternative_intent": alternatives[0]["intent"] if alternatives else None,
         "alternative_intents": alternatives,
         "model_name": MODEL_VERSION,
         "model_version": MODEL_VERSION,
+        "intent_calibration_method": bundle.get(
+            "intent_calibration_method"
+        ),
+        "intent_calibration_folds": bundle.get(
+            "intent_calibration_folds"
+        ),
+        "urgency_calibration_method": bundle.get(
+            "urgency_calibration_method"
+        ),
         "training_data_sha256": bundle.get("training_data_sha256"),
+        "model_fingerprint": bundle.get("model_fingerprint"),
     }
 
 
@@ -243,16 +512,50 @@ class TicketClassificationEngine:
         ]
 
     def _get_bundle(self) -> Dict[str, Any]:
-        cache_key = str(self.training_data_path.resolve())
-        bundle = self._bundle_cache.get(cache_key)
+        resolved = self.training_data_path.resolve()
+        data_sha = training_data_sha256(resolved)
+
+        cache_key = (
+            f"{resolved}|"
+            f"{data_sha}|"
+            f"{MODEL_VERSION}"
+        )
+
+        bundle = self._bundle_cache.get(
+            cache_key
+        )
+
         if bundle is not None:
             return bundle
+
         with self._cache_lock:
-            bundle = self._bundle_cache.get(cache_key)
+            bundle = self._bundle_cache.get(
+                cache_key
+            )
+
             if bundle is None:
-                bundle = build_model_bundle(load_training_tickets(self.training_data_path))
-                bundle["training_data_sha256"] = training_data_sha256(self.training_data_path)
-                self._bundle_cache[cache_key] = bundle
+                tickets = load_training_tickets(
+                    resolved
+                )
+
+                bundle = build_model_bundle(
+                    tickets
+                )
+
+                bundle["training_data_sha256"] = (
+                    data_sha
+                )
+
+                bundle["model_fingerprint"] = (
+                    _model_fingerprint(
+                        data_sha
+                    )
+                )
+
+                self._bundle_cache[
+                    cache_key
+                ] = bundle
+
         return bundle
 
     def process_classification(self, normalized_ticket: Any) -> Dict[str, Any]:
