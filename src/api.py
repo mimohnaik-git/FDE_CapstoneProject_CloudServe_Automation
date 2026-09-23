@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from src.pipeline import SupportPipelineOrchestrator
 from src.monitoring import observe_ticket, prometheus_payload
 from src.operations import is_kill_switch_enabled, kill_switch_escalation
-from src.security import require_api_access
+from src.security import require_api_access, require_reviewer_access
 
 
 class TicketRequest(BaseModel):
@@ -63,6 +63,24 @@ class TicketResponse(BaseModel):
     processing_status: Literal["COMPLETED", "FAILED"]
 
 
+class ReviewerTicketResponse(BaseModel):
+    """Strict internal projection for supervised human review."""
+
+    ticket_id: str
+    terminal_action: Literal["AUTO_RESPOND", "ESCALATE"]
+    intent: str | None
+    urgency: str | None
+    routing_reason: str
+    routing_reason_code: str
+    decision_id: str | None
+    processing_status: Literal["COMPLETED", "FAILED"]
+    approval_required: bool
+    review_draft: str | None
+    citations: list[CitationResponse]
+    evidence_status: str | None
+    evidence_reason_code: str | None
+
+
 @lru_cache(maxsize=1)
 def get_orchestrator() -> SupportPipelineOrchestrator:
     """Construct the real production orchestrator once per application process."""
@@ -72,6 +90,7 @@ def get_orchestrator() -> SupportPipelineOrchestrator:
 
 PipelineDependency = Annotated[SupportPipelineOrchestrator, Depends(get_orchestrator)]
 ApiAccessDependency = Annotated[None, Depends(require_api_access)]
+ReviewerAccessDependency = Annotated[None, Depends(require_reviewer_access)]
 
 app = FastAPI(
     title="CloudServe Support Pipeline API",
@@ -148,4 +167,117 @@ def process_ticket(
         citations=citations,
         decision_id=result.get("decision_id"),
         processing_status="FAILED" if result.get("processing_status") == "FAILED" else "COMPLETED",
+    )
+
+@app.post("/review/tickets/process", response_model=ReviewerTicketResponse)
+def process_ticket_for_review(
+    ticket: TicketRequest,
+    _reviewer_access: ReviewerAccessDependency,
+    orchestrator: PipelineDependency,
+) -> ReviewerTicketResponse:
+    """Process one ticket and expose only the approved internal review handoff."""
+
+    payload = ticket.model_dump(exclude_none=True)
+    started = time.perf_counter()
+
+    try:
+        result = (
+            kill_switch_escalation(orchestrator, payload)
+            if is_kill_switch_enabled()
+            else orchestrator.process_ticket(payload)
+        )
+    except Exception:
+        result = {
+            "ticket_id": ticket.ticket_id,
+            "status": "ESCALATE",
+            "reason": "Ticket processing failed safely and requires human review.",
+            "reason_code": "PIPELINE_INTERNAL_ERROR",
+            "processing_status": "FAILED",
+            "decision_id": None,
+            "classification": {},
+            "response_released": False,
+            "escalation_context": None,
+        }
+
+    observe_ticket(
+        ticket.channel,
+        result,
+        time.perf_counter() - started,
+    )
+
+    classification = (
+        result.get("classification")
+        if isinstance(result.get("classification"), dict)
+        else {}
+    )
+
+    released = (
+        result.get("response_released") is True
+        and result.get("status") == "AUTO_RESPOND"
+    )
+
+    handoff = (
+        result.get("escalation_context")
+        if isinstance(result.get("escalation_context"), dict)
+        else None
+    )
+
+    valid_handoff = (
+        not released
+        and handoff is not None
+        and handoff.get("visibility") == "INTERNAL_REVIEW_ONLY"
+        and handoff.get("approval_required") is True
+        and isinstance(handoff.get("review_draft"), str)
+        and bool(handoff["review_draft"].strip())
+    )
+
+    raw_citations = handoff.get("citations", []) if valid_handoff else []
+
+    citations = [
+        CitationResponse(
+            document_id=item["document_id"],
+            chunk_id=item["chunk_id"],
+        )
+        for item in raw_citations
+        if isinstance(item, dict)
+        and isinstance(item.get("document_id"), str)
+        and isinstance(item.get("chunk_id"), str)
+    ]
+
+    terminal_action = "AUTO_RESPOND" if released else "ESCALATE"
+
+    return ReviewerTicketResponse(
+        ticket_id=str(result.get("ticket_id") or ticket.ticket_id),
+        terminal_action=terminal_action,
+        intent=classification.get("intent"),
+        urgency=classification.get("urgency"),
+        routing_reason=str(
+            result.get("reason") or "Human review required."
+        ),
+        routing_reason_code=str(
+            result.get("reason_code") or "UNSPECIFIED_ESCALATION"
+        ),
+        decision_id=result.get("decision_id"),
+        processing_status=(
+            "FAILED"
+            if result.get("processing_status") == "FAILED"
+            else "COMPLETED"
+        ),
+        approval_required=bool(valid_handoff),
+        review_draft=(
+            handoff["review_draft"].strip()
+            if valid_handoff
+            else None
+        ),
+        citations=citations,
+        evidence_status=(
+            handoff.get("evidence_status")
+            if valid_handoff
+            else None
+        ),
+        evidence_reason_code=(
+            handoff.get("evidence_reason_code")
+            if valid_handoff
+            else None
+        ),
     )

@@ -107,6 +107,7 @@ def test_end_to_end_safe_response_fails_closed_without_verified_evidence_suffici
     handoff = result["escalation_context"]
     assert handoff is not None
     assert handoff["visibility"] == "INTERNAL_REVIEW_ONLY"
+    assert handoff["approval_required"] is True
     assert "Clear stale login credentials" in handoff["review_draft"]
     assert handoff["guardrails_passed"] is True
     assert handoff["routing_reason_code"] == "EVIDENCE_SUFFICIENCY_UNVERIFIED"
@@ -117,6 +118,26 @@ def test_end_to_end_safe_response_fails_closed_without_verified_evidence_suffici
             "chunk_id": "DOC-AUTH-001-test",
         }
     ]
+
+    # Internal review metadata must remain ephemeral. The same text may
+    # legitimately exist in retrieved documentation, so assert field-level
+    # isolation rather than searching for duplicated evidence text.
+    decision_record = result["decision_record"]
+    audit_record = result["audit_record"]
+
+    assert "escalation_context" not in decision_record
+    assert "review_draft" not in decision_record
+
+    decision_generation = decision_record.get("generation") or {}
+    assert decision_generation.get("response_text") is None
+    assert decision_generation.get("answer") is None
+
+    assert "escalation_context" not in audit_record
+    assert "review_draft" not in audit_record
+
+    audit_generation = audit_record.get("generation") or {}
+    assert audit_generation.get("response_text") is None
+    assert audit_generation.get("answer") is None
 
     assert result["guardrails"]["passed"] is True
     assert (

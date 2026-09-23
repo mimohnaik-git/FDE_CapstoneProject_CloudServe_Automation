@@ -12,7 +12,12 @@ from src.security import api_rate_limiter
 
 
 TEST_API_KEY = "synthetic-test-api-key"
+TEST_REVIEWER_API_KEY = "synthetic-reviewer-api-key"
+
 AUTH_HEADERS = {"Authorization": f"Bearer {TEST_API_KEY}"}
+REVIEWER_HEADERS = {
+    "Authorization": f"Bearer {TEST_REVIEWER_API_KEY}"
+}
 
 
 def _ticket(channel: str = "email") -> dict:
@@ -58,6 +63,10 @@ class StubOrchestrator:
 @pytest.fixture(autouse=True)
 def api_security_defaults(monkeypatch):
     monkeypatch.setenv("SUPPORT_API_KEY", TEST_API_KEY)
+    monkeypatch.setenv(
+        "SUPPORT_REVIEWER_API_KEY",
+        TEST_REVIEWER_API_KEY,
+    )
     monkeypatch.setenv("SUPPORT_API_RATE_LIMIT_PER_MINUTE", "60")
     api_rate_limiter.reset()
 
@@ -295,6 +304,127 @@ def test_internal_escalation_handoff_is_not_exposed_by_public_api(client, stub):
     assert body["citations"] == []
     assert "escalation_context" not in body
     assert "PRIVATE REVIEW DRAFT" not in response.text
+
+
+def test_reviewer_endpoint_exposes_only_safe_internal_handoff(
+    client,
+    stub,
+):
+    stub.result = {
+        **_result(
+            reason_code="EVIDENCE_SUFFICIENCY_UNVERIFIED"
+        ),
+        "escalation_context": {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "approval_required": True,
+            "review_draft": "Clear stale login credentials and authenticate again.",
+            "citations": [
+                {
+                    "document_id": "DOC-AUTH-001",
+                    "chunk_id": "DOC-AUTH-001-resolution",
+                }
+            ],
+            "evidence_status": "UNVERIFIED",
+            "evidence_reason_code": (
+                "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
+            ),
+        },
+    }
+
+    response = client.post(
+        "/review/tickets/process",
+        json=_ticket(),
+        headers=REVIEWER_HEADERS,
+    )
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["terminal_action"] == "ESCALATE"
+    assert body["approval_required"] is True
+    assert "Clear stale login credentials" in body["review_draft"]
+    assert body["citations"] == [
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-resolution",
+        }
+    ]
+    assert body["evidence_status"] == "UNVERIFIED"
+
+    assert set(body) == {
+        "ticket_id",
+        "terminal_action",
+        "intent",
+        "urgency",
+        "routing_reason",
+        "routing_reason_code",
+        "decision_id",
+        "processing_status",
+        "approval_required",
+        "review_draft",
+        "citations",
+        "evidence_status",
+        "evidence_reason_code",
+    }
+
+
+def test_processing_api_credential_cannot_access_reviewer_endpoint(
+    client,
+    stub,
+):
+    response = client.post(
+        "/review/tickets/process",
+        json=_ticket(),
+        headers=AUTH_HEADERS,
+    )
+
+    assert response.status_code == 401
+    assert stub.calls == []
+
+
+def test_reviewer_endpoint_requires_distinct_server_credential(
+    client,
+    stub,
+    monkeypatch,
+):
+    monkeypatch.setenv(
+        "SUPPORT_REVIEWER_API_KEY",
+        TEST_API_KEY,
+    )
+
+    response = client.post(
+        "/review/tickets/process",
+        json=_ticket(),
+        headers=AUTH_HEADERS,
+    )
+
+    assert response.status_code == 503
+    assert "must be distinct" in response.json()["detail"]
+    assert stub.calls == []
+
+
+def test_reviewer_endpoint_does_not_expose_draft_without_valid_handoff(
+    client,
+    stub,
+):
+    stub.result = {
+        **_result(reason_code="PROMPT_INJECTION_DETECTED"),
+        "escalation_context": None,
+    }
+
+    response = client.post(
+        "/review/tickets/process",
+        json=_ticket(),
+        headers=REVIEWER_HEADERS,
+    )
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["terminal_action"] == "ESCALATE"
+    assert body["approval_required"] is False
+    assert body["review_draft"] is None
+    assert body["citations"] == []
+    assert body["evidence_status"] is None
+    assert body["evidence_reason_code"] is None
 
 
 def test_pipeline_exception_is_suppressed_and_cannot_crash_api(client, stub):

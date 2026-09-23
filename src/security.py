@@ -105,6 +105,26 @@ def _bearer_token(authorization: str | None) -> str | None:
     return credential.strip()
 
 
+def _configured_reviewer_api_key() -> str:
+    key = os.getenv("SUPPORT_REVIEWER_API_KEY", "").strip()
+
+    if not key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Reviewer API authentication is not configured.",
+        )
+
+    processing_key = os.getenv("SUPPORT_API_KEY", "").strip()
+
+    if processing_key and secrets.compare_digest(key, processing_key):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Reviewer API credential must be distinct from processing API credential.",
+        )
+
+    return key
+
+
 def require_api_access(
     authorization: Annotated[str | None, Header()] = None,
 ) -> None:
@@ -132,4 +152,35 @@ def require_api_access(
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="API rate limit exceeded.",
+        )
+
+def require_reviewer_access(
+    authorization: Annotated[str | None, Header()] = None,
+) -> None:
+    """Authenticate access to internal human-review surfaces."""
+
+    configured_key = _configured_reviewer_api_key()
+    supplied_key = _bearer_token(authorization)
+
+    if (
+        supplied_key is None
+        or not secrets.compare_digest(supplied_key, configured_key)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing reviewer credential.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    identity = hashlib.sha256(
+        f"reviewer:{supplied_key}".encode("utf-8")
+    ).hexdigest()
+
+    if not api_rate_limiter.allow(
+        identity,
+        limit=_configured_rate_limit(),
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Reviewer API rate limit exceeded.",
         )

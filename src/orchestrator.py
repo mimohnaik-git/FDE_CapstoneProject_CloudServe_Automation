@@ -376,6 +376,7 @@ class SupportAutomationOrchestrator:
 
         return {
             "visibility": "INTERNAL_REVIEW_ONLY",
+            "approval_required": True,
             "review_draft": draft.strip(),
             "citations": citations,
             "routing_reason_code": reason_code,
