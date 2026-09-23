@@ -1,4 +1,4 @@
-﻿"""Inference-time evidence sufficiency assessment.
+"""Inference-time evidence sufficiency assessment.
 
 The current release policy intentionally abstains from declaring retrieved
 documentation sufficient for automatic customer response.
@@ -22,7 +22,46 @@ from src.classify import ticket_text
 
 
 EVIDENCE_POLICY_VERSION = "evidence-sufficiency-v1-fail-closed"
-EVIDENCE_FEATURE_VERSION = "evidence-features-v1"
+EVIDENCE_FEATURE_VERSION = "evidence-features-v2-policy-diagnostics"
+
+ELIGIBILITY_SELF_SERVICE_CANDIDATE = "SELF_SERVICE_CANDIDATE"
+ELIGIBILITY_REVIEW_REQUIRED = "REVIEW_REQUIRED"
+ELIGIBILITY_PLAN_INAPPLICABLE = "PLAN_INAPPLICABLE"
+ELIGIBILITY_UNKNOWN = "UNKNOWN"
+
+ALL_CUSTOMER_TIERS = frozenset(
+    {"free", "standard", "business", "enterprise"}
+)
+
+POLICY_PATTERNS = {
+    "support_required": (
+        r"\bcontact support\b",
+        r"\bsupport is required\b",
+        r"\bthrough support\b",
+        r"\brequires? support\b",
+    ),
+    "identity_verification": (
+        r"\bidentity verification\b",
+        r"\bverify identity\b",
+    ),
+    "administrator_required": (
+        r"\badministrator\b",
+        r"\baccount owner\b",
+        r"\borganisation owner\b",
+    ),
+    "security_sensitive": (
+        r"\brevoke\b",
+        r"\bcredential\b",
+        r"\bcompromise\b",
+        r"\bsecret\b",
+        r"\bexposed\b",
+    ),
+    "planned_change": (
+        r"\bmaintenance window\b",
+        r"\bmigration\b",
+        r"\bplanned migration\b",
+    ),
+}
 
 STATUS_INSUFFICIENT = "INSUFFICIENT"
 STATUS_UNVERIFIED = "UNVERIFIED"
@@ -86,6 +125,155 @@ def _document_id(item: Mapping[str, Any]) -> str:
         or item.get("doc_id")
         or ""
     ).strip()
+
+
+
+def _allowed_customer_tiers(
+    applies_to: Any,
+) -> frozenset[str] | None:
+    """Translate explicit plan applicability into allowed tiers.
+
+    Non-plan applicability such as Container Service or CLI cannot be
+    resolved from customer_tier and therefore returns None.
+    """
+    value = str(applies_to or "").strip().lower()
+
+    if value == "all plans":
+        return ALL_CUSTOMER_TIERS
+
+    if "business and enterprise" in value:
+        return frozenset({"business", "enterprise"})
+
+    if value == "enterprise":
+        return frozenset({"enterprise"})
+
+    return None
+
+
+def _policy_text(
+    retrieval_item: Mapping[str, Any],
+) -> str:
+    """Return authoritative runtime text available to generation."""
+    passages = [_passage(retrieval_item)]
+
+    supporting = retrieval_item.get("supporting_passages")
+
+    if (
+        isinstance(supporting, Sequence)
+        and not isinstance(supporting, (str, bytes))
+    ):
+        parent_document_id = _document_id(retrieval_item)
+
+        for support in supporting:
+            if not isinstance(support, Mapping):
+                continue
+
+            if _document_id(support) != parent_document_id:
+                continue
+
+            passages.append(_passage(support))
+
+    return "\n".join(
+        passage
+        for passage in passages
+        if passage
+    )
+
+
+def assess_resolution_eligibility(
+    ticket: Mapping[str, Any],
+    retrieval_results: Sequence[Mapping[str, Any]],
+) -> Dict[str, Any]:
+    """Return deterministic reviewer-facing policy diagnostics.
+
+    This function is diagnostic only. It never authorizes automatic release.
+    """
+    if not retrieval_results:
+        return {
+            "status": ELIGIBILITY_UNKNOWN,
+            "document_id": None,
+            "customer_tier": str(
+                ticket.get("customer_tier") or ""
+            ).strip().lower() or None,
+            "applies_to": None,
+            "plan_applicable": None,
+            "blocking_flags": [],
+        }
+
+    top = retrieval_results[0]
+
+    if not isinstance(top, Mapping):
+        return {
+            "status": ELIGIBILITY_UNKNOWN,
+            "document_id": None,
+            "customer_tier": None,
+            "applies_to": None,
+            "plan_applicable": None,
+            "blocking_flags": [],
+        }
+
+    document_id = _document_id(top)
+
+    tier = str(
+        ticket.get("customer_tier") or ""
+    ).strip().lower()
+
+    source_metadata = (
+        top.get("source_metadata")
+        if isinstance(top.get("source_metadata"), Mapping)
+        else {}
+    )
+
+    applies_to = str(
+        top.get("applies_to")
+        or source_metadata.get("applies_to")
+        or ""
+    ).strip()
+
+    allowed = _allowed_customer_tiers(applies_to)
+
+    plan_applicable = (
+        None
+        if allowed is None
+        else tier in allowed
+    )
+
+    if plan_applicable is False:
+        return {
+            "status": ELIGIBILITY_PLAN_INAPPLICABLE,
+            "document_id": document_id or None,
+            "customer_tier": tier or None,
+            "applies_to": applies_to or None,
+            "plan_applicable": False,
+            "blocking_flags": ["plan_inapplicable"],
+        }
+
+    policy_text = _policy_text(top).lower()
+
+    blocking_flags = sorted(
+        name
+        for name, patterns in POLICY_PATTERNS.items()
+        if any(
+            re.search(pattern, policy_text, re.I)
+            for pattern in patterns
+        )
+    )
+
+    if blocking_flags:
+        status = ELIGIBILITY_REVIEW_REQUIRED
+    elif policy_text.strip():
+        status = ELIGIBILITY_SELF_SERVICE_CANDIDATE
+    else:
+        status = ELIGIBILITY_UNKNOWN
+
+    return {
+        "status": status,
+        "document_id": document_id or None,
+        "customer_tier": tier or None,
+        "applies_to": applies_to or None,
+        "plan_applicable": plan_applicable,
+        "blocking_flags": blocking_flags,
+    }
 
 
 def extract_evidence_features(
@@ -279,6 +467,11 @@ class EvidenceSufficiencyEngine:
                 "error_type": None,
             }
 
+        eligibility = assess_resolution_eligibility(
+            ticket,
+            retrieval_results,
+        )
+
         return {
             "status": STATUS_UNVERIFIED,
             "sufficient": None,
@@ -292,5 +485,6 @@ class EvidenceSufficiencyEngine:
             "policy_version": self.policy_version,
             "feature_version": self.feature_version,
             "features": features,
+            "resolution_eligibility": eligibility,
             "error_type": None,
         }

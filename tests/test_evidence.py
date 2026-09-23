@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 
 from src.evidence import (
     EVIDENCE_FEATURE_VERSION,
@@ -9,7 +9,11 @@ from src.evidence import (
     STATUS_INSUFFICIENT,
     STATUS_INVALID,
     STATUS_UNVERIFIED,
+    ELIGIBILITY_PLAN_INAPPLICABLE,
+    ELIGIBILITY_REVIEW_REQUIRED,
+    ELIGIBILITY_SELF_SERVICE_CANDIDATE,
     EvidenceSufficiencyEngine,
+    assess_resolution_eligibility,
     extract_evidence_features,
 )
 
@@ -193,3 +197,114 @@ def test_engine_never_promotes_auto_release():
         )
 
         assert result["sufficient"] is not True
+
+
+def test_resolution_eligibility_detects_plan_inapplicability():
+    runtime_ticket = {
+        **ticket(),
+        "customer_tier": "standard",
+    }
+
+    evidence = [
+        {
+            **retrieval()[0],
+            "source_metadata": {
+                "applies_to": "Business and Enterprise plans",
+            },
+        }
+    ]
+
+    result = assess_resolution_eligibility(
+        runtime_ticket,
+        evidence,
+    )
+
+    assert result["status"] == ELIGIBILITY_PLAN_INAPPLICABLE
+    assert result["plan_applicable"] is False
+    assert "plan_inapplicable" in result["blocking_flags"]
+
+
+def test_resolution_eligibility_marks_privileged_resolution_for_review():
+    runtime_ticket = {
+        **ticket(),
+        "customer_tier": "business",
+    }
+
+    evidence = [
+        {
+            **retrieval()[0],
+            "applies_to": "All plans",
+            "supporting_passages": [
+                {
+                    "document_id": "DOC-DEPLOY-001",
+                    "chunk_id": "DOC-DEPLOY-001#support",
+                    "passage": (
+                        "Contact support if an administrator must "
+                        "perform the recovery."
+                    ),
+                }
+            ],
+        }
+    ]
+
+    result = assess_resolution_eligibility(
+        runtime_ticket,
+        evidence,
+    )
+
+    assert result["status"] == ELIGIBILITY_REVIEW_REQUIRED
+    assert "support_required" in result["blocking_flags"]
+    assert "administrator_required" in result["blocking_flags"]
+
+
+def test_resolution_eligibility_marks_plain_self_service_as_candidate_only():
+    runtime_ticket = {
+        **ticket(),
+        "customer_tier": "standard",
+    }
+
+    evidence = [
+        {
+            **retrieval()[0],
+            "applies_to": "All plans",
+        }
+    ]
+
+    result = assess_resolution_eligibility(
+        runtime_ticket,
+        evidence,
+    )
+
+    assert (
+        result["status"]
+        == ELIGIBILITY_SELF_SERVICE_CANDIDATE
+    )
+    assert result["blocking_flags"] == []
+
+
+def test_policy_diagnostics_never_enable_release():
+    runtime_ticket = {
+        **ticket(),
+        "customer_tier": "standard",
+    }
+
+    evidence = [
+        {
+            **retrieval()[0],
+            "applies_to": "All plans",
+        }
+    ]
+
+    result = EvidenceSufficiencyEngine().assess(
+        runtime_ticket,
+        evidence,
+    )
+
+    assert (
+        result["resolution_eligibility"]["status"]
+        == ELIGIBILITY_SELF_SERVICE_CANDIDATE
+    )
+
+    # Diagnostic candidacy must never cross the release boundary.
+    assert result["status"] == STATUS_UNVERIFIED
+    assert result["sufficient"] is None
