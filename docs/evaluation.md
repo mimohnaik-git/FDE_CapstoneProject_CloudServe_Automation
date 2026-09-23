@@ -64,3 +64,35 @@ claim and requires a newly isolated validation set.
 Frozen one-shot command, documented but not executed in Stage 12:
 
     python -m evaluation.harness --input data/raw/validation_tickets.json --output evaluation/results/validation-final.json --dataset-role validation
+
+## Post-validation evidence-sufficiency development study
+
+**Evidence classification:** DEVELOPMENT ONLY - POST-VALIDATION REMEDIATION.
+
+This study was performed after the historical frozen-V1 validation run. It did not
+rerun or tune against the 80-ticket validation set and did not access final/hidden
+assessment data.
+
+The 500 development tickets contain 343 normalized request-text groups. Thirty-six
+groups, covering 104 tickets, contain contradictory `answerable_from_docs` labels for
+the same normalized request text. Those ambiguous groups were therefore excluded from
+supervised evidence-sufficiency modelling rather than split across training and
+evaluation.
+
+The resulting development population contained 307 unambiguous independent text
+groups: 224 answerable and 83 unanswerable.
+
+| Development diagnostic | Result |
+|---|---:|
+| Raw retrieval Top-1 ROC-AUC | 0.668244 |
+| Retrieval-feature 5-fold OOF ROC-AUC | 0.662167 |
+| Text + retrieval 5-fold OOF ROC-AUC | 0.681368 |
+| Retrieval-model zero-observed-false-positive coverage | 7/307 (2.28%) |
+| Text + retrieval zero-observed-false-positive coverage | 2/307 (0.65%) |
+
+The combined model improved ROC-AUC only modestly and its zero-observed-false-positive
+region covered only two independent development groups. That evidence was judged
+insufficient to justify a production automatic-release threshold.
+
+**Decision:** no evidence-sufficiency threshold was promoted. The runtime evidence
+gate remains fail-closed. Historical validation metrics remain unchanged.

@@ -56,3 +56,23 @@ below describe when the gap should be closed; they do not imply that missing evi
   accuracy remain **NOT MEASURED**.
 - **OWNER TARGET, NOT MEASURED RESULT:** 30% is a future worthwhile-automation target,
   not a V1 result. Validation V1 automation remains 0%.
+
+## Post-validation gap - independently verified evidence sufficiency
+
+The runtime now has an explicit `EvidenceSufficiencyEngine`, but there is still no
+development-supported policy that can safely return `sufficient=True` with meaningful
+independent coverage.
+
+Development-only analysis identified 36 contradictory normalized-text groups covering
+104 of 500 tickets. On the 307 unambiguous groups, the strongest tested text-plus-
+retrieval approach reached ROC-AUC 0.681368, while its zero-observed-false-positive
+operating region covered only 2/307 groups (0.65%).
+
+This is insufficient evidence for automatic customer release. The current engine
+therefore computes auditable inference-time diagnostics but abstains from declaring
+retrieved documentation sufficient.
+
+**Gap remains open:** safe non-zero automation requires stronger independent evidence,
+a defensible evidence-sufficiency policy, and subsequent evaluation under an
+appropriately governed population. The consumed 80-ticket validation set must not be
+used for further threshold tuning.

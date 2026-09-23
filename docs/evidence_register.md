@@ -40,3 +40,22 @@ The frozen V1 aggregate fingerprint is
   100% decision-log coverage, P50 0.0502 seconds, and P95 0.0915 seconds.
 - Business metrics—FCR, first substantive response time, CSAT, availability, and
   repeat-contact rate—remain NOT MEASURED.
+
+## Post-validation evidence-sufficiency remediation
+
+| Evidence item | Classification | Result |
+|---|---|---|
+| Development answerability-group audit | DEVELOPMENT ONLY | 343 normalized groups; 36 contradictory groups covering 104 tickets |
+| Unambiguous supervised population | DEVELOPMENT ONLY | 307 groups: 224 answerable, 83 unanswerable |
+| Raw Top-1 retrieval discrimination | DEVELOPMENT ONLY | ROC-AUC 0.668244 |
+| Retrieval-feature OOF model | DEVELOPMENT ONLY | ROC-AUC 0.662167; zero-observed-false-positive coverage 7/307 (2.28%) |
+| Text + retrieval OOF model | DEVELOPMENT ONLY | ROC-AUC 0.681368; zero-observed-false-positive coverage 2/307 (0.65%) |
+| Threshold promotion decision | GOVERNANCE / DEVELOPMENT | No evidence-sufficiency threshold promoted |
+| Runtime remediation | ENGINEERING | `src/evidence.py` added at `e20a173`; orchestrator/audit integration added at `f744522` |
+| Regression evidence | ENGINEERING | 390/390 tests passed after integration |
+| Validation use | BOUNDARY | No validation rerun or development tuning against validation |
+| Hidden/final use | BOUNDARY | Not accessed |
+
+The remediation does not supersede or alter the historical frozen-V1 validation
+artifacts. It explains why the current runtime retains fail-closed automatic-release
+behaviour.

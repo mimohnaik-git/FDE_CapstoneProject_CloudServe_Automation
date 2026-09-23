@@ -71,3 +71,28 @@ precedence over narrative documents. For human metrics, the Stage 18 aggregate t
 precedence. For V2, the Stage 20 JSON decision takes precedence. Historical artifacts
 may retain the state known when generated and must not be rewritten; submission-facing
 documents must explain later evidence explicitly.
+
+## Post-validation evidence-sufficiency claim reconciliation
+
+The repository now contains an explicit inference-time evidence-sufficiency stage.
+This is a post-validation engineering remediation and is not a new validation result.
+
+Permitted current claim:
+
+> The current runtime computes evidence-sufficiency diagnostics internally and records
+> them in the audit trail, but it intentionally fails closed because development-only
+> experiments did not establish a defensible high-precision automatic-release policy
+> with meaningful independent coverage.
+
+Claims that remain unsupported:
+
+- that safe non-zero automation has been proven;
+- that the evidence-sufficiency stage has been validated on a fresh independent
+  validation population;
+- that the current branch improves the historical 0% validation automation result;
+- that validation hallucination, citation quality, FCR, CSAT, production reliability,
+  or other previously unmeasured outcomes are now measured;
+- that the hidden/final assessment has been accessed.
+
+Historical frozen-V1 validation remains 0% automation and 100% escalation. The
+deployment recommendation remains **LIMITED SUPERVISED PILOT - NOT PRODUCTION-READY**.

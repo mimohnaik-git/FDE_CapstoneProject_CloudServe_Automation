@@ -551,3 +551,20 @@ The urgency diagonal is 34/80, or 42.5%; derived macro F1 is 41.417%.
 ### Appendix B. Detailed metrics, human method, and traceability
 
 The authoritative rerun report contains complete metric definitions, denominators, and status rules. The human-development method used 50 candidates and two independent reviewers; its agreement figures appear in Section 7. The A1–A12 mapping is maintained in `docs/final_a1_a12_acceptance_audit.md` and `docs/requirements_traceability.md`. The Section 4 diagram is the implemented frozen V1 architecture.
+
+## Post-report addendum - evidence-sufficiency remediation
+
+**Addendum date:** 23 September 2026
+**Evidence class:** POST-VALIDATION DEVELOPMENT / ENGINEERING REMEDIATION.
+
+This addendum does not alter the report's frozen-V1 evidence cut-off or the authoritative 80-ticket validation results. It documents subsequent engineering work performed to resolve the previously implicit evidence-sufficiency gap.
+
+A development-only audit found 343 normalized request-text groups among the 500 development tickets. Thirty-six groups, covering 104 tickets, had contradictory `answerable_from_docs` labels for identical normalized request text. Those groups were excluded from supervised modelling rather than allowed to leak across evaluation folds.
+
+The remaining 307 unambiguous groups contained 224 answerable and 83 unanswerable groups. Raw Top-1 retrieval score achieved ROC-AUC 0.668244. A retrieval-feature model achieved 0.662167 OOF ROC-AUC, while a text-plus-retrieval model achieved 0.681368. Their zero-observed-false-positive regions covered only 7/307 (2.28%) and 2/307 (0.65%) groups respectively.
+
+These results did not establish a defensible automatic-release policy. No evidence-sufficiency threshold was promoted.
+
+The current repository therefore adds an explicit `EvidenceSufficiencyEngine` between retrieval and routing. It computes runtime diagnostics, preserves the caller trust boundary, records its assessment in the decision audit, and continues to fail closed. The current evidence engine does not produce `sufficient=True`.
+
+No validation rerun was performed, no threshold was tuned against validation, and no hidden/final assessment data was accessed. Historical validation automation remains 0%, escalation remains 100%, and the deployment recommendation remains **LIMITED SUPERVISED PILOT - NOT PRODUCTION-READY**.

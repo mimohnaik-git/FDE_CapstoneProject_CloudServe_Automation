@@ -148,11 +148,15 @@ Repository provenance is tracked as three distinct states:
   credential-free startup, and all 355 tests. Stabilization improved
   reproducibility and provider portability without rerunning validation or
   changing its results.
-- **Final delivery repository state:** limited to repository hygiene, delivery
-  provenance, and non-behavioral documentation cleanup. Frozen V1 runtime behavior,
-  thresholds, prompts, guardrails, authoritative validation artifacts/results, and
-  the rejected V2 status remain unchanged. Validation is not rerun for this delivery
-  state. The exact final delivery commit and hosted CI run are recorded after the
-  delivery commit exists.
+- **Post-validation remediation state:** the frozen evaluated V1 baseline and its
+  authoritative 80-ticket validation artifacts remain unchanged. After validation,
+  the repository added an explicit fail-closed evidence-sufficiency stage on branch
+  `fix/evidence-sufficiency-engine`. Development-only analysis found insufficient
+  evidence to justify any non-zero automatic-release policy, so no evidence threshold
+  was promoted and the current runtime still cannot produce a trusted
+  `evidence_sufficient=True` decision. The 0.80 classification and 0.30 retrieval
+  thresholds remain unchanged. Validation was not rerun and hidden/final data was not
+  accessed. Commits `e20a173` and `f744522` implement and integrate this remediation.
+  This is post-validation engineering evidence, not a new validation baseline.
 
 CI success is engineering evidence only; it is not production availability evidence.

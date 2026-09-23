@@ -149,3 +149,15 @@ frozen; this document does not authorize an implementation change.
 - **Trade-offs:** Deterministic and dependency-free on one host; distributed deployment
   would need a shared, access-controlled control plane.
 
+## ADR-013 - Explicit fail-closed evidence-sufficiency gate
+
+- **Status:** Implemented as post-validation remediation; no automatic-release policy promoted.
+- **Context:** The router required independent evidence sufficiency, but the production orchestrator previously had no legitimate inference-time component able to produce that signal.
+- **Alternatives:** Treat retrieval cosine as answerability; use generated-response support as the evidence gate; train a development-only answerability model and force a threshold; retain implicit `None`; add an explicit abstaining evidence component.
+- **Choice:** Add `EvidenceSufficiencyEngine` between retrieval and routing. The engine computes only legitimate inference-time diagnostics, rejects invalid evidence, and remains fail-closed unless a future independently justified policy can establish sufficiency.
+- **Development evidence:** 500 development tickets yielded 343 normalized text groups. Thirty-six groups covering 104 tickets had contradictory answerability labels. On the remaining 307 groups, raw Top-1 ROC-AUC was 0.668244, retrieval-feature OOF ROC-AUC was 0.662167, and text-plus-retrieval OOF ROC-AUC was 0.681368. Zero-observed-false-positive coverage was only 7/307 and 2/307 respectively.
+- **Decision consequence:** No threshold was promoted. The current engine cannot produce a trusted `sufficient=True` release signal; therefore automatic customer release remains fail-closed.
+- **Trust boundary:** Caller-provided `evidence_sufficient` values remain untrusted. The production orchestrator supplies only its internally generated assessment to the router.
+- **Auditability:** Evidence status, reason, policy/version information, and diagnostic features are persisted inside the existing routing-signals JSON.
+- **Validation boundary:** The historical 80-ticket validation set was not rerun or used for this development decision. Hidden/final assessment data was not accessed.
+- **Implementation evidence:** `e20a173` introduced the evidence component and tests; `f744522` integrated it into orchestration and audit persistence. The integrated repository passed 390/390 tests.
