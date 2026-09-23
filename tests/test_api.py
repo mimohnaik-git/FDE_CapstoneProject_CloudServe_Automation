@@ -454,7 +454,11 @@ def test_private_and_evaluation_fields_are_not_in_response(client):
 
 def test_production_support_pipeline_orchestrator_entry_point_is_called(monkeypatch):
     calls = []
-    monkeypatch.setattr(api_module.SupportPipelineOrchestrator, "__init__", lambda self: None)
+    monkeypatch.setattr(
+        api_module.SupportPipelineOrchestrator,
+        "__init__",
+        lambda self: setattr(self, "logger", object()),
+    )
     monkeypatch.setattr(api_module.SupportPipelineOrchestrator, "process_ticket", lambda self, ticket: calls.append(ticket) or _result())
     api_module.app.dependency_overrides.clear()
     api_module.get_orchestrator.cache_clear()
@@ -468,6 +472,183 @@ def test_production_support_pipeline_orchestrator_entry_point_is_called(monkeypa
     assert response.status_code == 200
     assert len(calls) == 1
     assert calls[0]["ticket_id"] == "API-email"
+
+
+def test_readiness_reports_initialized_pipeline(client):
+    response = client.get("/ready")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ready",
+        "service": "support-pipeline",
+        "dependency_status": "initialized",
+    }
+
+
+def test_health_does_not_require_pipeline_initialization(
+    monkeypatch,
+):
+    class BrokenOrchestrator:
+        def __init__(self):
+            raise RuntimeError(
+                "PRIVATE-INITIALIZATION-DIAGNOSTIC"
+            )
+
+    monkeypatch.setattr(
+        api_module,
+        "SupportPipelineOrchestrator",
+        BrokenOrchestrator,
+    )
+    api_module.app.dependency_overrides.clear()
+    api_module.get_orchestrator.cache_clear()
+
+    try:
+        with TestClient(api_module.app) as test_client:
+            response = test_client.get("/health")
+    finally:
+        api_module.get_orchestrator.cache_clear()
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
+def test_readiness_failure_is_sanitized(
+    monkeypatch,
+):
+    private_marker = "PRIVATE-INITIALIZATION-DIAGNOSTIC"
+
+    class BrokenOrchestrator:
+        def __init__(self):
+            raise RuntimeError(private_marker)
+
+    monkeypatch.setattr(
+        api_module,
+        "SupportPipelineOrchestrator",
+        BrokenOrchestrator,
+    )
+    api_module.app.dependency_overrides.clear()
+    api_module.get_orchestrator.cache_clear()
+
+    try:
+        with TestClient(
+            api_module.app,
+            raise_server_exceptions=False,
+        ) as test_client:
+            response = test_client.get("/ready")
+    finally:
+        api_module.get_orchestrator.cache_clear()
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "Pipeline dependencies are unavailable."
+    )
+    assert private_marker not in response.text
+
+
+def test_readiness_rejects_orchestrator_without_mandatory_audit_logger(
+    monkeypatch,
+):
+    class MissingLoggerOrchestrator:
+        def __init__(self):
+            self.logger = None
+            self.logger_initialization_error = "OperationalError"
+
+    monkeypatch.setattr(
+        api_module,
+        "SupportPipelineOrchestrator",
+        MissingLoggerOrchestrator,
+    )
+    api_module.app.dependency_overrides.clear()
+    api_module.get_orchestrator.cache_clear()
+
+    try:
+        with TestClient(
+            api_module.app,
+            raise_server_exceptions=False,
+        ) as test_client:
+            response = test_client.get("/ready")
+    finally:
+        api_module.get_orchestrator.cache_clear()
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "Pipeline dependencies are unavailable."
+    )
+    assert "OperationalError" not in response.text
+
+
+def test_authenticated_processing_dependency_failure_is_sanitized(
+    monkeypatch,
+):
+    private_marker = "PRIVATE-PROCESSING-INIT-ERROR"
+
+    class BrokenOrchestrator:
+        def __init__(self):
+            raise RuntimeError(private_marker)
+
+    monkeypatch.setattr(
+        api_module,
+        "SupportPipelineOrchestrator",
+        BrokenOrchestrator,
+    )
+    api_module.app.dependency_overrides.clear()
+    api_module.get_orchestrator.cache_clear()
+
+    try:
+        with TestClient(
+            api_module.app,
+            raise_server_exceptions=False,
+        ) as test_client:
+            response = test_client.post(
+                "/tickets/process",
+                json=_ticket(),
+                headers=AUTH_HEADERS,
+            )
+    finally:
+        api_module.get_orchestrator.cache_clear()
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "Pipeline dependencies are unavailable."
+    )
+    assert private_marker not in response.text
+
+
+def test_reviewer_dependency_failure_is_sanitized(
+    monkeypatch,
+):
+    private_marker = "PRIVATE-REVIEWER-INIT-ERROR"
+
+    class BrokenOrchestrator:
+        def __init__(self):
+            raise RuntimeError(private_marker)
+
+    monkeypatch.setattr(
+        api_module,
+        "SupportPipelineOrchestrator",
+        BrokenOrchestrator,
+    )
+    api_module.app.dependency_overrides.clear()
+    api_module.get_orchestrator.cache_clear()
+
+    try:
+        with TestClient(
+            api_module.app,
+            raise_server_exceptions=False,
+        ) as test_client:
+            response = test_client.post(
+                "/review/tickets/process",
+                json=_ticket(),
+                headers=REVIEWER_HEADERS,
+            )
+    finally:
+        api_module.get_orchestrator.cache_clear()
+
+    assert response.status_code == 503
+    assert response.json()["detail"] == (
+        "Pipeline dependencies are unavailable."
+    )
+    assert private_marker not in response.text
 
 
 def test_metrics_endpoint_is_prometheus_compatible_and_has_required_series(client):

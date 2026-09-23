@@ -6,7 +6,7 @@ from functools import lru_cache
 import time
 from typing import Annotated, Literal
 
-from fastapi import Depends, FastAPI, Response
+from fastapi import Depends, FastAPI, HTTPException, Response, status
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from src.pipeline import SupportPipelineOrchestrator
@@ -83,9 +83,25 @@ class ReviewerTicketResponse(BaseModel):
 
 @lru_cache(maxsize=1)
 def get_orchestrator() -> SupportPipelineOrchestrator:
-    """Construct the real production orchestrator once per application process."""
+    """Construct one ready orchestrator without leaking initialization errors."""
 
-    return SupportPipelineOrchestrator()
+    try:
+        orchestrator = SupportPipelineOrchestrator()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Pipeline dependencies are unavailable.",
+        ) from exc
+
+    # Audit persistence is a mandatory safety dependency. Do not cache or
+    # serve a newly initialized pipeline that could not initialize its logger.
+    if getattr(orchestrator, "logger", None) is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Pipeline dependencies are unavailable.",
+        )
+
+    return orchestrator
 
 
 PipelineDependency = Annotated[SupportPipelineOrchestrator, Depends(get_orchestrator)]
@@ -104,6 +120,23 @@ def health() -> dict[str, str]:
     """Report process health only; dependencies are not actively probed here."""
 
     return {"status": "ok", "service": "support-pipeline", "dependency_status": "not_checked"}
+
+
+@app.get("/ready")
+def readiness(
+    orchestrator: PipelineDependency,
+) -> dict[str, str]:
+    """Report initialization readiness without probing external networks."""
+
+    # Dependency resolution has already verified that the pipeline and
+    # mandatory audit store initialized successfully.
+    del orchestrator
+
+    return {
+        "status": "ready",
+        "service": "support-pipeline",
+        "dependency_status": "initialized",
+    }
 
 
 @app.get("/metrics", include_in_schema=False)
