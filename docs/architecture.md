@@ -1,34 +1,4 @@
 # Architecture Decisions
-## Reference stack reconciliation
-
-The capstone source pack supplied a reference implementation stack rather than a
-mandatory framework contract. The Build Specification evaluates system behavior
-through A1-A12 and permits justified implementation choices. The final stack
-therefore retains components that fit the measured requirements and records
-material departures explicitly.
-
-| Layer | Source-pack reference | Implemented stack | Decision |
-| --- | --- | --- | --- |
-| Language | Python 3.10+ | Python 3.12 | Retained and updated to the tested runtime |
-| Orchestration | LangChain + LangGraph | Explicit Python orchestration | Deliberate departure: fixed deterministic workflow is easier to audit, test, and fail closed |
-| Classification | Provider/model examples | TF-IDF + calibrated logistic regression | Deliberate local deterministic implementation with measurable probabilities |
-| Vector retrieval | Chroma | NumPy exact cosine | Deliberate departure: 29-document / ~170-chunk corpus does not require vector-database lifecycle complexity |
-| Embeddings | all-MiniLM-L6-v2 | all-MiniLM-L6-v2 | Retained after project-specific retrieval comparison |
-| Model access | OpenRouter / Groq | Provider-neutral interface with offline default plus optional hosted providers | Generalized baseline to preserve portability and outage handling |
-| API | FastAPI | FastAPI | Retained |
-| Decision storage | SQLite / PostgreSQL | SQLite | Retained for project scale |
-| Monitoring | Prometheus + Grafana | Prometheus-compatible metrics + Grafana configuration | Retained |
-| CI | GitHub Actions | GitHub Actions | Retained |
-| Testing | Pytest | Pytest | Retained |
-
-These substitutions do not change the required processing contract:
-ingest → classify → retrieve → evidence sufficiency → deterministic route →
-grounded generation → guardrails → terminal decision → audit persistence.
-
-The material departures are documented in ADR-001, ADR-003, ADR-004, ADR-006,
-and ADR-013. They were selected for reproducibility, auditability, local/offline
-operation, measured project performance, and reduced operational complexity
-rather than for framework preference.
 
 ## Stage 4 retrieval stack deviation
 
