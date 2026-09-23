@@ -13,6 +13,7 @@ from src.pipeline import SupportPipelineOrchestrator
 from src.monitoring import observe_ticket, prometheus_payload
 from src.operations import is_kill_switch_enabled, kill_switch_escalation
 from src.security import require_api_access, require_reviewer_access
+from src.review import review_handoff_store
 
 
 class TicketRequest(BaseModel):
@@ -176,6 +177,53 @@ def process_ticket(
         }
     observe_ticket(ticket.channel, result, time.perf_counter() - started)
 
+    handoff = (
+        result.get("escalation_context")
+        if isinstance(result.get("escalation_context"), dict)
+        else None
+    )
+    decision_id = result.get("decision_id")
+
+    if (
+        isinstance(decision_id, str)
+        and decision_id.strip()
+        and handoff is not None
+        and handoff.get("visibility") == "INTERNAL_REVIEW_ONLY"
+        and handoff.get("approval_required") is True
+    ):
+        review_handoff_store.put(
+            decision_id,
+            {
+                "ticket_id": str(
+                    result.get("ticket_id") or ticket.ticket_id
+                ),
+                "terminal_action": "ESCALATE",
+                "classification": (
+                    result.get("classification")
+                    if isinstance(
+                        result.get("classification"),
+                        dict,
+                    )
+                    else {}
+                ),
+                "routing_reason": str(
+                    result.get("reason")
+                    or "Human review required."
+                ),
+                "routing_reason_code": str(
+                    result.get("reason_code")
+                    or "UNSPECIFIED_ESCALATION"
+                ),
+                "decision_id": decision_id,
+                "processing_status": (
+                    "FAILED"
+                    if result.get("processing_status") == "FAILED"
+                    else "COMPLETED"
+                ),
+                "escalation_context": handoff,
+            },
+        )
+
     classification = result.get("classification") if isinstance(result.get("classification"), dict) else {}
     released = result.get("response_released") is True and result.get("status") == "AUTO_RESPOND"
     response = result.get("response") if released and isinstance(result.get("response"), dict) else {}
@@ -202,69 +250,37 @@ def process_ticket(
         processing_status="FAILED" if result.get("processing_status") == "FAILED" else "COMPLETED",
     )
 
-@app.post("/review/tickets/process", response_model=ReviewerTicketResponse)
-def process_ticket_for_review(
-    ticket: TicketRequest,
+@app.get(
+    "/review/decisions/{decision_id}",
+    response_model=ReviewerTicketResponse,
+)
+def get_review_handoff(
+    decision_id: str,
     _reviewer_access: ReviewerAccessDependency,
-    orchestrator: PipelineDependency,
 ) -> ReviewerTicketResponse:
-    """Process one ticket and expose only the approved internal review handoff."""
+    """Return the exact original internal handoff without reprocessing."""
 
-    payload = ticket.model_dump(exclude_none=True)
-    started = time.perf_counter()
+    stored = review_handoff_store.get(decision_id)
 
-    try:
-        result = (
-            kill_switch_escalation(orchestrator, payload)
-            if is_kill_switch_enabled()
-            else orchestrator.process_ticket(payload)
+    if stored is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review handoff not found.",
         )
-    except Exception:
-        result = {
-            "ticket_id": ticket.ticket_id,
-            "status": "ESCALATE",
-            "reason": "Ticket processing failed safely and requires human review.",
-            "reason_code": "PIPELINE_INTERNAL_ERROR",
-            "processing_status": "FAILED",
-            "decision_id": None,
-            "classification": {},
-            "response_released": False,
-            "escalation_context": None,
-        }
-
-    observe_ticket(
-        ticket.channel,
-        result,
-        time.perf_counter() - started,
-    )
 
     classification = (
-        result.get("classification")
-        if isinstance(result.get("classification"), dict)
+        stored.get("classification")
+        if isinstance(stored.get("classification"), dict)
         else {}
     )
 
-    released = (
-        result.get("response_released") is True
-        and result.get("status") == "AUTO_RESPOND"
-    )
-
     handoff = (
-        result.get("escalation_context")
-        if isinstance(result.get("escalation_context"), dict)
-        else None
+        stored.get("escalation_context")
+        if isinstance(stored.get("escalation_context"), dict)
+        else {}
     )
 
-    valid_handoff = (
-        not released
-        and handoff is not None
-        and handoff.get("visibility") == "INTERNAL_REVIEW_ONLY"
-        and handoff.get("approval_required") is True
-        and isinstance(handoff.get("review_draft"), str)
-        and bool(handoff["review_draft"].strip())
-    )
-
-    raw_citations = handoff.get("citations", []) if valid_handoff else []
+    raw_citations = handoff.get("citations", [])
 
     citations = [
         CitationResponse(
@@ -277,40 +293,26 @@ def process_ticket_for_review(
         and isinstance(item.get("chunk_id"), str)
     ]
 
-    terminal_action = "AUTO_RESPOND" if released else "ESCALATE"
-
     return ReviewerTicketResponse(
-        ticket_id=str(result.get("ticket_id") or ticket.ticket_id),
-        terminal_action=terminal_action,
+        ticket_id=str(stored["ticket_id"]),
+        terminal_action="ESCALATE",
         intent=classification.get("intent"),
         urgency=classification.get("urgency"),
-        routing_reason=str(
-            result.get("reason") or "Human review required."
-        ),
+        routing_reason=str(stored["routing_reason"]),
         routing_reason_code=str(
-            result.get("reason_code") or "UNSPECIFIED_ESCALATION"
+            stored["routing_reason_code"]
         ),
-        decision_id=result.get("decision_id"),
-        processing_status=(
-            "FAILED"
-            if result.get("processing_status") == "FAILED"
-            else "COMPLETED"
+        decision_id=str(stored["decision_id"]),
+        processing_status=str(
+            stored["processing_status"]
         ),
-        approval_required=bool(valid_handoff),
-        review_draft=(
-            handoff["review_draft"].strip()
-            if valid_handoff
-            else None
-        ),
+        approval_required=True,
+        review_draft=str(
+            handoff["review_draft"]
+        ).strip(),
         citations=citations,
-        evidence_status=(
-            handoff.get("evidence_status")
-            if valid_handoff
-            else None
-        ),
-        evidence_reason_code=(
-            handoff.get("evidence_reason_code")
-            if valid_handoff
-            else None
+        evidence_status=handoff.get("evidence_status"),
+        evidence_reason_code=handoff.get(
+            "evidence_reason_code"
         ),
     )

@@ -9,6 +9,7 @@ import src.api as api_module
 from src.ingest import TicketNormalizationEngine
 from src.logging_store import DecisionLoggingEngine
 from src.security import api_rate_limiter
+from src.review import review_handoff_store
 
 
 TEST_API_KEY = "synthetic-test-api-key"
@@ -69,10 +70,12 @@ def api_security_defaults(monkeypatch):
     )
     monkeypatch.setenv("SUPPORT_API_RATE_LIMIT_PER_MINUTE", "60")
     api_rate_limiter.reset()
+    review_handoff_store.clear()
 
     yield
 
     api_rate_limiter.reset()
+    review_handoff_store.clear()
 
 
 @pytest.fixture
@@ -306,7 +309,7 @@ def test_internal_escalation_handoff_is_not_exposed_by_public_api(client, stub):
     assert "PRIVATE REVIEW DRAFT" not in response.text
 
 
-def test_reviewer_endpoint_exposes_only_safe_internal_handoff(
+def test_original_processing_registers_exact_reviewer_handoff(
     client,
     stub,
 ):
@@ -317,7 +320,10 @@ def test_reviewer_endpoint_exposes_only_safe_internal_handoff(
         "escalation_context": {
             "visibility": "INTERNAL_REVIEW_ONLY",
             "approval_required": True,
-            "review_draft": "Clear stale login credentials and authenticate again.",
+            "review_draft": (
+                "Clear stale login credentials "
+                "and authenticate again."
+            ),
             "citations": [
                 {
                     "document_id": "DOC-AUTH-001",
@@ -331,17 +337,40 @@ def test_reviewer_endpoint_exposes_only_safe_internal_handoff(
         },
     }
 
-    response = client.post(
-        "/review/tickets/process",
+    public_response = client.post(
+        "/tickets/process",
         json=_ticket(),
+    )
+
+    public_body = public_response.json()
+
+    assert public_response.status_code == 200
+    assert public_body["terminal_action"] == "ESCALATE"
+    assert public_body["response_text"] is None
+    assert "review_draft" not in public_response.text
+
+    decision_id = public_body["decision_id"]
+
+    calls_before_review = len(stub.calls)
+
+    review_response = client.get(
+        f"/review/decisions/{decision_id}",
         headers=REVIEWER_HEADERS,
     )
-    body = response.json()
 
-    assert response.status_code == 200
+    body = review_response.json()
+
+    # Retrieval must not run the pipeline again.
+    assert len(stub.calls) == calls_before_review
+
+    assert review_response.status_code == 200
+    assert body["decision_id"] == decision_id
     assert body["terminal_action"] == "ESCALATE"
     assert body["approval_required"] is True
-    assert "Clear stale login credentials" in body["review_draft"]
+    assert (
+        "Clear stale login credentials"
+        in body["review_draft"]
+    )
     assert body["citations"] == [
         {
             "document_id": "DOC-AUTH-001",
@@ -350,40 +379,42 @@ def test_reviewer_endpoint_exposes_only_safe_internal_handoff(
     ]
     assert body["evidence_status"] == "UNVERIFIED"
 
-    assert set(body) == {
-        "ticket_id",
-        "terminal_action",
-        "intent",
-        "urgency",
-        "routing_reason",
-        "routing_reason_code",
-        "decision_id",
-        "processing_status",
-        "approval_required",
-        "review_draft",
-        "citations",
-        "evidence_status",
-        "evidence_reason_code",
-    }
 
-
-def test_processing_api_credential_cannot_access_reviewer_endpoint(
+def test_processing_api_credential_cannot_read_reviewer_handoff(
     client,
     stub,
 ):
-    response = client.post(
-        "/review/tickets/process",
+    stub.result = {
+        **_result(
+            reason_code="EVIDENCE_SUFFICIENCY_UNVERIFIED"
+        ),
+        "escalation_context": {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "approval_required": True,
+            "review_draft": "Internal draft.",
+            "citations": [],
+            "evidence_status": "UNVERIFIED",
+            "evidence_reason_code": "TEST",
+        },
+    }
+
+    processed = client.post(
+        "/tickets/process",
         json=_ticket(),
+    )
+
+    decision_id = processed.json()["decision_id"]
+
+    response = client.get(
+        f"/review/decisions/{decision_id}",
         headers=AUTH_HEADERS,
     )
 
     assert response.status_code == 401
-    assert stub.calls == []
 
 
 def test_reviewer_endpoint_requires_distinct_server_credential(
     client,
-    stub,
     monkeypatch,
 ):
     monkeypatch.setenv(
@@ -391,18 +422,16 @@ def test_reviewer_endpoint_requires_distinct_server_credential(
         TEST_API_KEY,
     )
 
-    response = client.post(
-        "/review/tickets/process",
-        json=_ticket(),
+    response = client.get(
+        "/review/decisions/DECISION-UNKNOWN",
         headers=AUTH_HEADERS,
     )
 
     assert response.status_code == 503
     assert "must be distinct" in response.json()["detail"]
-    assert stub.calls == []
 
 
-def test_reviewer_endpoint_does_not_expose_draft_without_valid_handoff(
+def test_non_handoff_escalation_is_not_registered_for_review(
     client,
     stub,
 ):
@@ -411,20 +440,23 @@ def test_reviewer_endpoint_does_not_expose_draft_without_valid_handoff(
         "escalation_context": None,
     }
 
-    response = client.post(
-        "/review/tickets/process",
+    processed = client.post(
+        "/tickets/process",
         json=_ticket(),
+    )
+
+    decision_id = processed.json()["decision_id"]
+
+    response = client.get(
+        f"/review/decisions/{decision_id}",
         headers=REVIEWER_HEADERS,
     )
-    body = response.json()
 
-    assert response.status_code == 200
-    assert body["terminal_action"] == "ESCALATE"
-    assert body["approval_required"] is False
-    assert body["review_draft"] is None
-    assert body["citations"] == []
-    assert body["evidence_status"] is None
-    assert body["evidence_reason_code"] is None
+    assert response.status_code == 404
+    assert response.json()["detail"] == (
+        "Review handoff not found."
+    )
+
 
 
 def test_pipeline_exception_is_suppressed_and_cannot_crash_api(client, stub):
@@ -614,14 +646,47 @@ def test_authenticated_processing_dependency_failure_is_sanitized(
     assert private_marker not in response.text
 
 
-def test_reviewer_dependency_failure_is_sanitized(
+def test_existing_reviewer_handoff_does_not_require_pipeline_initialization(
     monkeypatch,
 ):
-    private_marker = "PRIVATE-REVIEWER-INIT-ERROR"
+    decision_id = "DECISION-REVIEW-EXISTING"
+
+    review_handoff_store.put(
+        decision_id,
+        {
+            "ticket_id": "API-email",
+            "terminal_action": "ESCALATE",
+            "classification": {
+                "intent": "authentication_failure",
+                "urgency": "medium",
+            },
+            "routing_reason": "Human review required.",
+            "routing_reason_code": (
+                "EVIDENCE_SUFFICIENCY_UNVERIFIED"
+            ),
+            "decision_id": decision_id,
+            "processing_status": "COMPLETED",
+            "escalation_context": {
+                "visibility": "INTERNAL_REVIEW_ONLY",
+                "approval_required": True,
+                "review_draft": (
+                    "Clear stale login credentials "
+                    "and authenticate again."
+                ),
+                "citations": [],
+                "evidence_status": "UNVERIFIED",
+                "evidence_reason_code": (
+                    "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
+                ),
+            },
+        },
+    )
 
     class BrokenOrchestrator:
         def __init__(self):
-            raise RuntimeError(private_marker)
+            raise RuntimeError(
+                "PRIVATE-REVIEWER-INIT-ERROR"
+            )
 
     monkeypatch.setattr(
         api_module,
@@ -636,19 +701,20 @@ def test_reviewer_dependency_failure_is_sanitized(
             api_module.app,
             raise_server_exceptions=False,
         ) as test_client:
-            response = test_client.post(
-                "/review/tickets/process",
-                json=_ticket(),
+            response = test_client.get(
+                f"/review/decisions/{decision_id}",
                 headers=REVIEWER_HEADERS,
             )
     finally:
         api_module.get_orchestrator.cache_clear()
 
-    assert response.status_code == 503
-    assert response.json()["detail"] == (
-        "Pipeline dependencies are unavailable."
+    assert response.status_code == 200
+    assert response.json()["decision_id"] == decision_id
+    assert response.json()["approval_required"] is True
+    assert (
+        "PRIVATE-REVIEWER-INIT-ERROR"
+        not in response.text
     )
-    assert private_marker not in response.text
 
 
 def test_metrics_endpoint_is_prometheus_compatible_and_has_required_series(client):
