@@ -171,3 +171,20 @@ implementation-hardening evidence: run 34889316386, commit
 zero warnings. This hardening changed no product requirement, threshold, prompt,
 guardrail policy, or validation result. CI is reproducibility evidence, not
 availability evidence.
+
+## Post-validation runtime clarification
+
+The production-hardening statements above describe the Frozen V1 / Stage 2 state
+and are retained as historical design evidence.
+
+After frozen validation, runtime remediation added application-level bearer
+authentication for ticket processing, a distinct reviewer credential, bounded
+single-process rate limiting, readiness checks, exact ephemeral reviewer-handoff
+retrieval, and immutable reviewer-action auditing.
+
+These later controls do not rewrite the Stage 2/Frozen V1 record and do not create
+new validation evidence. Production-grade IAM/RBAC, distributed/edge abuse
+controls, durable reviewer infrastructure, load and availability evidence, alert
+verification, backup/recovery evidence, and production security testing remain
+incomplete. The deployment posture therefore remains LIMITED SUPERVISED PILOT -
+NOT PRODUCTION-READY.

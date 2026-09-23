@@ -1,4 +1,4 @@
-# Operational Governance — Frozen V1
+# Operational Governance — Frozen V1 and Post-Validation Pilot Controls
 
 This document governs the operational API around frozen V1. It does not change
 classifier, retrieval, routing, generation, prompt, guardrail, or evaluation behavior.
@@ -33,6 +33,52 @@ role before customer traffic is enabled.
 | Unsafe output release | Low | Critical | Blocking guardrails, response-release allowlist, kill switch, incident procedure | Security Lead |
 
 Likelihood and impact are governance assessments, not observed incident rates.
+
+## API access and reviewer controls
+
+Post-validation runtime remediation adds application-level bearer authentication
+around ticket processing and a separate credential boundary for human review.
+
+- SUPPORT_API_KEY authorizes normal ticket processing.
+- SUPPORT_REVIEWER_API_KEY authorizes internal review access.
+- The reviewer credential must be distinct from the processing credential.
+- Reviewer identity is persisted only as a pseudonymous credential fingerprint.
+- SUPPORT_API_RATE_LIMIT_PER_MINUTE provides a bounded single-process application
+  rate limit.
+
+These controls reduce accidental or unauthenticated access during a supervised
+pilot. They do not establish production-grade identity federation, individual-user
+RBAC, distributed rate limiting, gateway protection, or denial-of-service
+resilience.
+
+## Human-review governance
+
+Only safe evidence-unverified escalations that have grounded generation and passing
+output guardrails can produce an INTERNAL_REVIEW_ONLY draft.
+
+The ordinary customer-processing response never exposes that draft. The draft is
+held in a bounded process-local ephemeral store and is retrieved later by
+decision_id through the reviewer-authenticated API. Retrieval does not rerun the
+model pipeline.
+
+A reviewer can record exactly one immutable action:
+
+- APPROVE_DRAFT
+- REJECT_DRAFT
+
+The review action is linked to the original decision record and persisted without
+the draft text. Successful review removes the ephemeral draft.
+
+APPROVE_DRAFT is not a customer-send authorization implemented by this service.
+It does not mutate the original pipeline decision, does not change
+
+esponse_released, and does not create a customer-facing response. Any future
+delivery mechanism would require a separate governed design, authorization model,
+idempotency contract, delivery audit, and evaluation.
+
+Because the review draft store is process-local, restart or expiry can remove an
+unreviewed draft. This fails safely because the ticket remains escalated. A durable
+human-review queue has not been implemented or operationally measured.
 
 ## Deterministic kill switch
 
@@ -111,5 +157,7 @@ observation period before production claims are made.
   switch enforce this boundary.
 - The most likely remaining harm is a grounded but incomplete response that delays
   resolution or is accepted despite a missed semantic defect.
-- Do not deploy without named owners, tested alerts/backups, access control and rate
-  limiting, load testing, and a rehearsed incident/kill-switch exercise.
+- Do not deploy beyond a bounded supervised setting without named owners, tested
+  alerts/backups, production-grade identity and authorization, distributed/edge rate
+  controls, a durable reviewer queue where required, load testing, and a rehearsed
+  incident/kill-switch exercise.\n

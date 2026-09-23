@@ -96,7 +96,7 @@ Finally, **A11** is evidenced by controlled failure paths for malformed input, r
 
 Traceability is maintained at the requirement level rather than by treating the application as one opaque assistant. Ingestion preserves the source channel in a common ticket representation. Classification produces the structured fields required by the downstream route. Retrieval returns identifiable reviewed passages or a legitimate no-result outcome. The route consumes explicit safety-relevant inputs and returns a terminal action with a reason. Generation and guardrails have separate responsibilities, and the logger persists the resulting decision record. This division makes it possible to test a component, inspect a terminal decision, and identify an evidence boundary without assuming that one successful component proves the full workflow is ready for production.
 
-FR-04 remains an important qualification. The current two-outcome implementation expresses the A5 contract as AUTO_RESPOND or ESCALATE, with escalation serving as the human-review path. This structurally satisfies the applicable acceptance contract, while the original three-state wording remains only partially realized. More importantly, the 40.0% validation routing accuracy, 0.0% automation, and 100.0% escalation are reported as quality limitations rather than hidden behind structural compliance. The same approach is used for the NFRs: local latency, reproducibility, and decision-log coverage have evidence, while availability, load, recovery, authentication, authorization, and rate limiting remain production-hardening gaps.
+FR-04 remains an important qualification. The current two-outcome implementation expresses the A5 contract as AUTO_RESPOND or ESCALATE, with escalation serving as the human-review path. This structurally satisfies the applicable acceptance contract, while the original three-state wording remains only partially realized. More importantly, the 40.0% validation routing accuracy, 0.0% automation, and 100.0% escalation are reported as quality limitations rather than hidden behind structural compliance. The same approach is used for the NFRs: local latency, reproducibility, and decision-log coverage have evidence, while production availability, load, recovery, production-grade IAM/RBAC, distributed rate limiting, edge protection, and durable review operations remain production-hardening gaps. Post-validation application-level bearer authentication, distinct reviewer authorization, and bounded single-process rate limiting now have regression evidence.
 
 ### Canonical brief targets and evidence status
 
@@ -140,8 +140,7 @@ The non-functional requirements are reported according to evidence type rather t
 treated as automatic pass/fail outcomes. The local P95 target was measured and met, but
 that observation is deliberately not reused as availability or load evidence. The
 reproducibility path, modular workflow, and persistent logging have implementation and
-test evidence. Auth/authz/rate limiting, verified load, alert delivery, backup, and
-recovery remain production-hardening requirements with no qualifying measurement.
+test evidence. Post-validation application-level processing authentication, distinct reviewer authorization, and bounded single-process rate limiting now have regression evidence. Production-grade IAM/RBAC, distributed abuse controls, verified load, alert delivery, backup, and recovery remain production-hardening requirements without qualifying production evidence.
 
 | Non-functional area | Current position |
 |---|---|
@@ -151,7 +150,7 @@ recovery remain production-hardening requirements with no qualifying measurement
 | Privacy/security controls | Private-data and secret blocking controls have functional test evidence. Formal compliance, retention, and access-control validation are not evidenced; released-response leakage is NOT MEASURED because validation released zero automatic responses. |
 | Fairness | NOT PROVEN; segmentation is preliminary and human cross-group quality is not measured. |
 | Reproducibility | Documented setup, arbitrary-size harness, one-command tests, clean-checkout smoke, and hosted CI evidence. |
-| Production service hardening | PRODUCTION-HARDENING GAP — auth/authz, API rate limiting, production load testing, production availability, alert-delivery verification, backup/recovery testing, and production retention/access controls are absent or lack qualifying evidence. These are not recast as A1–A12 failures. |
+| Production service hardening | PRODUCTION-HARDENING GAP - post-validation application-level bearer authentication, separate reviewer authorization, and single-process rate limiting are implemented and regression tested. Production-grade IAM/RBAC, distributed/edge abuse controls, production load testing, production availability, alert-delivery verification, backup/recovery testing, durable reviewer workflow, and production retention/access controls remain absent or lack qualifying evidence. These are not recast as A1-A12 failures. |
 
 ## 4. Architecture and implementation
 
@@ -229,7 +228,29 @@ The SQLite decision store is the audit boundary for a processed ticket. A termin
 
 The validation reconciliation shows the logging behavior at the terminal-decision level: 80 source tickets, 80 evaluated tickets, 80 terminal outcomes, and 80 logged records. That is the basis for the reported 100.0% decision-log coverage. It does not prove production retention duration, concurrent-write behavior, database recovery, access control, or backup restoration. Those distinctions are retained because an auditable local record and a production data-management system have different operational requirements.
 
-FastAPI provides the documented application boundary for processing, health, and bounded metrics endpoints. The API and its tests support structured response and error behavior in the implementation. The `/health` endpoint is a local service check, and `/metrics` supports observability; neither is used as evidence of a highly available production service. Likewise, provider-neutral generation makes the system portable across configured providers, but provider smoke evidence is component-level development evidence and does not establish end-to-end production reliability.
+FastAPI provides the documented application boundary for processing,
+liveness, readiness, bounded metrics, and protected human review.
+`/tickets/process` requires application-level bearer authentication. Reviewer
+lookup and reviewer-action endpoints require a distinct reviewer credential.
+`/health` is liveness only, while `/ready` verifies successful pipeline
+construction and mandatory audit-store initialization without claiming
+external-provider or network availability. `/metrics` supports bounded
+observability.
+
+The post-validation reviewer workflow retrieves the exact original internal
+handoff by `decision_id` rather than rerunning classification, retrieval,
+generation, or guardrails. One immutable `APPROVE_DRAFT` or `REJECT_DRAFT`
+event can be recorded. Reviewer approval is audit-only: it does not mutate the
+original terminal action, set `response_released=True`, or send a customer
+response. The review draft remains in a bounded process-local ephemeral store
+and is excluded from the canonical decision record.
+
+These controls improve the supervised-pilot boundary but do not establish
+production-grade IAM/RBAC, distributed rate limiting, gateway or
+denial-of-service protection, durable review-queue operation, or highly
+available service behavior. Provider smoke evidence likewise remains
+component-level development evidence, not end-to-end production reliability
+evidence.
 
 ### Test and acceptance evidence
 
@@ -406,7 +427,7 @@ The AI-use declaration records ChatGPT, Codex in VS Code, and Claude. The owner 
 
 Monitoring is deliberately bounded to avoid turning observability into another private-data exposure path. The Prometheus-compatible endpoint exposes operational measurements without ticket bodies, customer identifiers, response text, retrieved passages, or secrets. The accompanying Prometheus configuration and Grafana dashboard cover ticket outcomes, latency, guardrail events, and confidence distribution. These assets support inspection of the fail-closed system during a supervised use setting, but no load test, alert-delivery rehearsal, or production availability observation window was performed.
 
-Reproducibility evidence is also kept separate from operational evidence. The observed hosted GitHub Actions run covered checkout, Python 3.12, dependency installation, `pip check`, offline clean-checkout smoke, and the complete Pytest suite. It demonstrates that the repository workflow ran successfully in that hosted CI execution. It does not demonstrate a continuously available service, an authenticated public API, recovery from backup, or performance under live demand.
+Reproducibility evidence is also kept separate from operational evidence. The observed hosted GitHub Actions run covered checkout, Python 3.12, dependency installation, `pip check`, offline clean-checkout smoke, and the complete Pytest suite. It demonstrates that the repository workflow ran successfully in that hosted CI execution. It does not by itself demonstrate a continuously available service, production-grade identity or authorization, distributed abuse protection, recovery from backup, or performance under live demand.
 
 Governance artifacts make the intended control ownership explicit. The risk register identifies confident-but-wrong output, private-data exposure, prompt injection treated as an instruction, uneven quality across groups, stale documentation, provider unavailability, latency degradation, unexpected cost growth, and unsafe release. The incident procedure supplies a Detect, Contain, Assess, Notify, Remediate, and Review sequence. Together with the kill switch, these artifacts give a reviewer a documented way to suspend release and preserve an audit trail when a safety condition is observed. They do not create evidence that the procedure has been exercised under a production incident.
 
@@ -430,14 +451,25 @@ V1 is **NOT PRODUCTION-READY**. The following remain explicit limitations:
 
 - FCR, CSAT, customer first-response time, production availability, load/alert performance, and backup/recovery performance are **NOT MEASURED**.
 - Validation hallucination, semantic citation accuracy, usefulness, and correctness are **NOT MEASURED**.
-- Production API authentication, authorization, and rate limiting are absent.
+- Post-validation application-level bearer authentication, distinct reviewer authorization, and bounded single-process rate limiting are implemented and regression tested. Production-grade IAM/RBAC, distributed rate limiting, TLS/gateway enforcement, credential-lifecycle evidence, and denial-of-service protection remain incomplete or unmeasured.
 - Urgency quality and calibration are weak; ECE is about 42.3 percentage points.
 - Safe non-zero automation is unproven: validation automation is 0% and escalation 100%.
 - Development-only usefulness is 2.87/5 and is too low for production in the owner's view.
 - Fairness evidence is preliminary and the fairness gate is not proven.
 - Live-provider evidence is component-level development smoke evidence, not end-to-end validation or production evidence.
 
-The production-readiness assessment is not a restatement of A1–A12. The engineering contract has credible PASS evidence for the frozen workflow, while production readiness requires additional evidence about real service operation, customer outcomes, security controls, and safe release behavior. In particular, the absence of API authentication, authorization, and rate limiting is a production-hardening gap; it is not retroactively classified as an A1–A12 failure. Likewise, the successful CI run and local P95 latency result demonstrate reproducibility and bounded technical performance, not availability or first-response performance.
+The production-readiness assessment is not a restatement of A1?A12. The
+engineering contract has credible PASS evidence for the frozen workflow, while
+production readiness requires additional evidence about real service operation,
+customer outcomes, security controls, and safe release behavior. The original
+frozen-V1 API access-control gap has been partially remediated after validation
+through application-level bearer authentication, a distinct reviewer credential,
+and bounded single-process rate limiting. These are post-validation engineering
+controls, not frozen A1?A12 validation evidence, and they do not establish
+production-grade IAM/RBAC, distributed abuse protection, or production security
+readiness. Likewise, the successful historical CI run and local P95 latency
+result demonstrate reproducibility and bounded technical performance, not
+availability or first-response performance.
 
 The validation results also constrain the deployment posture. Intent classification and audit coverage are strong technical findings, but urgency and calibration are weak, and every validation terminal outcome escalated. The absence of released automatic validation responses prevents a claim about validation response quality or released-response privacy outcomes. The project therefore has a controlled, reviewable foundation suitable only for an evidence-gathering supervised setting, not a demonstrated basis for autonomous production support.
 
@@ -453,7 +485,14 @@ The confirmed owner recommendation is **LIMITED SUPERVISED PILOT**, not producti
 
 The recommendation is an owner decision based on the documented evidence boundaries, not a claim that the pilot outcomes have already been achieved. A limited supervised pilot is the only recommended deployment scope recorded here because it can preserve human accountability while gathering the operational evidence that is currently absent. It must not be described as production readiness, a successful automation result, or a fairness-gate pass. Human reviewers retain final accountability for customer-impacting decisions.
 
-Before any production decision, the unresolved requirements remain explicit: stronger urgency and calibration evidence, demonstrated safe non-zero automation, improved usefulness, adequately powered fairness evidence, API authentication/authorization/rate limiting, production load and availability evidence, alert delivery evidence, and backup/recovery testing. These are future evidence requirements, not changes made to frozen V1 in this report.
+Before any production decision, the unresolved requirements remain explicit:
+stronger urgency and calibration evidence, demonstrated safe non-zero automation,
+improved usefulness, adequately powered fairness evidence, production-grade
+IAM/RBAC, distributed/edge rate and abuse controls, production load and
+availability evidence, alert-delivery evidence, backup/recovery testing, and a
+durable reviewer workflow where required. These are future production evidence
+requirements. The post-validation access-control remediation does not change the
+frozen V1 validation results.
 
 ### Supervised-pilot evidence boundary
 
@@ -568,3 +607,46 @@ These results did not establish a defensible automatic-release policy. No eviden
 The current repository therefore adds an explicit `EvidenceSufficiencyEngine` between retrieval and routing. It computes runtime diagnostics, preserves the caller trust boundary, records its assessment in the decision audit, and continues to fail closed. The current evidence engine does not produce `sufficient=True`.
 
 No validation rerun was performed, no threshold was tuned against validation, and no hidden/final assessment data was accessed. Historical validation automation remains 0%, escalation remains 100%, and the deployment recommendation remains **LIMITED SUPERVISED PILOT - NOT PRODUCTION-READY**.
+
+## Post-report addendum - runtime remediation
+
+After the evidence-sufficiency remediation, engineering continued on the local
+`fix/runtime-remediation` branch. This work occurred after the frozen V1
+validation cycle and does not alter any preserved validation artifact or metric.
+
+The remediation adds:
+
+- safe `INTERNAL_REVIEW_ONLY` escalation handoffs for grounded,
+  guardrail-passing evidence-unverified cases;
+- same-document Resolution support passages for grounded generation without
+  changing primary semantic document ranking;
+- bearer authentication on ticket processing;
+- a separate reviewer credential that must differ from the processing credential;
+- bounded single-process application rate limiting;
+- liveness/readiness separation with sanitized dependency-initialization failures;
+- exact reviewer retrieval of the original handoff without rerunning inference;
+- bounded process-local ephemeral review-draft storage;
+- immutable `APPROVE_DRAFT` / `REJECT_DRAFT` review-action persistence using a
+  pseudonymous reviewer identity; and
+- regression coverage proving that reviewer approval does not mutate the original
+  escalated decision or release a customer response.
+
+The complete local Pytest suite reached **425 passing tests** after these changes.
+This is local post-validation engineering evidence only. It does not replace or
+modify the historical hosted-CI 355-test result already reported in this document.
+
+The reviewer-draft store is deliberately ephemeral and process-local. Restart,
+expiry, or cache loss can remove the draft while leaving the original ticket
+safely escalated. A durable distributed reviewer queue has not been implemented.
+Application authentication and rate limiting are supervised-pilot controls, not
+evidence of production IAM/RBAC, distributed rate limiting, gateway protection,
+or denial-of-service resilience.
+
+No frozen validation rerun was performed for this remediation. No hidden/final
+data was accessed, no evidence-sufficiency threshold was promoted, and no new
+validation automation, response-quality, hallucination, citation-quality,
+fairness, availability, security-outcome, or business-outcome measurement is
+claimed.
+
+Historical V1 validation remains **0% automation and 100% escalation**, and the
+deployment posture remains **LIMITED SUPERVISED PILOT ? NOT PRODUCTION-READY**.

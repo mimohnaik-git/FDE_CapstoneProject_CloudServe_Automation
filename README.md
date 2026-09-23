@@ -48,6 +48,13 @@ cp .env.example .env
 `GROQ_BASE_URL`. Store credentials only in the untracked `.env` or process
 environment; never commit them.
 
+Operational ticket processing requires `SUPPORT_API_KEY`. Human-review access uses
+the separate `SUPPORT_REVIEWER_API_KEY`; the two credentials must be distinct.
+`SUPPORT_API_RATE_LIMIT_PER_MINUTE` applies a bounded, single-process application
+rate limit. These controls are post-validation supervised-pilot controls, not
+evidence of production-grade IAM, RBAC, distributed rate limiting, edge protection,
+or denial-of-service protection.
+
 The semantic retriever uses `sentence-transformers/all-MiniLM-L6-v2`. Normal first
 use may download that public model. Fully disconnected operation requires the same
 weights to be provisioned in a readable Hugging Face cache in advance; provider
@@ -61,9 +68,12 @@ Start the API from the repository root:
 python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
 ```
 
-- `GET /health` reports application-process health without claiming downstream availability.
+- `GET /health` reports process liveness only and does not initialize pipeline dependencies.
+- `GET /ready` verifies that the pipeline and mandatory audit store initialized successfully; it does not claim external-provider or network availability.
 - `GET /metrics` exposes bounded, Prometheus-compatible operational metrics.
-- `POST /tickets/process` processes one ticket through the production orchestrator.
+- `POST /tickets/process` processes one authenticated ticket through the support orchestrator.
+- `GET /review/decisions/{decision_id}` allows an authenticated reviewer to retrieve the exact original internal escalation handoff without rerunning inference.
+- `POST /review/decisions/{decision_id}/action` records one immutable `APPROVE_DRAFT` or `REJECT_DRAFT` human-review audit event. Approval does not release or send a customer response.
 
 The deterministic automatic-response kill switch is the exact file
 `storage/auto_response.disabled`. An authorized operator enables it without a
@@ -133,8 +143,10 @@ availability, load/alert performance, and backup/recovery are also not measured.
 The owner recommendation is a limited supervised pilot. Frozen V1 is not
 production-ready: validation automation was 0%, safe non-zero automation was not
 proven, urgency and calibration were weak, fairness evidence was preliminary, and
-production authentication, authorization, rate limiting, load, alert, and recovery
-evidence remain incomplete. The owner's 30% future automation target is not a
+post-validation application-level bearer authentication, separate reviewer
+authorization, and single-process rate limiting are now implemented and regression
+tested, but production-grade IAM/RBAC, distributed rate limiting, edge protection,
+load, alert, durable review-queue, backup, and recovery evidence remain incomplete. The owner's 30% future automation target is not a
 measured V1 result, and safety takes priority over automation.
 
 Repository provenance is tracked as three distinct states:
@@ -158,5 +170,17 @@ Repository provenance is tracked as three distinct states:
   thresholds remain unchanged. Validation was not rerun and hidden/final data was not
   accessed. Commits `e20a173` and `f744522` implement and integrate this remediation.
   This is post-validation engineering evidence, not a new validation baseline.
+
+- **Post-validation runtime remediation:** subsequent engineering work added safe
+  internal escalation handoffs, resolution-context enrichment for generation,
+  authenticated processing and reviewer APIs, fail-closed readiness checks, exact
+  ephemeral reviewer handoff retrieval, and immutable reviewer-action auditing.
+  The ordinary customer-processing endpoint still releases no response unless the
+  pipeline explicitly reaches `AUTO_RESPOND`; reviewer approval is audit-only and
+  there is no customer-send/release endpoint. Reviewer draft text remains ephemeral
+  and is deliberately excluded from the canonical SQLite decision record.
+  These changes have not been evaluated on the frozen validation set and create no
+  new validation, automation, usefulness, hallucination, fairness, business-outcome,
+  availability, or production-readiness claim.
 
 CI success is engineering evidence only; it is not production availability evidence.

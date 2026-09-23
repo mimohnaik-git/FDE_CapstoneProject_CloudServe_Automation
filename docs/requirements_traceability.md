@@ -39,3 +39,27 @@ validation/human-review evidence remain unchanged.
 |---|---|---|
 | A1 — Clean Checkout | Root `README.md`, placeholder-only `.env.example`, `.gitignore`, and `scripts/clean_checkout_smoke.py` document and exercise the credential-free offline path without developer-specific paths. | Fresh repository checkout: dependency installation, application/evaluation imports, `/health`, complete tests, and `pip check`. |
 | A12 — Tests | `.github/workflows/ci.yml` installs Python 3.12 dependencies, runs `pip check`, executes the clean-checkout smoke check, and runs the full suite using the README's single test command. | `python -m pytest` from repository root. |
+
+## Post-validation runtime-remediation traceability
+
+These controls were implemented after frozen V1 validation. They are engineering
+evidence only and do not change historical validation metrics.
+
+| Runtime concern | Post-validation implementation | Evidence boundary |
+|---|---|---|
+| Evidence-unverified escalation | Internal reviewer handoff is produced only after grounded generation and passing output guardrails | No new validation run |
+| Response usefulness | Same-document Resolution passages are supplied to generation without changing semantic document ranking | Regression tested; no new human-quality score |
+| Public API authentication | Bearer authentication protects `/tickets/process` | Application-level supervised-pilot control only |
+| Reviewer authorization | Separate reviewer credential is required and must differ from the processing credential | Not production IAM/RBAC |
+| Rate limiting | Bounded process-local request limiter | Not distributed or edge protection |
+| Dependency readiness | `/health` liveness is separated from `/ready` pipeline/audit initialization readiness; initialization failures return sanitized HTTP 503 | No availability or SLO claim |
+| Human-review consistency | Reviewer retrieves the exact original handoff by `decision_id`; inference is not rerun | Handoff storage is process-local and ephemeral |
+| Review audit | One immutable `APPROVE_DRAFT` or `REJECT_DRAFT` event is recorded per original decision | Approval is audit-only; no customer-send endpoint |
+| Draft persistence | Review draft is excluded from canonical SQLite decision records | Draft is lost safely on expiry or restart |
+| Audit persistence | Reviewer action records contain decision ID, pseudonymous reviewer identity, action, timestamp, and review-event ID | Draft content is not persisted with the review action |
+| Regression coverage | Complete local Pytest suite reached 425 passing tests on the runtime-remediation branch | Local engineering evidence, not frozen-validation or hosted-CI evidence |
+
+The runtime-remediation work therefore improves supervised-pilot control and
+traceability without creating a new automatic-response safety claim. The frozen
+validation result remains unchanged, including 0% automation and 100% escalation
+in the authorized 80-ticket V1 validation run.

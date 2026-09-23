@@ -38,7 +38,7 @@ operational evidence, and missing evidence must remain NOT MEASURED.
 | Response quality | Correctness was 3.74/5 and usefulness was 2.87/5, with no formal targets. | DEVELOPMENT ONLY | 100 reviewer ratings over 50 candidates; not validation auto-response performance. |
 | Fairness | Only explicit tier/fluency fields and a deterministic text-length grouping were used. Validation enterprise n=8 and non-fluent n=19 were below minimum n=20. | LIMITATION | Stage 18 fairness report. Underpowered groups and cross-group human quality are NOT MEASURED. |
 | V2 | V2 was a rejected development experiment, not a candidate for production or validation. | DEVELOPMENT ONLY | Stage 20: calibration improved, but no policy met zero-false-auto safety; best observed policy had 18 false auto-responses. |
-| API | FastAPI `/health`, `/tickets/process`, and `/metrics` are implemented and locally tested. | OPERATIONAL | API/monitoring tests. `/health` does not prove external provider availability. |
+| API and supervised-review controls | FastAPI implements `/health`, `/ready`, authenticated `/tickets/process`, `/metrics`, exact reviewer handoff retrieval by `decision_id`, and immutable reviewer action recording. Processing and reviewer credentials are distinct, and bounded single-process application rate limiting is regression tested. | POST-VALIDATION ENGINEERING | Local regression tests only. `/health` is liveness, `/ready` verifies pipeline/audit initialization only, reviewer approval is audit-only, and these controls do not establish production IAM/RBAC, distributed rate limiting, gateway protection, provider availability, or production readiness. |
 | Kill switch | The deterministic kill switch suppresses AUTO_RESPOND, escalates with an explicit reason, and keeps decision logging active. | OPERATIONAL | Local synthetic tests; fleet propagation and operator response time are not measured. |
 | Monitoring | Prometheus-compatible metrics and Grafana-ready configuration exist. | OPERATIONAL | Local tests/configuration only; scrape retention, alert delivery, and response performance are NOT MEASURED. |
 | CI | GitHub Actions CI was observed passing on `main` commit `b97f40bd308127fc7569b79e97ed5a297f226c1b` (run `34617707232`). Checkout, Python 3.12 setup, dependency installation, `pip check`, offline clean-checkout smoke, and the complete pytest suite all succeeded. | OPERATIONAL | GitHub Actions workflow `CI`, run `34617707232`, conclusion `success`. This is hosted CI evidence, not production availability evidence. |
@@ -96,3 +96,14 @@ Claims that remain unsupported:
 
 Historical frozen-V1 validation remains 0% automation and 100% escalation. The
 deployment recommendation remains **LIMITED SUPERVISED PILOT - NOT PRODUCTION-READY**.
+
+Post-validation runtime remediation added safe internal escalation handoffs,
+same-document Resolution support for grounded generation, application-level bearer
+authentication, a separate reviewer credential, bounded single-process rate limiting,
+fail-closed readiness checks, exact ephemeral handoff retrieval, and immutable
+`APPROVE_DRAFT` / `REJECT_DRAFT` review auditing. The local regression suite reached
+425 passing tests. These are post-validation engineering results only: validation was
+not rerun, the hidden/final assessment was not accessed, no automatic-release threshold
+was promoted, reviewer approval does not send a customer response, and no new
+validation-quality, availability, business-outcome, or production-readiness claim is
+created.

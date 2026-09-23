@@ -54,3 +54,46 @@ The engine records retrieval-strength, lexical-support, document-count, section,
 Only the internally produced evidence result is passed directly to `TicketRoutingEngine.route(...)`. Untrusted batch/caller requests cannot promote their own evidence-sufficiency assertion. The assessment is persisted in the existing routing-signals audit JSON.
 
 This post-validation stage does not change the historical frozen-V1 validation results or the retained 0.80 classification / 0.30 retrieval thresholds.
+
+## Post-validation supervised-review runtime remediation
+
+After the evidence-sufficiency remediation, engineering continued on a separate post-validation runtime-remediation branch. These changes do not alter the frozen validation evidence or promote a new automatic-release policy.
+
+The current supervised-review path is:
+
+```text
+Authenticated ticket request
+  -> Normalize
+  -> Classify
+  -> Retrieve authoritative documentation
+  -> Evidence sufficiency
+  -> Deterministic route
+  -> Grounded generation when applicable
+  -> Guardrails
+  -> Persist terminal decision
+  -> Safe public projection
+       |
+       +-- if evidence remains unverified and generation is grounded/safe:
+             create INTERNAL_REVIEW_ONLY handoff
+             -> ephemeral TTL-bounded process-local handoff store
+             -> reviewer-authenticated lookup by decision_id
+             -> immutable APPROVE_DRAFT / REJECT_DRAFT audit event
+             -> delete ephemeral handoff after successful review action
+```
+
+The reviewer endpoint retrieves the exact handoff produced by the original ticket execution. It does not rerun classification, retrieval, generation, guardrails, or decision logging. Reviewer drafts are excluded from the canonical SQLite decision record.
+
+The process-local handoff cache is bounded and ephemeral. If the process restarts or a handoff expires, the draft is lost and the original ticket remains safely escalated. The immutable reviewer action persists only the linked decision ID, pseudonymous reviewer identity, action, timestamp, and review-event ID.
+
+`APPROVE_DRAFT` is an audit decision only. It does not change the original terminal action, does not set `response_released=True`, and does not send or publish a customer response. No customer-send/release endpoint exists in the review workflow.
+
+### API operational boundaries
+
+- `/health` is liveness only and does not initialize inference dependencies.
+- `/ready` verifies successful pipeline construction and mandatory audit-store initialization without claiming provider/network availability.
+- `/tickets/process` requires `SUPPORT_API_KEY`.
+- reviewer endpoints require the distinct `SUPPORT_REVIEWER_API_KEY`.
+- application rate limiting is process-local and bounded; it is not a distributed gateway or denial-of-service control.
+- pipeline initialization failures return a sanitized HTTP 503 rather than leaking constructor/provider/storage diagnostics.
+
+These are post-validation engineering controls for a supervised-pilot architecture. They are not production-availability, production-security, or business-outcome measurements.

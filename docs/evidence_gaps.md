@@ -31,12 +31,21 @@ below describe when the gap should be closed; they do not imply that missing evi
 | Load and latency under concurrency | Validation P95 0.0915 seconds was a local sequential pipeline measurement. | Representative load test covering API, retrieval, provider, database, and tail latency. |
 | Alert delivery and response | Metrics/dashboard configuration and local tests do not prove paging. | Alert thresholds, routed notification test, acknowledgement and response-time exercise. |
 | Backup and recovery | SQLite recovery behavior is documented but not rehearsed. | Restore drill with RPO/RTO, integrity, WAL handling, and decision reconciliation. |
-| Authentication, authorization, and abuse controls | FastAPI exposes no measured production access-control boundary. | Identity, authorization, TLS, rate limiting, request limits, and security testing. |
+| Production-grade authentication, authorization, and abuse controls | Post-validation runtime remediation now provides application-level bearer authentication for ticket processing, a distinct reviewer credential, and bounded single-process rate limiting. These controls are regression tested but are not production-grade IAM/RBAC, distributed rate limiting, TLS termination, gateway protection, or denial-of-service evidence. | Federated identity or equivalent production IAM, individual authorization/RBAC, TLS/gateway enforcement, distributed rate limiting, request-size and abuse controls, credential lifecycle procedures, and production security testing. |
 | Live-provider reliability/cost | Offline mode was the default evidence path. | Provider SLA/error/latency/cost observation with approved retry and fallback policy. |
 | Named accountable operators | Governance defines roles but explicitly says named individuals are unavailable. | Assign trained System Owner, on-call, Support Operations, Security, ML/Evaluation, and Platform owners. |
 | Kill-switch operational performance | Synthetic tests prove logic, not fleet-wide propagation or human response time. | Rehearsed exercise across every instance, including in-flight traffic and audit failure. |
 
 ## Completed evidence confirmations
+
+- Post-validation runtime remediation added application-level bearer authentication
+  for `/tickets/process`, a separate reviewer credential that must differ from the
+  processing credential, bounded single-process rate limiting, sanitized dependency
+  readiness failures, exact ephemeral reviewer-handoff retrieval, and immutable
+  reviewer-action auditing. The local complete regression suite reached **425
+  passing tests**. These are engineering controls and regression evidence only;
+  they do not establish production IAM/RBAC, distributed abuse protection,
+  availability, or a new frozen-validation result.
 
 - Owner review and sign-off were completed by **Mimoh Naik** on **12 September 2026**.
   The owner approved a **limited supervised pilot**, confirmed V1 is **not

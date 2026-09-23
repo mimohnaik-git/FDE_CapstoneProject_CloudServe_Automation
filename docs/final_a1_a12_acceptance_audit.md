@@ -45,4 +45,4 @@ Frozen evidence remains intact. The recorded aggregate fingerprint is:
 
 ## Production-readiness limitations
 
-Weak urgency/calibration, 0% V1 automation, low development usefulness, unproven safe automation, unmeasured fairness quality, API auth/authz/rate limiting, load/availability/alerting, backup/recovery, and operational ownership remain outside the completed submission evidence.
+Weak urgency/calibration, 0% V1 automation, low development usefulness, unproven safe automation, unmeasured fairness quality, production-grade IAM/RBAC, distributed/edge rate and abuse controls, load/availability/alerting, backup/recovery, durable reviewer operations, and operational ownership remain outside the completed submission evidence. Post-validation engineering now provides application-level bearer authentication, distinct reviewer authorization, and bounded single-process rate limiting; these are supervised-pilot controls rather than new frozen-validation evidence.
