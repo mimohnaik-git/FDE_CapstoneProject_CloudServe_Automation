@@ -137,19 +137,71 @@ def _response_text(payload: Mapping[str, Any]) -> str:
 
 
 def _retrieval_pairs(retrieval_results: Any) -> Dict[tuple[str, str], str]:
+    """Return every authoritative passage that generation is allowed to cite."""
     pairs: Dict[tuple[str, str], str] = {}
-    if not isinstance(retrieval_results, Sequence) or isinstance(retrieval_results, (str, bytes)):
+
+    if (
+        not isinstance(retrieval_results, Sequence)
+        or isinstance(retrieval_results, (str, bytes))
+    ):
         return pairs
+
     for item in retrieval_results:
         if not isinstance(item, Mapping):
             continue
+
         document_id = item.get("document_id") or item.get("doc_id")
         chunk_id = item.get("chunk_id")
         passage = item.get("passage") or item.get("chunk_content")
-        if all(isinstance(value, str) and value.strip() for value in (document_id, chunk_id, passage)):
-            pairs[(document_id.strip(), chunk_id.strip())] = passage.strip()
-    return pairs
 
+        if all(
+            isinstance(value, str) and value.strip()
+            for value in (document_id, chunk_id, passage)
+        ):
+            document_id = document_id.strip()
+            pairs[(document_id, chunk_id.strip())] = passage.strip()
+        else:
+            document_id = None
+
+        supporting = item.get("supporting_passages")
+
+        if not isinstance(supporting, list) or not document_id:
+            continue
+
+        for support in supporting:
+            if not isinstance(support, Mapping):
+                continue
+
+            support_document_id = support.get("document_id")
+            support_chunk_id = support.get("chunk_id")
+            support_passage = (
+                support.get("passage")
+                or support.get("chunk_content")
+            )
+
+            if not all(
+                isinstance(value, str) and value.strip()
+                for value in (
+                    support_document_id,
+                    support_chunk_id,
+                    support_passage,
+                )
+            ):
+                continue
+
+            # Supporting evidence is valid only inside its parent
+            # authoritative document.
+            if support_document_id.strip() != document_id:
+                continue
+
+            pairs[
+                (
+                    support_document_id.strip(),
+                    support_chunk_id.strip(),
+                )
+            ] = support_passage.strip()
+
+    return pairs
 
 def _cited_passages(
     payload: Mapping[str, Any],

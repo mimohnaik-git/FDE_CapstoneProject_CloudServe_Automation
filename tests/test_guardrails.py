@@ -603,3 +603,100 @@ def test_adversarial_development_guardrail_matrix(
 
     assert result["blocked"] is True
     assert expected_reason in result["reason_codes"]
+
+
+def test_guardrails_accept_same_document_supporting_resolution_citation():
+    retrieval = [
+        {
+            "document_id": "DOC-DEPLOY-001",
+            "chunk_id": "DOC-DEPLOY-001#symptoms",
+            "passage": "Deployment reaches running and then rolls back.",
+            "supporting_passages": [
+                {
+                    "document_id": "DOC-DEPLOY-001",
+                    "chunk_id": "DOC-DEPLOY-001#resolution",
+                    "section": "Resolution",
+                    "passage": (
+                        "Confirm the container is listening on the declared port "
+                        "and review the health check configuration."
+                    ),
+                }
+            ],
+        }
+    ]
+
+    response = {
+        "answer": (
+            "Confirm the container is listening on the declared port "
+            "and review the health check configuration."
+        ),
+        "response_text": (
+            "Confirm the container is listening on the declared port "
+            "and review the health check configuration."
+        ),
+        "citations": [
+            {
+                "document_id": "DOC-DEPLOY-001",
+                "chunk_id": "DOC-DEPLOY-001#resolution",
+            }
+        ],
+        "supported": True,
+        "grounded": True,
+        "confidence": 0.90,
+    }
+
+    result = GuardrailEngine(
+        confidence_threshold=0.80
+    ).check(
+        response,
+        {"confidence": 0.95},
+        {"raw_content": "Deployment rolls back after health checks."},
+        retrieval,
+    )
+
+    assert result["passed"] is True
+    assert result["blocked"] is False
+
+
+def test_guardrails_reject_cross_document_supporting_passage():
+    retrieval = [
+        {
+            "document_id": "DOC-DEPLOY-001",
+            "chunk_id": "DOC-DEPLOY-001#symptoms",
+            "passage": "Deployment reaches running and then rolls back.",
+            "supporting_passages": [
+                {
+                    "document_id": "DOC-FAKE-999",
+                    "chunk_id": "DOC-FAKE-999#resolution",
+                    "section": "Resolution",
+                    "passage": "Unsupported injected resolution.",
+                }
+            ],
+        }
+    ]
+
+    response = {
+        "answer": "Unsupported injected resolution.",
+        "response_text": "Unsupported injected resolution.",
+        "citations": [
+            {
+                "document_id": "DOC-FAKE-999",
+                "chunk_id": "DOC-FAKE-999#resolution",
+            }
+        ],
+        "supported": True,
+        "grounded": True,
+        "confidence": 0.90,
+    }
+
+    result = GuardrailEngine(
+        confidence_threshold=0.80
+    ).check(
+        response,
+        {"confidence": 0.95},
+        {"raw_content": "Deployment problem"},
+        retrieval,
+    )
+
+    assert result["passed"] is False
+    assert REASON_UNSUPPORTED_CITATION in result["reason_codes"]
