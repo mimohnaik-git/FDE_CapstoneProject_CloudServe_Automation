@@ -41,7 +41,7 @@ operational evidence, and missing evidence must remain NOT MEASURED.
 | API and supervised-review controls | FastAPI implements `/health`, `/ready`, authenticated `/tickets/process`, `/metrics`, exact reviewer handoff retrieval by `decision_id`, and immutable reviewer action recording. Processing and reviewer credentials are distinct, and bounded single-process application rate limiting is regression tested. | POST-VALIDATION ENGINEERING | Local regression tests only. `/health` is liveness, `/ready` verifies pipeline/audit initialization only, reviewer approval is audit-only, and these controls do not establish production IAM/RBAC, distributed rate limiting, gateway protection, provider availability, or production readiness. |
 | Kill switch | The deterministic kill switch suppresses AUTO_RESPOND, escalates with an explicit reason, and keeps decision logging active. | OPERATIONAL | Local synthetic tests; fleet propagation and operator response time are not measured. |
 | Monitoring | Prometheus-compatible metrics and Grafana-ready configuration exist. | OPERATIONAL | Local tests/configuration only; scrape retention, alert delivery, and response performance are NOT MEASURED. |
-| CI | Verified hosted CI run `35909582906`: SUCCESS at verified post-validation engineering checkpoint `f430ea6`; post-validation regression suite: 425 passing tests. Earlier hosted runs, including `34617707232`, remain historical reproducibility evidence. | OPERATIONAL | GitHub Actions workflow `CI`, run `35909582906`, conclusion `success`. This is hosted CI evidence, not production availability evidence. |
+| CI | GitHub Actions CI was observed passing on `main` commit `b97f40bd308127fc7569b79e97ed5a297f226c1b` (run `34617707232`). Checkout, Python 3.12 setup, dependency installation, `pip check`, offline clean-checkout smoke, and the complete pytest suite all succeeded. | OPERATIONAL | GitHub Actions workflow `CI`, run `34617707232`, conclusion `success`. This is hosted CI evidence, not production availability evidence. |
 | Historical FCR/CSAT | Development discovery recorded historical FCR 43.8% and mean historical CSAT 2.97/5. These are dataset baselines, not outcomes of V1. | DEVELOPMENT ONLY | 500 supplied development tickets. |
 | System FCR | System-attributable FCR is NOT MEASURED. | NOT MEASURED | No linked resolution/follow-up outcomes. |
 | System CSAT | System-attributable CSAT is NOT MEASURED. | NOT MEASURED | No attributable customer ratings. |
@@ -102,7 +102,7 @@ same-document Resolution support for grounded generation, application-level bear
 authentication, a separate reviewer credential, bounded single-process rate limiting,
 fail-closed readiness checks, exact ephemeral handoff retrieval, and immutable
 `APPROVE_DRAFT` / `REJECT_DRAFT` review auditing. The local regression suite reached
-post-validation regression suite: 425 passing tests. These are post-validation engineering results only: validation was
+425 passing tests. These are post-validation engineering results only: validation was
 not rerun, the hidden/final assessment was not accessed, no automatic-release threshold
 was promoted, reviewer approval does not send a customer response, and no new
 validation-quality, availability, business-outcome, or production-readiness claim is

@@ -38,19 +38,14 @@ The recording must show at least seven minutes of the system actually running.
 
 1. Start the API in offline mode from repository-root README instructions.
 2. Show `/health` without describing it as proof of provider availability.
-3. Show `/ready` as a fail-closed initialization check, not as availability evidence.
-4. If demonstrating processing or reviewer actions, show the required distinct credentials
-   without displaying their values; explain that authentication and the bounded
-   single-process rate limit are supervised-pilot controls, not production IAM/RBAC or
-   distributed abuse protection.
-5. Process a valid ticket and show its controlled terminal result and decision ID.
-6. Show an ordinary low-confidence escalation.
-7. Show a prompt-injection or private-data guardrail case ending in safe escalation.
-8. Enable the deterministic kill switch, show AUTO_RESPOND suppression with an explicit
+3. Process a valid ticket and show its controlled terminal result and decision ID.
+4. Show an ordinary low-confidence escalation.
+5. Show a prompt-injection or private-data guardrail case ending in safe escalation.
+6. Enable the deterministic kill switch, show AUTO_RESPOND suppression with an explicit
    auditable reason, then disable it.
-9. Show `/metrics` and verify it contains no ticket body, customer identifier, retrieved
+7. Show `/metrics` and verify it contains no ticket body, customer identifier, retrieved
    passage, response text, or secret.
-10. Show the preserved unattended validation rerun report with 80 source, evaluated,
+8. Show the preserved unattended validation rerun report with 80 source, evaluated,
    terminal, and decision records reconciled.
 
 V1 validation had zero automatic releases. Do not stage or claim a validation
@@ -90,10 +85,9 @@ may inform it:
 - V1 is safe but operationally over-conservative: 0% automation and 100% escalation.
 - V2 improved development calibration but was rejected because candidate routing still
   produced false auto-responses; it was not validated.
-- Remaining work includes establishing a defensible non-zero evidence-sufficiency/release
-  policy and evaluating a new release candidate on a fresh independent governed
-  population, plus production-grade IAM/RBAC, distributed abuse controls,
-  load/availability/alert studies, backup/restore rehearsal, and named operators.
+- Remaining work includes a new safe answerability signal and validation cycle,
+  operational security, hosted CI observation, load/availability/alert studies,
+  backup/restore rehearsal, and named operators.
 
 ## Recording checklist
 

@@ -383,13 +383,12 @@ The kill switch is an additional operational control. The file-based setting sup
 Prometheus-compatible `/metrics` exposes bounded operational measurements without ticket bodies, customer identifiers, response text, retrieved passages, or secrets. Prometheus configuration and a Grafana dashboard cover ticket outcomes, latency, guardrail events, and confidence distribution. Governance artifacts provide a risk register, incident-response procedure, ownership roles, and kill-switch operation.
 
 Historical frozen GitHub Actions CI was **SUCCESS** on run `34773077234` for
-commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`; the later stabilization run
-`34889316386` was **SUCCESS** for commit
-`7062f683e41a178e644713acee81478731dc9adc` with 355 tests. Verified hosted CI run
-`35909582906`: **SUCCESS** at verified post-validation engineering
-checkpoint `f430ea6`; post-validation regression suite: 425 passing tests. This is
-reproducibility evidence, not production
-availability evidence.
+commit `6a80e91a3b7a82504f04afa98cdb8265f7617234`. Current post-freeze stabilized
+CI was **SUCCESS** on run `34889316386` for commit
+`7062f683e41a178e644713acee81478731dc9adc`. The current run covered checkout,
+Python 3.12, dependency installation, `pip check`, credential-free startup, and
+the complete 355-test suite with zero warnings. This is reproducibility evidence,
+not production availability evidence.
 
 ### Post-Freeze Engineering Stabilization
 
@@ -400,11 +399,9 @@ remove two warnings, and improve smoke-output and repository hygiene. The work w
 implementation hardening rather than model or product tuning.
 
 The stabilized baseline is commit
-`7062f683e41a178e644713acee81478731dc9adc`; its 355-test evidence is historical.
-The verified post-validation engineering checkpoint is `f430ea6`, with post-validation
-regression suite: 425 passing tests and verified hosted CI run `35909582906`: SUCCESS.
-A clean source export without `.env` also passed all 355
-tests at the historical stabilization point.
+`7062f683e41a178e644713acee81478731dc9adc`. The complete suite contains 355
+tests and passes with zero warnings when the parent environment selects offline,
+OpenRouter, or Groq. A clean source export without `.env` also passed all 355 tests.
 Dependencies use `requirements.txt` plus targeted `constraints.txt`; this is not
 described as a complete lockfile. Unused direct LangChain, LangGraph, and LiteLLM
 dependencies were removed because frozen V1 uses explicit Python orchestration and
@@ -634,10 +631,8 @@ The remediation adds:
 - regression coverage proving that reviewer approval does not mutate the original
   escalated decision or release a customer response.
 
-The post-validation regression suite reached **425 passing tests** after these changes,
-and verified hosted CI run `35909582906` was **SUCCESS** at verified post-validation
-engineering checkpoint `f430ea6`. This is
-post-validation engineering and reproducibility evidence only. It does not replace or
+The complete local Pytest suite reached **425 passing tests** after these changes.
+This is local post-validation engineering evidence only. It does not replace or
 modify the historical hosted-CI 355-test result already reported in this document.
 
 The reviewer-draft store is deliberately ephemeral and process-local. Restart,
