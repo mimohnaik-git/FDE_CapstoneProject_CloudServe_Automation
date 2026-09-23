@@ -8,7 +8,7 @@ below describe when the gap should be closed; they do not imply that missing evi
 | Gap | Current evidence | Required action |
 |---|---|---|
 | Submission evidence packaging decision | Immutable evaluation JSON contains original absolute execution paths, and SQLite decision evidence is locally preserved but intentionally ignored as runtime state. Stage 23 recorded hashes but did not package the databases. | Decide which decision databases the submission requires and how Git history will be supplied; do not edit frozen Stage 13/16 artifacts. |
-| Final package production | The existing `submission/` tree is a pre-reconciliation staging reference and its source snapshot predates stabilized commit `7062f68`. The MP4/link, final 20–30 page PDF, refreshed workbook set, final archive, and a delivery mechanism for required repository history remain pending. | Complete documentation reconciliation, regenerate and inspect the existing seven report/workbook artifacts, refresh the source snapshot, complete the owner-controlled video, resolve the history-delivery mechanism, and assemble the exact four-folder archive without rerunning validation. |
+| Final package production | The existing `submission/` tree is a pre-reconciliation staging reference and its source snapshot predates the verified post-validation engineering checkpoint `f430ea6`. The MP4/link, final 20–30 page PDF, refreshed workbook set, final archive, and a delivery mechanism for required repository history remain pending. | Regenerate and inspect the existing seven report/workbook artifacts, refresh the source snapshot, complete the owner-controlled video, resolve the history-delivery mechanism, and assemble the exact four-folder archive without rerunning validation. |
 
 ## Recommended
 
@@ -51,11 +51,13 @@ below describe when the gap should be closed; they do not imply that missing evi
   The owner approved a **limited supervised pilot**, confirmed V1 is **not
   production-ready**, and prioritized safety over automation.
 - Historical frozen GitHub Actions run `34773077234` was **SUCCESS** on commit
-  `6a80e91a3b7a82504f04afa98cdb8265f7617234`. Current stabilized run
-  `34889316386` was **SUCCESS** on commit
-  `7062f683e41a178e644713acee81478731dc9adc`, including dependency installation,
-  consistency checks, offline startup, and the 355-test suite with zero warnings.
-  These runs are reproducibility evidence, not production availability evidence.
+  `6a80e91a3b7a82504f04afa98cdb8265f7617234`. Historical post-freeze stabilization
+  run `34889316386` was **SUCCESS** on commit
+  `7062f683e41a178e644713acee81478731dc9adc`, including the 355-test suite.
+  Verified hosted CI run `35909582906`: **SUCCESS** at the verified post-validation
+  engineering checkpoint `f430ea6`; post-validation regression suite: **425 passing
+  tests**. These runs are reproducibility
+  evidence, not production availability evidence.
 - Provider-mode ambiguity, deterministic-test contamination from developer `.env`,
   the two dependency warnings, and the missing compatibility-constraints contract
   were resolved by post-freeze implementation hardening. This did not rerun
@@ -68,9 +70,9 @@ below describe when the gap should be closed; they do not imply that missing evi
 
 ## Post-validation gap - independently verified evidence sufficiency
 
-The runtime now has an explicit `EvidenceSufficiencyEngine`, but there is still no
-development-supported policy that can safely return `sufficient=True` with meaningful
-independent coverage.
+The runtime now has an implemented, fail-closed `EvidenceSufficiencyEngine`. It computes
+and audits inference-time diagnostics, but no development-supported policy can safely
+return `sufficient=True` with meaningful independent coverage.
 
 Development-only analysis identified 36 contradictory normalized-text groups covering
 104 of 500 tickets. On the 307 unambiguous groups, the strongest tested text-plus-
