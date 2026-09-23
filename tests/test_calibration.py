@@ -5,6 +5,7 @@ import pytest
 from evaluation.calibration import (
     development_three_way_split,
     evaluate_policy,
+    build_markdown,
     run_stage11,
     select_candidate_policies,
 )
@@ -90,3 +91,59 @@ def test_stage11_rejects_validation_path_before_loading(monkeypatch, tmp_path):
     with pytest.raises(ValueError, match="development dataset"):
         run_stage11(tmp_path / "validation_tickets.json")
     assert called is False
+
+
+
+def test_stage11_reports_current_calibration_and_policy_scope(monkeypatch):
+    # Reporting-contract coverage must not depend on the semantic embedding
+    # runtime, model cache, network state, or vector-store availability.
+    def deterministic_retrieval(tickets):
+        return [
+            [
+                {
+                    "document_id": "TEST-DOC",
+                    "doc_id": "TEST-DOC",
+                    "relevance_score": 0.0,
+                }
+            ]
+            for _ in tickets
+        ]
+
+    monkeypatch.setattr(
+        "evaluation.calibration._retrieve_raw_scores",
+        deterministic_retrieval,
+    )
+
+    result = run_stage11()
+
+    assert result["validation_or_final_data_loaded"] is False
+
+    model = result["model"]
+
+    assert model["intent_calibration_method"] == "sigmoid"
+    assert model["intent_calibration_folds"] == 3
+    assert model["urgency_calibration_method"] == "none"
+    assert model["feature_fields"] == ["subject", "body"]
+
+    simulation = result["policy_simulation"]
+
+    assert simulation["scope"] == "counterfactual_threshold_analysis"
+    assert simulation["evidence_sufficient_assumption"] is True
+    assert simulation["production_automation_claim"] is False
+
+    assert (
+        result["selected_thresholds"]["new_thresholds"]
+        is None
+    )
+
+    assert (
+        result["selected_thresholds"]["production_config_changed"]
+        is False
+    )
+
+    markdown = build_markdown(result)
+
+    assert "counterfactual policy simulations" in markdown
+    assert "Production remains fail-closed" in markdown
+    assert "Probabilities were measured, not transformed" not in markdown
+    assert "Urgency remains weak but is not a routing input" not in markdown

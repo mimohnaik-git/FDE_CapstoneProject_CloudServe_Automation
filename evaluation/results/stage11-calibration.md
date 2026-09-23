@@ -2,7 +2,7 @@
 
 ## Calibration Method
 
-Evidence class: **DEVELOPMENT**. The unchanged classifier was fit on 305 tickets. Policy selection used 95 disjoint calibration tickets; confirmation used 100 disjoint evaluation tickets. Probabilities were measured, not transformed.
+Evidence class: **DEVELOPMENT**. The classifier was fit on 305 tickets. Intent confidence uses group-safe sigmoid calibration; the urgency head remains uncalibrated. Policy selection used 95 disjoint calibration tickets; confirmation used 100 disjoint evaluation tickets.
 
 ## Leakage Check
 
@@ -17,47 +17,49 @@ Evidence class: **DEVELOPMENT**. The unchanged classifier was fit on 305 tickets
 
 | Population | Tickets | Expected calibration error |
 | :--- | ---: | ---: |
-| Calibration | 95 | 59.5% |
-| Evaluation | 100 | 56.8% |
+| Calibration | 95 | 12.5% |
+| Evaluation | 100 | 6.1% |
 
 Reliability buckets and per-intent confidence behavior (minimum five examples) are recorded in the machine-readable result.
 
 ## Threshold Grid
 
+These routing rows are **counterfactual policy simulations** with `evidence_sufficient=True`. They measure classification/retrieval threshold behavior after an independent evidence-sufficiency gate has hypothetically passed. They are not observed production automation rates.
+
 | Class threshold | Retrieval threshold | Route accuracy | Auto precision | Auto recall | Automation | Escalation | False auto | False escalation | Must-not violations | High-risk violations | Safety satisfied |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
-| 0.30 | 0.30 | 69.5% | 83.6% | 75.7% | 70.5% | 29.5% | 11 | 18 | 0 | 0 | False |
-| 0.30 | 0.40 | 69.5% | 83.6% | 75.7% | 70.5% | 29.5% | 11 | 18 | 0 | 0 | False |
-| 0.30 | 0.50 | 65.3% | 82.5% | 70.3% | 66.3% | 33.7% | 11 | 22 | 0 | 0 | False |
-| 0.30 | 0.60 | 50.5% | 81.4% | 47.3% | 45.3% | 54.7% | 8 | 39 | 0 | 0 | False |
-| 0.40 | 0.30 | 60.0% | 84.6% | 59.5% | 54.7% | 45.3% | 8 | 30 | 0 | 0 | False |
-| 0.40 | 0.40 | 60.0% | 84.6% | 59.5% | 54.7% | 45.3% | 8 | 30 | 0 | 0 | False |
-| 0.40 | 0.50 | 55.8% | 83.3% | 54.1% | 50.5% | 49.5% | 8 | 34 | 0 | 0 | False |
-| 0.40 | 0.60 | 46.3% | 81.1% | 40.5% | 38.9% | 61.1% | 7 | 44 | 0 | 0 | False |
-| 0.50 | 0.30 | 36.8% | 88.9% | 21.6% | 18.9% | 81.1% | 2 | 58 | 0 | 0 | False |
-| 0.50 | 0.40 | 36.8% | 88.9% | 21.6% | 18.9% | 81.1% | 2 | 58 | 0 | 0 | False |
-| 0.50 | 0.50 | 34.7% | 87.5% | 18.9% | 16.8% | 83.2% | 2 | 60 | 0 | 0 | False |
-| 0.50 | 0.60 | 27.4% | 77.8% | 9.5% | 9.5% | 90.5% | 2 | 67 | 0 | 0 | False |
-| 0.60 | 0.30 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.60 | 0.40 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.60 | 0.50 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.60 | 0.60 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.70 | 0.30 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.70 | 0.40 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.70 | 0.50 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.70 | 0.60 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.80 | 0.30 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.80 | 0.40 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.80 | 0.50 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
-| 0.80 | 0.60 | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 | True |
+| 0.30 | 0.30 | 75.8% | 83.1% | 86.5% | 81.1% | 18.9% | 13 | 10 | 0 | 0 | False |
+| 0.30 | 0.40 | 75.8% | 83.1% | 86.5% | 81.1% | 18.9% | 13 | 10 | 0 | 0 | False |
+| 0.30 | 0.50 | 71.6% | 82.2% | 81.1% | 76.8% | 23.2% | 13 | 14 | 0 | 0 | False |
+| 0.30 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
+| 0.40 | 0.30 | 75.8% | 83.1% | 86.5% | 81.1% | 18.9% | 13 | 10 | 0 | 0 | False |
+| 0.40 | 0.40 | 75.8% | 83.1% | 86.5% | 81.1% | 18.9% | 13 | 10 | 0 | 0 | False |
+| 0.40 | 0.50 | 71.6% | 82.2% | 81.1% | 76.8% | 23.2% | 13 | 14 | 0 | 0 | False |
+| 0.40 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
+| 0.50 | 0.30 | 76.8% | 84.2% | 86.5% | 80.0% | 20.0% | 12 | 10 | 0 | 0 | False |
+| 0.50 | 0.40 | 76.8% | 84.2% | 86.5% | 80.0% | 20.0% | 12 | 10 | 0 | 0 | False |
+| 0.50 | 0.50 | 72.6% | 83.3% | 81.1% | 75.8% | 24.2% | 12 | 14 | 0 | 0 | False |
+| 0.50 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
+| 0.60 | 0.30 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.60 | 0.40 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.60 | 0.50 | 67.4% | 82.1% | 74.3% | 70.5% | 29.5% | 12 | 19 | 0 | 0 | False |
+| 0.60 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
+| 0.70 | 0.30 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.70 | 0.40 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.70 | 0.50 | 67.4% | 82.1% | 74.3% | 70.5% | 29.5% | 12 | 19 | 0 | 0 | False |
+| 0.70 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
+| 0.80 | 0.30 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.80 | 0.40 | 71.6% | 83.1% | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 | False |
+| 0.80 | 0.50 | 67.4% | 82.1% | 74.3% | 70.5% | 29.5% | 12 | 19 | 0 | 0 | False |
+| 0.80 | 0.60 | 51.6% | 80.4% | 50.0% | 48.4% | 51.6% | 9 | 37 | 0 | 0 | False |
 
 ## Candidate Policies
 
 | Policy | Class / retrieval | Calibration automation | Evaluation automation | Evaluation safety |
 | :--- | :--- | ---: | ---: | :---: |
-| Safest viable candidate (fails strict safety if False below) | 0.50 / 0.40 | 18.9% | 26.0% | False |
-| Best balanced candidate | 0.30 / 0.30 | 70.5% | 74.0% | False |
-| Highest automation satisfying strict safety | 0.60 / 0.30 | 0.0% | 0.0% | True |
+| Safest viable candidate (fails strict safety if False below) | 0.80 / 0.60 | 48.4% | 34.0% | False |
+| Best balanced candidate | 0.50 / 0.30 | 80.0% | 71.0% | False |
+| Highest automation satisfying strict safety | Not identified | - | - | - |
 
 ## Selected Thresholds
 
@@ -72,17 +74,19 @@ Reliability buckets and per-intent confidence behavior (minimum five examples) a
 
 Safety-constrained candidates require zero false auto-responses, zero must-not-auto-respond violations, and zero true high-risk violations. The escalation target is not used as a selection constraint.
 
-## Routing Metrics After Calibration
+## Conditional Routing Metrics After Intent Calibration
 
-The unchanged current defaults reproduce the following behavior:
+Under the counterfactual `evidence_sufficient=True` assumption, the currently configured 0.80 / 0.30 thresholds produce the following behavior. Production remains fail-closed when evidence sufficiency is unverified:
 
 | Population | Route accuracy | Auto precision | Auto recall | Automation | Escalation | False auto | False escalation | Must-not violations | High-risk violations |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Calibration | 22.1% | - | 0.0% | 0.0% | 100.0% | 0 | 74 | 0 | 0 |
-| Evaluation | 44.0% | - | 0.0% | 0.0% | 100.0% | 0 | 56 | 0 | 0 |
+| Calibration | 71.6% | - | 79.7% | 74.7% | 25.3% | 12 | 15 | 0 | 0 |
+| Evaluation | 73.0% | - | 89.3% | 71.0% | 29.0% | 21 | 6 | 0 | 0 |
 
 ## Remaining Risks
 
 - This is development evidence, not validation or final evidence.
 - Small per-intent populations limit intent-specific calibration conclusions.
-- Urgency remains weak but is not a routing input, so it was not redesigned in this stage.
+- The urgency head remains weak and uncalibrated; high predicted urgency is nevertheless a routing input for database and performance incidents.
+- No tested threshold pair satisfied the zero-false-auto safety requirement with viable automation.
+- Production does not obtain `evidence_sufficient=True` from retrieval score or generated-response support.

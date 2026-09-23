@@ -278,7 +278,25 @@ def run_stage11(dataset_path: Path | str = DEFAULT_TRAINING_DATA_PATH) -> Dict[s
         "dataset_sha256": training_data_sha256(path),
         "validation_or_final_data_loaded": False,
         "split": split,
-        "model": {"architecture": "unchanged TF-IDF logistic regression", "fit_population": "train only", "training_count": len(train)},
+        "model": {
+            "architecture": (
+                "TF-IDF logistic regression with group-safe sigmoid-calibrated "
+                "intent confidence and an uncalibrated urgency head"
+            ),
+            "model_version": bundle.get("model_version"),
+            "feature_fields": list(bundle.get("feature_fields", ())),
+            "intent_calibration_method": bundle.get(
+                "intent_calibration_method"
+            ),
+            "intent_calibration_folds": bundle.get(
+                "intent_calibration_folds"
+            ),
+            "urgency_calibration_method": bundle.get(
+                "urgency_calibration_method"
+            ),
+            "fit_population": "train only",
+            "training_count": len(train),
+        },
         "calibration_metrics": reliability_metrics(calibration_predictions, calibration),
         "evaluation_metrics": reliability_metrics(evaluation_predictions, evaluation),
         "threshold_grid": {"classification_thresholds": list(CLASSIFICATION_GRID), "retrieval_thresholds": list(RETRIEVAL_GRID),
@@ -286,7 +304,20 @@ def run_stage11(dataset_path: Path | str = DEFAULT_TRAINING_DATA_PATH) -> Dict[s
         "candidate_policies": candidates,
         "candidate_evaluation_confirmation": confirmations,
         "selected_thresholds": selected,
-        "urgency_note": "Urgency is measured separately and is not a routing input in the unchanged production router.",
+        "policy_simulation": {
+            "scope": "counterfactual_threshold_analysis",
+            "evidence_sufficient_assumption": True,
+            "production_release_gate": (
+                "fail closed when evidence sufficiency is unverified"
+            ),
+            "production_automation_claim": False,
+        },
+        "urgency_note": (
+            "The urgency head remains uncalibrated. Predicted high urgency is "
+            "a routing input for database_issue and performance_degradation. "
+            "Threshold-grid results are conditional on independently verified "
+            "evidence sufficiency."
+        ),
     }
 
 
@@ -314,7 +345,7 @@ def build_markdown(result: Mapping[str, Any]) -> str:
 
 ## Calibration Method
 
-Evidence class: **DEVELOPMENT**. The unchanged classifier was fit on {split['train_count']} tickets. Policy selection used {split['calibration_count']} disjoint calibration tickets; confirmation used {split['evaluation_count']} disjoint evaluation tickets. Probabilities were measured, not transformed.
+Evidence class: **DEVELOPMENT**. The classifier was fit on {split['train_count']} tickets. Intent confidence uses group-safe sigmoid calibration; the urgency head remains uncalibrated. Policy selection used {split['calibration_count']} disjoint calibration tickets; confirmation used {split['evaluation_count']} disjoint evaluation tickets.
 
 ## Leakage Check
 
@@ -335,6 +366,8 @@ Evidence class: **DEVELOPMENT**. The unchanged classifier was fit on {split['tra
 Reliability buckets and per-intent confidence behavior (minimum five examples) are recorded in the machine-readable result.
 
 ## Threshold Grid
+
+These routing rows are **counterfactual policy simulations** with `evidence_sufficient=True`. They measure classification/retrieval threshold behavior after an independent evidence-sufficiency gate has hypothetically passed. They are not observed production automation rates.
 
 | Class threshold | Retrieval threshold | Route accuracy | Auto precision | Auto recall | Automation | Escalation | False auto | False escalation | Must-not violations | High-risk violations | Safety satisfied |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
@@ -359,9 +392,9 @@ Reliability buckets and per-intent confidence behavior (minimum five examples) a
 
 Safety-constrained candidates require zero false auto-responses, zero must-not-auto-respond violations, and zero true high-risk violations. The escalation target is not used as a selection constraint.
 
-## Routing Metrics After Calibration
+## Conditional Routing Metrics After Intent Calibration
 
-The unchanged current defaults reproduce the following behavior:
+Under the counterfactual `evidence_sufficient=True` assumption, the currently configured 0.80 / 0.30 thresholds produce the following behavior. Production remains fail-closed when evidence sufficiency is unverified:
 
 | Population | Route accuracy | Auto precision | Auto recall | Automation | Escalation | False auto | False escalation | Must-not violations | High-risk violations |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -372,7 +405,9 @@ The unchanged current defaults reproduce the following behavior:
 
 - This is development evidence, not validation or final evidence.
 - Small per-intent populations limit intent-specific calibration conclusions.
-- Urgency remains weak but is not a routing input, so it was not redesigned in this stage.
+- The urgency head remains weak and uncalibrated; high predicted urgency is nevertheless a routing input for database and performance incidents.
+- No tested threshold pair satisfied the zero-false-auto safety requirement with viable automation.
+- Production does not obtain `evidence_sufficient=True` from retrieval score or generated-response support.
 """
 
 
