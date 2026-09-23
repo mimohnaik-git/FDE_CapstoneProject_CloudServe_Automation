@@ -109,7 +109,7 @@ class OfflineGroundedProvider:
     """Deterministic provider that copies supplied evidence without inventing content."""
 
     name: str = "offline-grounded"
-    model: str = "deterministic-evidence-extract-v1"
+    model: str = "deterministic-resolution-grounded-v2"
 
     def generate(
         self,
@@ -126,14 +126,32 @@ class OfflineGroundedProvider:
                 "uncertainty": FAILURE_INSUFFICIENT_DOCUMENTATION,
             }
         evidence = retrieved_context[0]
-        title = evidence.get("title") or evidence["document_id"]
-        passage = evidence["passage"].strip()
+        selected = evidence
+
+        for support in evidence.get("supporting_passages") or []:
+            if str(support.get("section") or "").strip().lower() == "resolution":
+                selected = support
+                break
+
+        passage = selected["passage"].strip()
+
+        if str(selected.get("section") or "").strip().lower() == "resolution":
+            passage = re.sub(
+                r"^#{1,6}\\s+Resolution\\s*",
+                "",
+                passage,
+                flags=re.IGNORECASE,
+            ).strip()
+            answer = f"Try these documented steps:\n{passage}"
+        else:
+            answer = passage
+
         return {
-            "answer": f"Based on {title}: {passage}",
+            "answer": answer,
             "citations": [
                 {
-                    "document_id": evidence["document_id"],
-                    "chunk_id": evidence["chunk_id"],
+                    "document_id": selected["document_id"],
+                    "chunk_id": selected["chunk_id"],
                 }
             ],
             "supported": True,
@@ -329,7 +347,21 @@ class ResponseGenerationEngine:
             )
 
         citations = parsed["citations"]
-        allowed = {(item["document_id"], item["chunk_id"]) for item in context}
+
+        allowed = {
+            (item["document_id"], item["chunk_id"])
+            for item in context
+        }
+
+        for item in context:
+            for support in item.get("supporting_passages") or []:
+                allowed.add(
+                    (
+                        support["document_id"],
+                        support["chunk_id"],
+                    )
+                )
+
         if any((cite["document_id"], cite["chunk_id"]) not in allowed for cite in citations):
             return self._failure_result(ticket_id, FAILURE_UNSUPPORTED_CITATION)
 
@@ -394,6 +426,47 @@ class ResponseGenerationEngine:
                     value = metadata.get(key)
                     if isinstance(value, str):
                         safe_metadata[key] = value
+            safe_supporting: List[Dict[str, Any]] = []
+
+            raw_supporting = result.get("supporting_passages")
+
+            if isinstance(raw_supporting, list):
+                for support in raw_supporting:
+                    if not isinstance(support, Mapping):
+                        continue
+
+                    support_document_id = support.get("document_id")
+                    support_chunk_id = support.get("chunk_id")
+                    support_passage = support.get("passage")
+
+                    if (
+                        not isinstance(support_document_id, str)
+                        or support_document_id.strip() != document_id.strip()
+                        or not isinstance(support_chunk_id, str)
+                        or not support_chunk_id.strip()
+                        or not isinstance(support_passage, str)
+                        or not support_passage.strip()
+                    ):
+                        continue
+
+                    safe_supporting.append(
+                        {
+                            "document_id": support_document_id.strip(),
+                            "chunk_id": support_chunk_id.strip(),
+                            "title": str(
+                                support.get("title")
+                                or result.get("title")
+                                or safe_metadata.get("title")
+                                or ""
+                            ).strip(),
+                            "section": str(
+                                support.get("section") or ""
+                            ).strip(),
+                            "source": "authoritative_documentation",
+                            "passage": support_passage.strip(),
+                        }
+                    )
+
             context.append(
                 {
                     "document_id": document_id.strip(),
@@ -404,6 +477,7 @@ class ResponseGenerationEngine:
                     "source_metadata": safe_metadata,
                     "passage": passage.strip(),
                     "similarity_score": score,
+                    "supporting_passages": safe_supporting,
                 }
             )
         return context

@@ -298,6 +298,55 @@ class DocumentationRetrievalEngine:
                 return False
         return True
 
+    def _generation_support_passages(
+        self,
+        document_id: str,
+        primary_chunk_id: str,
+        *,
+        limit: int = 2,
+    ) -> List[Dict[str, Any]]:
+        """Return same-document Resolution chunks for grounded generation only."""
+
+        if self._state is None or limit <= 0:
+            return []
+
+        support: List[Dict[str, Any]] = []
+
+        for chunk in self._state.chunks:
+            if chunk.get("document_id") != document_id:
+                continue
+
+            if chunk.get("chunk_id") == primary_chunk_id:
+                continue
+
+            if str(chunk.get("section") or "").strip().lower() != "resolution":
+                continue
+
+            metadata = {
+                "source_path": self._source_path(),
+                "title": chunk["title"],
+                "category": chunk["category"],
+                "applies_to": chunk["applies_to"],
+                "section": chunk["section"],
+            }
+
+            support.append(
+                {
+                    "document_id": document_id,
+                    "chunk_id": chunk["chunk_id"],
+                    "passage": chunk["chunk_content"],
+                    "section": chunk["section"],
+                    "title": chunk["title"],
+                    "source": "authoritative_documentation",
+                    "source_metadata": metadata,
+                }
+            )
+
+            if len(support) >= limit:
+                break
+
+        return support
+
     def query_authoritative_knowledge(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Return distinct ranked document passages above the score floor."""
 
@@ -341,6 +390,10 @@ class DocumentationRetrievalEngine:
                         "source": "authoritative_documentation",
                         "source_path": source_metadata["source_path"],
                         "source_metadata": source_metadata,
+                        "supporting_passages": self._generation_support_passages(
+                            document_id,
+                            chunk["chunk_id"],
+                        ),
                     }
                 )
                 if len(results) == top_k:

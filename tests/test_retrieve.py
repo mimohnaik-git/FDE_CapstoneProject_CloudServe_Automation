@@ -103,6 +103,43 @@ def test_exact_cosine_ranking_returns_expected_document(tmp_path):
     assert results[0]["similarity_score"] > results[1]["similarity_score"]
 
 
+def test_ranked_document_includes_resolution_support_for_generation(tmp_path):
+    engine = make_engine(
+        tmp_path,
+        [
+            document(
+                "DOC-AUTH-001",
+                "Login recovery",
+                "authentication",
+                "# Login recovery\n"
+                "password credentials login authentication failure\n\n"
+                "## Symptoms\n"
+                "Login fails with invalid credentials.\n\n"
+                "## Resolution\n"
+                "1. Clear stale cookies.\n"
+                "2. Authenticate again.",
+            )
+        ],
+        min_relevance_score=-1.0,
+    )
+
+    result = engine.query_authoritative_knowledge(
+        "password credentials login authentication",
+        top_k=1,
+    )[0]
+
+    assert result["document_id"] == "DOC-AUTH-001"
+    assert result["rank"] == 1
+    assert result["section"] != "Resolution"
+
+    support = result["supporting_passages"]
+    assert support
+    assert support[0]["document_id"] == "DOC-AUTH-001"
+    assert support[0]["section"] == "Resolution"
+    assert "Clear stale cookies" in support[0]["passage"]
+    assert support[0]["chunk_id"] != result["chunk_id"]
+
+
 def test_score_exposure_uses_cosine_similarity(tmp_path):
     engine = make_engine(
         tmp_path,

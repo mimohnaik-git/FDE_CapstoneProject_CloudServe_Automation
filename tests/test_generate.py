@@ -157,6 +157,79 @@ def sample_retrieval():
     ]
 
 
+def test_offline_provider_prefers_same_document_resolution_support(
+    sample_ticket,
+    sample_classification,
+    sample_retrieval,
+):
+    retrieval = [dict(sample_retrieval[0])]
+    retrieval[0]["section"] = "Symptoms"
+    retrieval[0]["passage"] = "Login fails with invalid credentials."
+    retrieval[0]["chunk_content"] = retrieval[0]["passage"]
+    retrieval[0]["supporting_passages"] = [
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-resolution",
+            "title": "Resolving invalid credential errors",
+            "section": "Resolution",
+            "source": "authoritative_documentation",
+            "passage": "## Resolution\n1. Clear stale login credentials.\n2. Authenticate again.",
+        }
+    ]
+
+    result = ResponseGenerationEngine(
+        provider=OfflineGroundedProvider()
+    ).generate_response(
+        sample_ticket,
+        sample_classification,
+        retrieval,
+    )
+
+    assert result["supported"] is True
+    assert result["generation_source"] == GEN_SOURCE_OFFLINE
+    assert result["model"] == "deterministic-resolution-grounded-v2"
+    assert result["answer"].startswith("Try these documented steps:")
+    assert "Clear stale login credentials" in result["answer"]
+    assert result["citations"] == [
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-resolution",
+        }
+    ]
+
+
+def test_supporting_passage_from_different_document_is_not_allowlisted(
+    sample_ticket,
+    sample_classification,
+    sample_retrieval,
+):
+    retrieval = [dict(sample_retrieval[0])]
+    retrieval[0]["supporting_passages"] = [
+        {
+            "document_id": "DOC-FAKE-999",
+            "chunk_id": "DOC-FAKE-999-resolution",
+            "section": "Resolution",
+            "passage": "Invented instructions.",
+        }
+    ]
+
+    provider = StaticProvider(
+        supported_output(
+            "DOC-FAKE-999",
+            "DOC-FAKE-999-resolution",
+        )
+    )
+
+    result = ResponseGenerationEngine(provider=provider).generate_response(
+        sample_ticket,
+        sample_classification,
+        retrieval,
+    )
+
+    assert result["supported"] is False
+    assert result["failure_reason"] == FAILURE_UNSUPPORTED_CITATION
+
+
 def test_grounded_supported_answer_succeeds(sample_ticket, sample_classification, sample_retrieval):
     provider = StaticProvider(supported_output())
     result = ResponseGenerationEngine(provider=provider).generate_response(
