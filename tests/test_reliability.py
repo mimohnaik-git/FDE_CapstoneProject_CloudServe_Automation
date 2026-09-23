@@ -58,10 +58,20 @@ class Retriever:
 
 
 class Router(TicketRoutingEngine):
-    def route(self, classification, retrieval_results):
+    def route(
+        self,
+        classification,
+        retrieval_results,
+        **kwargs,
+    ):
         if classification.get("test_case") == "routing":
             raise RuntimeError(PRIVATE_MARKER)
-        return super().route(classification, retrieval_results)
+
+        return super().route(
+            classification,
+            retrieval_results,
+            **kwargs,
+        )
 
 
 class Provider:

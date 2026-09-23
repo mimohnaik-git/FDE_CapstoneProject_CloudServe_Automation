@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from src.classify import TicketClassificationEngine
 from src.config import settings
+from src.evidence import EvidenceSufficiencyEngine
 from src.generate import ResponseGenerationEngine
 from src.guardrails import GuardrailEngine
 from src.ingest import TicketNormalizationEngine
@@ -33,6 +34,7 @@ REASON_AUDIT_FAILURE = "AUDIT_PERSISTENCE_FAILED"
 STAGE_FAILURES = {
     "classification": "CLASSIFICATION_FAILURE",
     "retrieval": "RETRIEVAL_FAILURE",
+    "evidence_sufficiency": "EVIDENCE_SUFFICIENCY_FAILURE",
     "routing": "ROUTING_FAILURE",
     "generation": REASON_GENERATION_FAILED,
     "input_guardrails": "GUARDRAIL_INTERNAL_ERROR",
@@ -66,6 +68,31 @@ def _validate_stage(name: str, value: Any) -> Any:
             if (isinstance(score, bool) or not isinstance(score, (int, float))
                     or not math.isfinite(score) or not -1 <= score <= 1):
                 raise ValueError("Invalid retrieval score")
+    elif name == "evidence_sufficiency":
+        if not isinstance(value, dict):
+            raise ValueError("Invalid evidence sufficiency result")
+
+        sufficient = value.get("sufficient")
+
+        if (
+            sufficient is not True
+            and sufficient is not False
+            and sufficient is not None
+        ):
+            raise ValueError(
+                "Invalid evidence sufficiency decision"
+            )
+
+        if not isinstance(value.get("status"), str):
+            raise ValueError(
+                "Invalid evidence sufficiency status"
+            )
+
+        if not isinstance(value.get("reason_code"), str):
+            raise ValueError(
+                "Invalid evidence sufficiency reason"
+            )
+
     elif name == "routing":
         if (not isinstance(value, dict)
                 or value.get("action") not in (ACTION_AUTO_RESPOND, ACTION_ESCALATE)
@@ -92,6 +119,7 @@ class SupportAutomationOrchestrator:
         self, ingester: Optional[TicketNormalizationEngine] = None,
         classifier: Optional[TicketClassificationEngine] = None,
         retriever: Optional[DocumentationRetrievalEngine] = None,
+        evidence_engine: Optional[EvidenceSufficiencyEngine] = None,
         router: Optional[TicketRoutingEngine] = None,
         generator: Optional[ResponseGenerationEngine] = None,
         guardrails: Optional[GuardrailEngine] = None,
@@ -106,6 +134,11 @@ class SupportAutomationOrchestrator:
         self.ingester = ingester or TicketNormalizationEngine()
         self.classifier = classifier or TicketClassificationEngine()
         self.retriever = retriever or DocumentationRetrievalEngine()
+        self.evidence_engine = (
+            evidence_engine
+            if evidence_engine is not None
+            else EvidenceSufficiencyEngine()
+        )
         self.retrieval_top_k = settings.RETRIEVAL_TOP_K
         self.router = router or TicketRoutingEngine(
             confidence_threshold=threshold, retrieval_threshold=retrieval_routing_threshold
@@ -188,10 +221,30 @@ class SupportAutomationOrchestrator:
                     content, top_k=self.retrieval_top_k
                 )
             )
+            evidence_sufficiency = run_stage(
+                "evidence_sufficiency",
+                lambda: self.evidence_engine.assess(
+                    normalized,
+                    retrieval,
+                ),
+            )
+
             routing = run_stage(
                 "routing",
-                lambda: self.router.route(classification, retrieval),
+                lambda: self.router.route(
+                    classification,
+                    retrieval,
+                    evidence_sufficient=(
+                        evidence_sufficiency.get("sufficient")
+                    ),
+                ),
             )
+
+            # Evidence sufficiency is produced only by the trusted internal
+            # engine above. Persist its complete diagnostic result with the
+            # routing decision for auditability.
+            routing = dict(routing)
+            routing["evidence_sufficiency"] = evidence_sufficiency
 
             provisional_evidence_escalation = (
                 routing["action"] == ROUTE_ESCALATE

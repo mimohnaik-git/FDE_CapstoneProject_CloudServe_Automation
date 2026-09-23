@@ -303,3 +303,61 @@ def test_orchestrator_honors_configured_retrieval_top_k(monkeypatch, valid_tech_
 
     assert retriever.seen_top_k == 3
     assert result["status"] in (ROUTE_AUTO_RESPOND, ROUTE_ESCALATE)
+
+
+def test_internal_evidence_sufficiency_is_audited(
+    routing_contract_orchestrator,
+    valid_tech_ticket,
+):
+    result = routing_contract_orchestrator.process_ticket(
+        valid_tech_ticket
+    )
+
+    evidence = result["routing"].get(
+        "evidence_sufficiency"
+    )
+
+    assert evidence is not None
+
+    assert evidence["status"] == "UNVERIFIED"
+
+    assert evidence["sufficient"] is None
+
+    assert (
+        evidence["reason_code"]
+        == "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
+    )
+
+    assert (
+        evidence["policy_version"]
+        == "evidence-sufficiency-v1-fail-closed"
+    )
+
+    assert result["response_released"] is False
+
+    stored = (
+        routing_contract_orchestrator
+        .logging_store
+        .get_decision_by_id(
+            result["decision_id"]
+        )
+    )
+
+    assert stored is not None
+
+    stored_evidence = (
+        stored["routing_signals"]
+        ["evidence_sufficiency"]
+    )
+
+    assert stored_evidence["sufficient"] is None
+
+    assert (
+        stored_evidence["reason_code"]
+        == "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
+    )
+
+    assert (
+        stored_evidence["policy_version"]
+        == "evidence-sufficiency-v1-fail-closed"
+    )

@@ -215,9 +215,25 @@ class DecisionLogStore:
         if not fingerprint and isinstance(input_text, str) and input_text:
             fingerprint = hashlib.sha256(input_text.encode()).hexdigest()
         signals = {
-            key: route[key] for key in ("classification_confidence", "retrieval_score", "retrieval_count", "valid_retrieval_count", "answerable")
+            key: route[key]
+            for key in (
+                "classification_confidence",
+                "retrieval_score",
+                "retrieval_count",
+                "valid_retrieval_count",
+                "answerable",
+            )
             if route.get(key) is not None
         }
+
+        evidence_sufficiency = route.get(
+            "evidence_sufficiency"
+        )
+
+        if isinstance(evidence_sufficiency, Mapping):
+            signals["evidence_sufficiency"] = dict(
+                evidence_sufficiency
+            )
         record = DecisionRecordModel(
             decision_id=str(uuid.uuid4()), decision_schema_version=DECISION_SCHEMA_VERSION,
             timestamp=datetime.now(timezone.utc), run_id=_clean(run_id or extra.get("run_id"), 100),
