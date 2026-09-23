@@ -71,8 +71,7 @@ the draft text. Successful review removes the ephemeral draft.
 
 APPROVE_DRAFT is not a customer-send authorization implemented by this service.
 It does not mutate the original pipeline decision, does not change
-
-esponse_released, and does not create a customer-facing response. Any future
+`response_released`, and does not create a customer-facing response. Any future
 delivery mechanism would require a separate governed design, authorization model,
 idempotency contract, delivery audit, and evaluation.
 
@@ -160,4 +159,4 @@ observation period before production claims are made.
 - Do not deploy beyond a bounded supervised setting without named owners, tested
   alerts/backups, production-grade identity and authorization, distributed/edge rate
   controls, a durable reviewer queue where required, load testing, and a rehearsed
-  incident/kill-switch exercise.\n
+  incident/kill-switch exercise.

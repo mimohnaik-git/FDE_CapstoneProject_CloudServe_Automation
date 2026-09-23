@@ -458,14 +458,14 @@ V1 is **NOT PRODUCTION-READY**. The following remain explicit limitations:
 - Fairness evidence is preliminary and the fairness gate is not proven.
 - Live-provider evidence is component-level development smoke evidence, not end-to-end validation or production evidence.
 
-The production-readiness assessment is not a restatement of A1?A12. The
+The production-readiness assessment is not a restatement of A1-A12. The
 engineering contract has credible PASS evidence for the frozen workflow, while
 production readiness requires additional evidence about real service operation,
 customer outcomes, security controls, and safe release behavior. The original
 frozen-V1 API access-control gap has been partially remediated after validation
 through application-level bearer authentication, a distinct reviewer credential,
 and bounded single-process rate limiting. These are post-validation engineering
-controls, not frozen A1?A12 validation evidence, and they do not establish
+controls, not frozen A1-A12 validation evidence, and they do not establish
 production-grade IAM/RBAC, distributed abuse protection, or production security
 readiness. Likewise, the successful historical CI run and local P95 latency
 result demonstrate reproducibility and bounded technical performance, not
@@ -649,4 +649,4 @@ fairness, availability, security-outcome, or business-outcome measurement is
 claimed.
 
 Historical V1 validation remains **0% automation and 100% escalation**, and the
-deployment posture remains **LIMITED SUPERVISED PILOT ? NOT PRODUCTION-READY**.
+deployment posture remains **LIMITED SUPERVISED PILOT - NOT PRODUCTION-READY**.
