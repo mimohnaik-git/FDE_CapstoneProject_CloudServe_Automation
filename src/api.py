@@ -64,6 +64,25 @@ class TicketResponse(BaseModel):
     processing_status: Literal["COMPLETED", "FAILED"]
 
 
+class ReviewActionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    action: Literal[
+        "APPROVE_DRAFT",
+        "REJECT_DRAFT",
+    ]
+
+
+class ReviewActionResponse(BaseModel):
+    review_id: str
+    decision_id: str
+    action: Literal[
+        "APPROVE_DRAFT",
+        "REJECT_DRAFT",
+    ]
+    status: Literal["RECORDED"]
+
+
 class ReviewerTicketResponse(BaseModel):
     """Strict internal projection for supervised human review."""
 
@@ -107,7 +126,7 @@ def get_orchestrator() -> SupportPipelineOrchestrator:
 
 PipelineDependency = Annotated[SupportPipelineOrchestrator, Depends(get_orchestrator)]
 ApiAccessDependency = Annotated[None, Depends(require_api_access)]
-ReviewerAccessDependency = Annotated[None, Depends(require_reviewer_access)]
+ReviewerAccessDependency = Annotated[str, Depends(require_reviewer_access)]
 
 app = FastAPI(
     title="CloudServe Support Pipeline API",
@@ -222,6 +241,7 @@ def process_ticket(
                 ),
                 "escalation_context": handoff,
             },
+            audit_store=getattr(orchestrator, "logger", None),
         )
 
     classification = result.get("classification") if isinstance(result.get("classification"), dict) else {}
@@ -315,4 +335,58 @@ def get_review_handoff(
         evidence_reason_code=handoff.get(
             "evidence_reason_code"
         ),
+    )
+
+@app.post(
+    "/review/decisions/{decision_id}/action",
+    response_model=ReviewActionResponse,
+)
+def record_review_action(
+    decision_id: str,
+    request: ReviewActionRequest,
+    reviewer_identity: ReviewerAccessDependency,
+) -> ReviewActionResponse:
+    """Record one immutable human decision; never sends a customer response."""
+
+    stored = review_handoff_store.get_for_action(decision_id)
+
+    if stored is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Review handoff not found.",
+        )
+
+    _, audit_store = stored
+
+    if audit_store is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Review audit dependency is unavailable.",
+        )
+
+    try:
+        review = audit_store.record_review_action(
+            decision_id,
+            reviewer_identity,
+            request.action,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Review action could not be recorded.",
+        ) from exc
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Review audit dependency is unavailable.",
+        ) from exc
+
+    # Remove the draft only after the immutable audit event commits.
+    review_handoff_store.delete(decision_id)
+
+    return ReviewActionResponse(
+        review_id=str(review["review_id"]),
+        decision_id=str(review["decision_id"]),
+        action=review["action"],
+        status="RECORDED",
     )

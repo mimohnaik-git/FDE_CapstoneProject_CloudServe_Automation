@@ -43,14 +43,14 @@ class ReviewHandoffStore:
         self.max_entries = max_entries
         self._items: OrderedDict[
             str,
-            tuple[float, Dict[str, Any]],
+            tuple[float, Dict[str, Any], Any],
         ] = OrderedDict()
         self._lock = threading.Lock()
 
     def _purge_expired(self, now: float) -> None:
         expired = [
             key
-            for key, (expires_at, _) in self._items.items()
+            for key, (expires_at, _, _) in self._items.items()
             if expires_at <= now
         ]
 
@@ -61,6 +61,8 @@ class ReviewHandoffStore:
         self,
         decision_id: str,
         handoff: Dict[str, Any],
+        *,
+        audit_store: Any = None,
     ) -> None:
         if not isinstance(decision_id, str) or not decision_id.strip():
             raise ValueError("decision_id is required")
@@ -78,6 +80,7 @@ class ReviewHandoffStore:
             self._items[key] = (
                 now + self.ttl_seconds,
                 deepcopy(handoff),
+                audit_store,
             )
 
             while len(self._items) > self.max_entries:
@@ -100,8 +103,41 @@ class ReviewHandoffStore:
             if item is None:
                 return None
 
-            _, handoff = item
+            _, handoff, _ = item
             return deepcopy(handoff)
+
+    def get_for_action(
+        self,
+        decision_id: str,
+    ) -> Optional[tuple[Dict[str, Any], Any]]:
+        """Return the handoff and originating audit store."""
+
+        if not isinstance(decision_id, str) or not decision_id.strip():
+            return None
+
+        now = time.monotonic()
+
+        with self._lock:
+            self._purge_expired(now)
+
+            item = self._items.get(decision_id.strip())
+
+            if item is None:
+                return None
+
+            _, handoff, audit_store = item
+
+            return deepcopy(handoff), audit_store
+
+    def delete(
+        self,
+        decision_id: str,
+    ) -> None:
+        if not isinstance(decision_id, str):
+            return
+
+        with self._lock:
+            self._items.pop(decision_id.strip(), None)
 
     def clear(self) -> None:
         with self._lock:

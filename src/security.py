@@ -156,7 +156,7 @@ def require_api_access(
 
 def require_reviewer_access(
     authorization: Annotated[str | None, Header()] = None,
-) -> None:
+) -> str:
     """Authenticate access to internal human-review surfaces."""
 
     configured_key = _configured_reviewer_api_key()
@@ -184,3 +184,5 @@ def require_reviewer_access(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Reviewer API rate limit exceeded.",
         )
+
+    return identity

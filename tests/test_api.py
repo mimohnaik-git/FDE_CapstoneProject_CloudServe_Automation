@@ -459,6 +459,175 @@ def test_non_handoff_escalation_is_not_registered_for_review(
 
 
 
+def test_reviewer_can_record_one_audited_approval_without_customer_send(
+    client,
+    stub,
+):
+    stub.logger = DecisionLoggingEngine(
+        db_url="sqlite:///:memory:"
+    )
+
+    decision = stub.logger.record_decision(
+        ticket_id="API-email",
+        routing_action="ESCALATE",
+        routing_reason="Human review required.",
+    )
+
+    stub.result = {
+        **_result(
+            reason_code="EVIDENCE_SUFFICIENCY_UNVERIFIED"
+        ),
+        "decision_id": decision["decision_id"],
+        "escalation_context": {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "approval_required": True,
+            "review_draft": "Internal reviewer draft.",
+            "citations": [],
+            "evidence_status": "UNVERIFIED",
+            "evidence_reason_code": (
+                "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
+            ),
+        },
+    }
+
+    processed = client.post(
+        "/tickets/process",
+        json=_ticket(),
+    )
+
+    assert processed.status_code == 200
+    assert processed.json()["terminal_action"] == "ESCALATE"
+    assert processed.json()["response_text"] is None
+
+    decision_id = decision["decision_id"]
+
+    action_response = client.post(
+        f"/review/decisions/{decision_id}/action",
+        json={"action": "APPROVE_DRAFT"},
+        headers=REVIEWER_HEADERS,
+    )
+
+    assert action_response.status_code == 200
+    assert action_response.json()["action"] == "APPROVE_DRAFT"
+    assert action_response.json()["status"] == "RECORDED"
+
+    audit = stub.logger.get_review_action(decision_id)
+
+    assert audit is not None
+    assert audit["action"] == "APPROVE_DRAFT"
+    assert len(audit["reviewer_identity"]) == 64
+
+    # Approval is an audit event only. It must not mutate the original
+    # pipeline decision into a released customer response.
+    original_decision = stub.logger.get_decision_by_id(decision_id)
+
+    assert original_decision is not None
+    assert original_decision["terminal_action"] == "ESCALATE"
+    assert original_decision["response_released"] is False
+    assert original_decision["generated_response"] is None
+
+    assert processed.json()["response_text"] is None
+    assert processed.json()["terminal_action"] == "ESCALATE"
+
+    # Successful review removes the ephemeral draft.
+    after = client.get(
+        f"/review/decisions/{decision_id}",
+        headers=REVIEWER_HEADERS,
+    )
+
+    assert after.status_code == 404
+
+
+def test_reviewer_can_record_rejection(
+    client,
+    stub,
+):
+    stub.logger = DecisionLoggingEngine(
+        db_url="sqlite:///:memory:"
+    )
+
+    decision = stub.logger.record_decision(
+        ticket_id="API-email",
+        routing_action="ESCALATE",
+        routing_reason="Human review required.",
+    )
+
+    stub.result = {
+        **_result(
+            reason_code="EVIDENCE_SUFFICIENCY_UNVERIFIED"
+        ),
+        "decision_id": decision["decision_id"],
+        "escalation_context": {
+            "visibility": "INTERNAL_REVIEW_ONLY",
+            "approval_required": True,
+            "review_draft": "Draft to reject.",
+            "citations": [],
+            "evidence_status": "UNVERIFIED",
+            "evidence_reason_code": "TEST",
+        },
+    }
+
+    client.post("/tickets/process", json=_ticket())
+
+    response = client.post(
+        f"/review/decisions/{decision['decision_id']}/action",
+        json={"action": "REJECT_DRAFT"},
+        headers=REVIEWER_HEADERS,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["action"] == "REJECT_DRAFT"
+
+    stored = stub.logger.get_review_action(
+        decision["decision_id"]
+    )
+
+    assert stored["action"] == "REJECT_DRAFT"
+
+
+def test_review_action_requires_reviewer_credential(
+    client,
+    stub,
+):
+    response = client.post(
+        "/review/decisions/DECISION-UNKNOWN/action",
+        json={"action": "APPROVE_DRAFT"},
+        headers=AUTH_HEADERS,
+    )
+
+    assert response.status_code == 401
+
+
+def test_invalid_review_action_is_rejected_before_audit(
+    client,
+):
+    response = client.post(
+        "/review/decisions/DECISION-UNKNOWN/action",
+        json={"action": "AUTO_RESPOND"},
+        headers=REVIEWER_HEADERS,
+    )
+
+    assert response.status_code == 422
+
+
+def test_review_workflow_exposes_no_customer_send_endpoint(client):
+    openapi = client.get("/openapi.json")
+
+    assert openapi.status_code == 200
+
+    paths = set(openapi.json()["paths"])
+
+    assert "/review/decisions/{decision_id}" in paths
+    assert "/review/decisions/{decision_id}/action" in paths
+
+    assert not any(
+        "send" in path.lower()
+        or "release" in path.lower()
+        or "publish" in path.lower()
+        for path in paths
+    )
+
+
 def test_pipeline_exception_is_suppressed_and_cannot_crash_api(client, stub):
     secret = "sk-secret-provider-key"
     stub.error = RuntimeError(f"database failed; key={secret}; system prompt=private")

@@ -276,3 +276,104 @@ def test_import_does_not_create_configured_database(tmp_path):
     code = "import os; os.environ['DATABASE_URL']=r'sqlite:///{}'; import src.logging_store".format(db_path.as_posix())
     subprocess.run([sys.executable, "-c", code], check=True, cwd=str(Path(__file__).resolve().parents[1]))
     assert not db_path.exists()
+
+def test_review_action_is_persisted_without_draft_content(store):
+    decision = store.record_decision(
+        ticket_id="T-REVIEW-1",
+        routing_action="ESCALATE",
+        routing_reason="Human review required",
+    )
+
+    review = store.record_review_action(
+        decision["decision_id"],
+        "reviewer-key-fingerprint",
+        "APPROVE_DRAFT",
+    )
+
+    assert review["decision_id"] == decision["decision_id"]
+    assert review["action"] == "APPROVE_DRAFT"
+    assert review["reviewer_identity"] == "reviewer-key-fingerprint"
+
+    stored = store.get_review_action(
+        decision["decision_id"]
+    )
+
+    assert stored == review
+
+    assert set(stored) == {
+        "review_id",
+        "decision_id",
+        "timestamp",
+        "reviewer_identity",
+        "action",
+    }
+
+    assert "review_draft" not in stored
+    assert "response_text" not in stored
+    assert "escalation_context" not in stored
+
+
+def test_review_action_requires_existing_pipeline_decision(store):
+    with pytest.raises(
+        ValueError,
+        match="Pipeline decision does not exist",
+    ):
+        store.record_review_action(
+            "DECISION-NOT-FOUND",
+            "reviewer-key-fingerprint",
+            "REJECT_DRAFT",
+        )
+
+
+def test_review_action_is_immutable_per_pipeline_decision(store):
+    decision = store.record_decision(
+        ticket_id="T-REVIEW-2",
+        routing_action="ESCALATE",
+        routing_reason="Human review required",
+    )
+
+    store.record_review_action(
+        decision["decision_id"],
+        "reviewer-key-fingerprint",
+        "REJECT_DRAFT",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="already recorded",
+    ):
+        store.record_review_action(
+            decision["decision_id"],
+            "reviewer-key-fingerprint",
+            "APPROVE_DRAFT",
+        )
+
+
+@pytest.mark.parametrize(
+    "action",
+    [
+        "",
+        "APPROVE",
+        "REJECT",
+        "AUTO_RESPOND",
+    ],
+)
+def test_review_action_rejects_unsupported_actions(
+    store,
+    action,
+):
+    decision = store.record_decision(
+        ticket_id=f"T-REVIEW-{action or 'EMPTY'}",
+        routing_action="ESCALATE",
+        routing_reason="Human review required",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Unsupported review action",
+    ):
+        store.record_review_action(
+            decision["decision_id"],
+            "reviewer-key-fingerprint",
+            action,
+        )

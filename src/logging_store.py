@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from sqlalchemy import Boolean, Column, DateTime, Float, String, Text, create_engine, event, func
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, String, Text, create_engine, event, func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -79,6 +80,35 @@ class DecisionRecordModel(Base):
     error_type = Column(String(100))
     error_category = Column(String(100))
     requirement_ids = Column(Text, nullable=False)
+
+
+class ReviewActionModel(Base):
+    """Immutable human-review decision linked to one pipeline decision."""
+
+    __tablename__ = "review_actions"
+
+    review_id = Column(String(36), primary_key=True)
+    decision_id = Column(
+        String(36),
+        ForeignKey("decision_records.decision_id"),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    timestamp = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        index=True,
+    )
+    reviewer_identity = Column(
+        String(64),
+        nullable=False,
+        index=True,
+    )
+    action = Column(
+        String(32),
+        nullable=False,
+    )
 
 
 def _json(value: Any) -> str:
@@ -321,6 +351,105 @@ class DecisionLogStore:
 
     get_decision = get_decision_by_id
     retrieve_decision = get_decision_by_id
+
+    def get_review_action(
+        self,
+        decision_id: str,
+    ) -> Optional[Dict[str, Any]]:
+        session = self.Session()
+        try:
+            row = (
+                session.query(ReviewActionModel)
+                .filter(
+                    ReviewActionModel.decision_id
+                    == str(decision_id)
+                )
+                .first()
+            )
+
+            if row is None:
+                return None
+
+            return {
+                "review_id": row.review_id,
+                "decision_id": row.decision_id,
+                "timestamp": row.timestamp.isoformat(),
+                "reviewer_identity": row.reviewer_identity,
+                "action": row.action,
+            }
+        finally:
+            session.close()
+
+    def record_review_action(
+        self,
+        decision_id: str,
+        reviewer_identity: str,
+        action: str,
+    ) -> Dict[str, Any]:
+        decision_id = str(decision_id).strip()
+        reviewer_identity = str(reviewer_identity).strip()
+        action = str(action).strip().upper()
+
+        if action not in {
+            "APPROVE_DRAFT",
+            "REJECT_DRAFT",
+        }:
+            raise ValueError(
+                "Unsupported review action"
+            )
+
+        if not decision_id:
+            raise ValueError(
+                "decision_id is required"
+            )
+
+        if not reviewer_identity:
+            raise ValueError(
+                "reviewer_identity is required"
+            )
+
+        if self.get_decision_by_id(decision_id) is None:
+            raise ValueError(
+                "Pipeline decision does not exist"
+            )
+
+        if self.get_review_action(decision_id) is not None:
+            raise ValueError(
+                "Review action already recorded"
+            )
+
+        session = self.Session()
+
+        try:
+            row = ReviewActionModel(
+                review_id=str(uuid.uuid4()),
+                decision_id=decision_id,
+                timestamp=datetime.now(timezone.utc),
+                reviewer_identity=reviewer_identity[:64],
+                action=action,
+            )
+
+            session.add(row)
+
+            try:
+                session.commit()
+            except IntegrityError as exc:
+                session.rollback()
+                raise ValueError(
+                    "Review action already recorded"
+                ) from exc
+
+            session.refresh(row)
+
+            return {
+                "review_id": row.review_id,
+                "decision_id": row.decision_id,
+                "timestamp": row.timestamp.isoformat(),
+                "reviewer_identity": row.reviewer_identity,
+                "action": row.action,
+            }
+        finally:
+            session.close()
 
     def get_decisions_by_ticket_id(self, ticket_id: str) -> List[Dict[str, Any]]:
         return self._query(ticket_id=ticket_id)
