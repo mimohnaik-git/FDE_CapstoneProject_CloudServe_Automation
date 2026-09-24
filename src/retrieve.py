@@ -303,11 +303,11 @@ class DocumentationRetrievalEngine:
         document_id: str,
         primary_chunk_id: str,
         *,
-        limit: int = 2,
+        limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """Return same-document Resolution chunks for grounded generation only."""
 
-        if self._state is None or limit <= 0:
+        if self._state is None or (limit is not None and limit <= 0):
             return []
 
         support: List[Dict[str, Any]] = []
@@ -342,7 +342,7 @@ class DocumentationRetrievalEngine:
                 }
             )
 
-            if len(support) >= limit:
+            if limit is not None and len(support) >= limit:
                 break
 
         return support

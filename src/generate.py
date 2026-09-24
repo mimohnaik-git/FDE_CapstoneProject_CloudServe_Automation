@@ -33,6 +33,9 @@ FAILURE_PROVIDER_ERROR = "PROVIDER_ERROR"
 FAILURE_PROMPT_DISCLOSURE = "PROMPT_DISCLOSURE"
 FAILURE_UNSUPPORTED_COMMITMENT = "UNSUPPORTED_COMMITMENT"
 
+DRAFT_STATUS_EVIDENCE_ASSEMBLY_COMPLETE = "EVIDENCE_ASSEMBLY_COMPLETE"
+DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED = "PARTIAL_REVIEW_REQUIRED"
+
 _PROVIDER_OUTPUT_KEYS = {"answer", "citations", "supported", "uncertainty"}
 GENERATION_OUTPUT_SCHEMA: Dict[str, Any] = {
     "type": "object",
@@ -126,34 +129,47 @@ class OfflineGroundedProvider:
                 "uncertainty": FAILURE_INSUFFICIENT_DOCUMENTATION,
             }
         evidence = retrieved_context[0]
-        selected = evidence
+        document_id = str(evidence["document_id"])
+        resolution_passages = []
 
-        for support in evidence.get("supporting_passages") or []:
-            if str(support.get("section") or "").strip().lower() == "resolution":
-                selected = support
-                break
+        candidates = [evidence, *(evidence.get("supporting_passages") or [])]
+        seen_chunk_ids = set()
+        for candidate in candidates:
+            if not isinstance(candidate, Mapping):
+                continue
+            if str(candidate.get("document_id") or "") != document_id:
+                continue
+            if str(candidate.get("section") or "").strip().lower() != "resolution":
+                continue
+            chunk_id = str(candidate.get("chunk_id") or "")
+            passage = str(candidate.get("passage") or "").strip()
+            if not chunk_id or not passage or chunk_id in seen_chunk_ids:
+                continue
+            seen_chunk_ids.add(chunk_id)
+            resolution_passages.append(candidate)
 
-        passage = selected["passage"].strip()
-
-        if str(selected.get("section") or "").strip().lower() == "resolution":
-            passage = re.sub(
-                r"^#{1,6}\\s+Resolution\\s*",
-                "",
-                passage,
-                flags=re.IGNORECASE,
-            ).strip()
-            answer = f"Try these documented steps:\n{passage}"
+        if resolution_passages:
+            steps = []
+            for selected in resolution_passages:
+                passage = re.sub(
+                    r"^#{1,6}\\s+Resolution\\s*",
+                    "",
+                    str(selected["passage"]).strip(),
+                    flags=re.IGNORECASE,
+                ).strip()
+                steps.append(passage)
+            answer = "Try these documented steps:\n" + "\n\n".join(steps)
+            citations = [
+                {"document_id": document_id, "chunk_id": str(item["chunk_id"])}
+                for item in resolution_passages
+            ]
         else:
-            answer = passage
+            answer = str(evidence["passage"]).strip()
+            citations = [{"document_id": document_id, "chunk_id": str(evidence["chunk_id"])}]
 
         return {
             "answer": answer,
-            "citations": [
-                {
-                    "document_id": selected["document_id"],
-                    "chunk_id": selected["chunk_id"],
-                }
-            ],
+            "citations": citations,
             "supported": True,
             "uncertainty": None,
         }
@@ -385,6 +401,7 @@ class ResponseGenerationEngine:
             "citation_ids": citation_ids,
             "supported": True,
             "grounded": True,
+            "draft_status": self._draft_status(context, citations),
             "uncertainty": parsed["uncertainty"],
             "confidence": top_score,
             "warnings": [],
@@ -481,6 +498,41 @@ class ResponseGenerationEngine:
                 }
             )
         return context
+
+    @staticmethod
+    def _draft_status(
+        context: Sequence[Mapping[str, Any]],
+        citations: Sequence[Mapping[str, Any]],
+    ) -> str:
+        """Classify internal-draft completeness from supplied same-doc evidence.
+
+        A complete draft cites every Resolution passage supplied for the
+        selected top document.  The status is reviewer-facing metadata only;
+        it never authorizes customer release.
+        """
+        if not context:
+            return DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED
+
+        selected = context[0]
+        document_id = str(selected.get("document_id") or "")
+        expected = set()
+        candidates = [selected, *(selected.get("supporting_passages") or [])]
+        for item in candidates:
+            if not isinstance(item, Mapping):
+                continue
+            if str(item.get("document_id") or "") != document_id:
+                continue
+            if str(item.get("section") or "").strip().lower() == "resolution":
+                expected.add((document_id, str(item.get("chunk_id") or "")))
+
+        cited = {
+            (str(citation.get("document_id") or ""), str(citation.get("chunk_id") or ""))
+            for citation in citations
+            if isinstance(citation, Mapping)
+        }
+        if expected and expected.issubset(cited):
+            return DRAFT_STATUS_EVIDENCE_ASSEMBLY_COMPLETE
+        return DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED
 
     def get_generation_prompt(
         self,
@@ -606,6 +658,7 @@ class ResponseGenerationEngine:
             "citation_ids": [],
             "supported": False,
             "grounded": False,
+            "draft_status": DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED,
             "uncertainty": reason,
             "confidence": 0.0,
             "warnings": [reason],

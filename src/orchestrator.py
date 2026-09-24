@@ -387,6 +387,7 @@ class SupportAutomationOrchestrator:
             "visibility": "INTERNAL_REVIEW_ONLY",
             "approval_required": True,
             "review_draft": draft.strip(),
+            "draft_status": generation.get("draft_status"),
             "citations": citations,
             "routing_reason_code": reason_code,
             "evidence_status": evidence.get("status"),

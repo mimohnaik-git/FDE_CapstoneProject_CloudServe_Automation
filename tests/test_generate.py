@@ -12,6 +12,8 @@ from src.generate import (
     FAILURE_PROVIDER_UNAVAILABLE,
     FAILURE_UNSUPPORTED_CITATION,
     FAILURE_UNSUPPORTED_COMMITMENT,
+    DRAFT_STATUS_EVIDENCE_ASSEMBLY_COMPLETE,
+    DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED,
     GENERATION_OUTPUT_SCHEMA,
     GEN_SOURCE_OFFLINE,
     PROMPT_VERSION,
@@ -174,7 +176,15 @@ def test_offline_provider_prefers_same_document_resolution_support(
             "section": "Resolution",
             "source": "authoritative_documentation",
             "passage": "## Resolution\n1. Clear stale login credentials.\n2. Authenticate again.",
-        }
+        },
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-resolution-continued",
+            "title": "Resolving invalid credential errors",
+            "section": "Resolution",
+            "source": "authoritative_documentation",
+            "passage": "## Resolution\n3. Confirm the account is unlocked before retrying.",
+        },
     ]
 
     result = ResponseGenerationEngine(
@@ -190,12 +200,39 @@ def test_offline_provider_prefers_same_document_resolution_support(
     assert result["model"] == "deterministic-resolution-grounded-v2"
     assert result["answer"].startswith("Try these documented steps:")
     assert "Clear stale login credentials" in result["answer"]
+    assert "Confirm the account is unlocked" in result["answer"]
+    assert result["draft_status"] == DRAFT_STATUS_EVIDENCE_ASSEMBLY_COMPLETE
     assert result["citations"] == [
         {
             "document_id": "DOC-AUTH-001",
             "chunk_id": "DOC-AUTH-001-resolution",
+        },
+        {
+            "document_id": "DOC-AUTH-001",
+            "chunk_id": "DOC-AUTH-001-resolution-continued",
         }
     ]
+
+
+def test_offline_provider_marks_non_resolution_evidence_partial(
+    sample_ticket,
+    sample_classification,
+    sample_retrieval,
+):
+    retrieval = [dict(sample_retrieval[0])]
+    retrieval[0]["section"] = "Symptoms"
+    retrieval[0]["supporting_passages"] = []
+
+    result = ResponseGenerationEngine(
+        provider=OfflineGroundedProvider()
+    ).generate_response(sample_ticket, sample_classification, retrieval)
+
+    assert result["supported"] is True
+    assert result["draft_status"] == DRAFT_STATUS_PARTIAL_REVIEW_REQUIRED
+    assert result["citations"] == [{
+        "document_id": "DOC-AUTH-001",
+        "chunk_id": "DOC-AUTH-001-test",
+    }]
 
 
 def test_supporting_passage_from_different_document_is_not_allowlisted(
