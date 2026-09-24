@@ -83,6 +83,15 @@ class ReviewActionResponse(BaseModel):
     status: Literal["RECORDED"]
 
 
+class ResolutionEligibilityResponse(BaseModel):
+    status: str
+    document_id: str | None = None
+    customer_tier: str | None = None
+    applies_to: str | None = None
+    plan_applicable: bool | None = None
+    blocking_flags: list[str]
+
+
 class ReviewerTicketResponse(BaseModel):
     """Strict internal projection for supervised human review."""
 
@@ -99,6 +108,7 @@ class ReviewerTicketResponse(BaseModel):
     citations: list[CitationResponse]
     evidence_status: str | None
     evidence_reason_code: str | None
+    resolution_eligibility: ResolutionEligibilityResponse | None = None
 
 
 @lru_cache(maxsize=1)
@@ -334,6 +344,14 @@ def get_review_handoff(
         evidence_status=handoff.get("evidence_status"),
         evidence_reason_code=handoff.get(
             "evidence_reason_code"
+        ),
+        resolution_eligibility=(
+            handoff.get("resolution_eligibility")
+            if isinstance(
+                handoff.get("resolution_eligibility"),
+                dict,
+            )
+            else None
         ),
     )
 

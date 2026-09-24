@@ -334,6 +334,14 @@ def test_original_processing_registers_exact_reviewer_handoff(
             "evidence_reason_code": (
                 "DEVELOPMENT_EVIDENCE_INSUFFICIENT_FOR_RELEASE"
             ),
+            "resolution_eligibility": {
+                "status": "SELF_SERVICE_CANDIDATE",
+                "document_id": "DOC-AUTH-001",
+                "customer_tier": "standard",
+                "applies_to": "All plans",
+                "plan_applicable": True,
+                "blocking_flags": [],
+            },
         },
     }
 
@@ -378,6 +386,15 @@ def test_original_processing_registers_exact_reviewer_handoff(
         }
     ]
     assert body["evidence_status"] == "UNVERIFIED"
+
+    assert body["resolution_eligibility"] == {
+        "status": "SELF_SERVICE_CANDIDATE",
+        "document_id": "DOC-AUTH-001",
+        "customer_tier": "standard",
+        "applies_to": "All plans",
+        "plan_applicable": True,
+        "blocking_flags": [],
+    }
 
 
 def test_processing_api_credential_cannot_read_reviewer_handoff(
