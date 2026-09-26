@@ -1,0 +1,3202 @@
+[
+ {
+  "ticket_id": "DEV-0000",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Health check timeout on deploy",
+  "body": "Urgent: health check timeout on deploy Need this today.\n-- \nSent from my phone",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0001",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, SAML assertion error when logging in with Okta We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0002",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Resetting your password",
+  "body": "Urgent: I forgot my password and the reset email never arrived Any docs on this?",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0003",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Getting 429 too many requests errors",
+  "body": "Quick question - getting 429 too many requests errors Any docs on this?",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0004",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Getting 429 too many requests errors",
+  "body": "Quick question - getting 429 too many requests errors We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0005",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - getting 429 too many requests errors Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0006",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Rotating API keys",
+  "body": "Quick question - API returns 401 unauthorized after key rotation This is blocking production.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0007",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Api returns 401 unauthorized after key rotation",
+  "body": "Quick question - API returns 401 unauthorized after key rotation We are on the enterprise plan.",
+  "intent": "api_key_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0008",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Deployment failed with a build error",
+  "body": "Quick question - deployment failed with a build error Need this today.\n-- \nSent from my phone",
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0009",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: suspicious login from unknown country, account compromised Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0010",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Connecting to managed databases",
+  "body": "Urgent: how do I enable SSL for the database connection We are on the enterprise plan.",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0011",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "My deploy keeps failing at the build step",
+  "body": "Hi team, my deploy keeps failing at the build step Thanks.",
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0012",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "How do we set up single sign-on for our domain",
+  "body": "Quick question - how do we set up single sign-on for our domain Any docs on this?\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0013",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "how can I export my project data to CSV We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_export",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0014",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "Urgent: health check timeout on deploy Any docs on this?",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0015",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "How do we set up single sign-on for our domain",
+  "body": "Hello, how do we set up single sign-on for our domain Need this today.",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0016",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Someone accessed our project without permission",
+  "body": "someone accessed our project without permission\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0017",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "how do I update my credit card Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0018",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Security incident reporting",
+  "body": "Hello, someone accessed our project without permission Need this today.",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0019",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Deployment failed with a build error",
+  "body": "Urgent: deployment failed with a build error This is blocking production.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0020",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "I think my account was hacked",
+  "body": "Urgent: I think my account was hacked\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0021",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: need a JSON export of all records Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0022",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Updating billing details",
+  "body": "Hi team, how do I update my credit card Any docs on this?",
+  "intent": "billing_query",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0023",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Need a new api key, old one was revoked",
+  "body": "Quick question - need a new API key, old one was revoked This is blocking production.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0024",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i enable ssl for the database connection",
+  "body": "Please help: how do I enable SSL for the database connection Any docs on this?\n-- \nSent from my phone",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0025",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, SSO redirect loop with our identity provider Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0026",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Resetting your password",
+  "body": "Quick question - reset password email is not in my inbox Thanks.",
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0027",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Cannot sign in, password reset link expired",
+  "body": "Urgent: cannot sign in, password reset link expired We are on the enterprise plan.",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0028",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Possible data breach in our workspace",
+  "body": "Hi team, possible data breach in our workspace Need this today.\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0029",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: I think my account was hacked Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0030",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Connecting to managed databases",
+  "body": "Urgent: cannot connect to postgres from app servers Any docs on this?",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0031",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "I was charged twice on my invoice this month",
+  "body": "I was charged twice on my invoice this month Thanks.",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0032",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Where can i download invoices",
+  "body": "where can I download invoices This is blocking production.\n-- \nSent from my phone",
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0033",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "I forgot my password and the reset email never arrived We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0034",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "deployment failed with a build error Thanks.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0035",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Our api key expired and requests fail",
+  "body": "Hello, our API key expired and requests fail We are on the enterprise plan.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0036",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Saml assertion error when logging in with okta",
+  "body": "Urgent: SAML assertion error when logging in with Okta Any docs on this?\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0037",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "change billing address on the account Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0038",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Exporting your data",
+  "body": "Please help: where is the data export option Thanks.",
+  "intent": "data_export",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0039",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Requests throttled during traffic burst, retry-after header",
+  "body": "Hi team, requests throttled during traffic burst, retry-after header Need this today.",
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0040",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Which regions are available for data residency",
+  "body": "Please help: which regions are available for data residency\n-- \nSent from my phone",
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0041",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, which regions are available for data residency This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0042",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "Please help: which regions are available for data residency Thanks.",
+  "intent": "data_residency",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0043",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "How do i avoid hitting rate limits",
+  "body": "Please help: how do I avoid hitting rate limits Thanks.",
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0044",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Deployment failed with a build error",
+  "body": "deployment failed with a build error This is blocking production.\n-- \nSent from my phone",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0045",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: need a JSON export of all records We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0046",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "my deploy keeps failing at the build step Thanks.",
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0047",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Where can i download invoices",
+  "body": "Hello, where can I download invoices Thanks.",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0048",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Change billing address on the account",
+  "body": "Please help: change billing address on the account\n-- \nSent from my phone",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0049",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: database timeout from my application Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0050",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "Please help: deployment failed with a build error Any docs on this?",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0051",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Sso redirect loop with our identity provider",
+  "body": "Hi team, SSO redirect loop with our identity provider Thanks.",
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0052",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Someone accessed our project without permission",
+  "body": "Please help: someone accessed our project without permission Thanks.\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0053",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: someone accessed our project without permission This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0054",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "can we move our project to the EU region",
+  "intent": "data_residency",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0055",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Can we move our project to the eu region",
+  "body": "Urgent: can we move our project to the EU region Thanks.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0056",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "How do i reset my password for my account",
+  "body": "Hi team, how do I reset my password for my account This is blocking production.\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0057",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, requests throttled during traffic burst, retry-after header We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0058",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Resetting your password",
+  "body": "Urgent: how do I reset my password for my account Need this today.",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0059",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Data residency requirements for compliance",
+  "body": "Quick question - data residency requirements for compliance Thanks.",
+  "intent": "data_residency",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0060",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Where is our data stored",
+  "body": "Urgent: where is our data stored Thanks.\n-- \nSent from my phone",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0061",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, cannot sign in, password reset link expired Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0062",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "Hello, where is our data stored Need this today.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0063",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Saml assertion error when logging in with okta",
+  "body": "Hi team, SAML assertion error when logging in with Okta Thanks.",
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0064",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Entity id mismatch error during sso setup",
+  "body": "Quick question - entity ID mismatch error during SSO setup\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0065",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: health check timeout on deploy This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0066",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "Quick question - data residency requirements for compliance Thanks.",
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0067",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Can we move our project to the eu region",
+  "body": "Urgent: can we move our project to the EU region Thanks.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0068",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Entity id mismatch error during sso setup",
+  "body": "Urgent: entity ID mismatch error during SSO setup This is blocking production.\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0069",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "how do I avoid hitting rate limits Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0070",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Configuring single sign-on (SSO)",
+  "body": "Please help: SSO redirect loop with our identity provider Need this today.",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0071",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Our api key expired and requests fail",
+  "body": "Hi team, our API key expired and requests fail Any docs on this?",
+  "intent": "api_key_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0072",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Cannot connect to postgres from app servers",
+  "body": "Hi team, cannot connect to postgres from app servers Need this today.\n-- \nSent from my phone",
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0073",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, cannot connect to postgres from app servers Any docs on this?"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0074",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "Please help: deployment failed with a build error This is blocking production.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0075",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "App does not start after deployment",
+  "body": "Urgent: app does not start after deployment Need this today.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0076",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "How do i enable ssl for the database connection",
+  "body": "Quick question - how do I enable SSL for the database connection We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0077",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "SSO redirect loop with our identity provider"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0078",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Resetting your password",
+  "body": "Hello, cannot sign in, password reset link expired Thanks.",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0079",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Database timeout from my application",
+  "body": "Quick question - database timeout from my application We are on the enterprise plan.",
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0080",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Deployment failed with a build error",
+  "body": "Hello, deployment failed with a build error\n-- \nSent from my phone",
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0081",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, connection refused to managed database"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0082",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Exporting your data",
+  "body": "Quick question - how can I export my project data to CSV Thanks.",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0083",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Entity id mismatch error during sso setup",
+  "body": "entity ID mismatch error during SSO setup This is blocking production.",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0084",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i enable ssl for the database connection",
+  "body": "Quick question - how do I enable SSL for the database connection Thanks.\n-- \nSent from my phone",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0085",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, SSO redirect loop with our identity provider"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0086",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Exporting your data",
+  "body": "Quick question - export download link expired Thanks.",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0087",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Can we move our project to the eu region",
+  "body": "Hello, can we move our project to the EU region This is blocking production.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0088",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "How can i export my project data to csv",
+  "body": "how can I export my project data to CSV\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0089",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, data residency requirements for compliance Any docs on this?"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0090",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Updating billing details",
+  "body": "Quick question - I was charged twice on my invoice this month This is blocking production.",
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0091",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "What are the api rate limits on the free plan",
+  "body": "Hello, what are the API rate limits on the free plan Thanks.",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0092",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i enable ssl for the database connection",
+  "body": "how do I enable SSL for the database connection Thanks.\n-- \nSent from my phone",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0093",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, where is the data export option"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0094",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "Quick question - which regions are available for data residency Thanks.",
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0095",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Reset password email is not in my inbox",
+  "body": "Hi team, reset password email is not in my inbox Thanks.",
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0096",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "How do i reset my password for my account",
+  "body": "Hello, how do I reset my password for my account This is blocking production.\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0097",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "health check timeout on deploy This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0098",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "health check timeout on deploy This is blocking production.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0099",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Entity id mismatch error during sso setup",
+  "body": "Hello, entity ID mismatch error during SSO setup We are on the enterprise plan.",
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0100",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Getting 429 too many requests errors",
+  "body": "getting 429 too many requests errors This is blocking production.\n-- \nSent from my phone",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0101",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - need a new API key, old one was revoked"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "api_key_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0102",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Exporting your data",
+  "body": "Please help: export download link expired Thanks.",
+  "intent": "data_export",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0103",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Someone accessed our project without permission",
+  "body": "Hello, someone accessed our project without permission Need this today.",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0104",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Our api key expired and requests fail",
+  "body": "Please help: our API key expired and requests fail We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "api_key_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0105",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: reset password email is not in my inbox Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0106",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Data residency regions",
+  "body": "Please help: where is our data stored We are on the enterprise plan.",
+  "intent": "data_residency",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0107",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Saml assertion error when logging in with okta",
+  "body": "SAML assertion error when logging in with Okta Thanks.",
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0108",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Entity id mismatch error during sso setup",
+  "body": "Urgent: entity ID mismatch error during SSO setup We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0109",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: cannot sign in, password reset link expired This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0110",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Updating billing details",
+  "body": "Please help: how do I update my credit card We are on the enterprise plan.",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0111",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Where is our data stored",
+  "body": "Please help: where is our data stored Need this today.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0112",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do we set up single sign-on for our domain",
+  "body": "Hi team, how do we set up single sign-on for our domain Need this today.\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0113",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: I was charged twice on my invoice this month"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0114",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Exporting your data",
+  "body": "Quick question - how can I export my project data to CSV Need this today.",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0115",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Sso redirect loop with our identity provider",
+  "body": "Hello, SSO redirect loop with our identity provider This is blocking production.",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0116",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "Need a json export of all records",
+  "body": "need a JSON export of all records Any docs on this?\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0117",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: how can I export my project data to CSV Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0118",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Exporting your data",
+  "body": "Urgent: export download link expired Any docs on this?",
+  "intent": "data_export",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0119",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Sso redirect loop with our identity provider",
+  "body": "Hello, SSO redirect loop with our identity provider",
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0120",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Where is the data export option",
+  "body": "where is the data export option We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0121",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, database timeout from my application"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0122",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Rotating API keys",
+  "body": "Hello, our API key expired and requests fail Thanks.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0123",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "How do we set up single sign-on for our domain",
+  "body": "Hi team, how do we set up single sign-on for our domain Any docs on this?",
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0124",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Cannot sign in, password reset link expired",
+  "body": "cannot sign in, password reset link expired Any docs on this?\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0125",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: how do I enable SSL for the database connection Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0126",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Connecting to managed databases",
+  "body": "how do I enable SSL for the database connection This is blocking production.",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0127",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "My deploy keeps failing at the build step",
+  "body": "Urgent: my deploy keeps failing at the build step",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0128",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i reset my password for my account",
+  "body": "Hello, how do I reset my password for my account This is blocking production.\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0129",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - cannot connect to postgres from app servers"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0130",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Exporting your data",
+  "body": "Hello, how can I export my project data to CSV",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0131",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "How do i rotate my api key safely",
+  "body": "Hello, how do I rotate my API key safely Any docs on this?",
+  "intent": "api_key_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0132",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Requests throttled during traffic burst, retry-after header",
+  "body": "Urgent: requests throttled during traffic burst, retry-after header\n-- \nSent from my phone",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0133",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: database timeout from my application"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0134",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Updating billing details",
+  "body": "Please help: where can I download invoices This is blocking production.",
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0135",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Cannot sign in, password reset link expired",
+  "body": "Hi team, cannot sign in, password reset link expired Any docs on this?",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0136",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Export download link expired",
+  "body": "Hello, export download link expired Need this today.\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0137",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, database timeout from my application Any docs on this?"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0138",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Configuring single sign-on (SSO)",
+  "body": "Please help: SSO redirect loop with our identity provider Thanks.",
+  "intent": "sso_configuration",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0139",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Data residency requirements for compliance",
+  "body": "Quick question - data residency requirements for compliance Thanks.",
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0140",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "I was charged twice on my invoice this month",
+  "body": "Hi team, I was charged twice on my invoice this month We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0141",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, SSO redirect loop with our identity provider We are on the enterprise plan."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0142",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Understanding API rate limits",
+  "body": "Hello, requests throttled during traffic burst, retry-after header We are on the enterprise plan.",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0143",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Cannot connect to postgres from app servers",
+  "body": "Urgent: cannot connect to postgres from app servers Need this today.",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0144",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i avoid hitting rate limits",
+  "body": "Hello, how do I avoid hitting rate limits This is blocking production.\n-- \nSent from my phone",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0145",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - change billing address on the account This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0146",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Data residency regions",
+  "body": "can we move our project to the EU region This is blocking production.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0147",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Cannot connect to postgres from app servers",
+  "body": "Please help: cannot connect to postgres from app servers Any docs on this?",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0148",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Cannot sign in, password reset link expired",
+  "body": "cannot sign in, password reset link expired Any docs on this?\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0149",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "someone accessed our project without permission"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0150",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Data residency regions",
+  "body": "Urgent: data residency requirements for compliance Thanks.",
+  "intent": "data_residency",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0151",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "What are the api rate limits on the free plan",
+  "body": "Hi team, what are the API rate limits on the free plan We are on the enterprise plan.",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0152",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i update my credit card",
+  "body": "Quick question - how do I update my credit card\n-- \nSent from my phone",
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0153",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Please help: getting 429 too many requests errors Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0154",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Exporting your data",
+  "body": "Please help: where is the data export option",
+  "intent": "data_export",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0155",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Need a json export of all records",
+  "body": "Urgent: need a JSON export of all records This is blocking production.",
+  "intent": "data_export",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0156",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "I think my account was hacked",
+  "body": "I think my account was hacked We are on the enterprise plan.\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0157",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, change billing address on the account Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0158",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Data residency regions",
+  "body": "Quick question - can we move our project to the EU region Thanks.",
+  "intent": "data_residency",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0159",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "How can i export my project data to csv",
+  "body": "how can I export my project data to CSV Thanks.",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0160",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "How do we set up single sign-on for our domain",
+  "body": "Hi team, how do we set up single sign-on for our domain Need this today.\n-- \nSent from my phone",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0161",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "how do I avoid hitting rate limits Need this today."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0162",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Troubleshooting failed deployments",
+  "body": "Hi team, app does not start after deployment",
+  "intent": "deployment_failure",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0163",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "How do i avoid hitting rate limits",
+  "body": "Hi team, how do I avoid hitting rate limits This is blocking production.",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0164",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "How do i avoid hitting rate limits",
+  "body": "Hi team, how do I avoid hitting rate limits This is blocking production.\n-- \nSent from my phone",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0165",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - entity ID mismatch error during SSO setup Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0166",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Connecting to managed databases",
+  "body": "Quick question - connection refused to managed database Thanks.",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0167",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Getting 429 too many requests errors",
+  "body": "Quick question - getting 429 too many requests errors Thanks.",
+  "intent": "rate_limit",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0168",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "Cannot sign in, password reset link expired",
+  "body": "Urgent: cannot sign in, password reset link expired Any docs on this?\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0169",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "deployment failed with a build error Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0170",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Rotating API keys",
+  "body": "need a new API key, old one was revoked This is blocking production.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0171",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "How do i enable ssl for the database connection",
+  "body": "Hello, how do I enable SSL for the database connection Any docs on this?",
+  "intent": "database_issue",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0172",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "I forgot my password and the reset email never arrived",
+  "body": "Hello, I forgot my password and the reset email never arrived\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0173",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Urgent: SSO redirect loop with our identity provider This is blocking production."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0174",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Connecting to managed databases",
+  "body": "connection refused to managed database Need this today.",
+  "intent": "database_issue",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0175",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "App does not start after deployment",
+  "body": "Hi team, app does not start after deployment This is blocking production.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0176",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "How do i update my credit card",
+  "body": "Please help: how do I update my credit card Any docs on this?\n-- \nSent from my phone",
+  "intent": "billing_query",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0177",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "reset password email is not in my inbox Any docs on this?"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0178",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Exporting your data",
+  "body": "Please help: need a JSON export of all records",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0179",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "My deploy keeps failing at the build step",
+  "body": "Hello, my deploy keeps failing at the build step We are on the enterprise plan.",
+  "intent": "deployment_failure",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0180",
+  "channel": "email",
+  "customer_tier": "enterprise",
+  "subject": "My deploy keeps failing at the build step",
+  "body": "Hello, my deploy keeps failing at the build step\n-- \nSent from my phone",
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0181",
+  "channel": "chat",
+  "customer_tier": "enterprise",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "cannot sign in, password reset link expired Any docs on this?"
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "password_reset",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0182",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Connecting to managed databases",
+  "body": "Urgent: how do I enable SSL for the database connection Any docs on this?",
+  "intent": "database_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0183",
+  "channel": "forum",
+  "customer_tier": "pro",
+  "title": "Where can i download invoices",
+  "body": "where can I download invoices Need this today.",
+  "intent": "billing_query",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0184",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Suspicious login from unknown country, account compromised",
+  "body": "Hello, suspicious login from unknown country, account compromised This is blocking production.\n-- \nSent from my phone",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0185",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Quick question - deployment failed with a build error Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0186",
+  "channel": "docs_comment",
+  "customer_tier": "free",
+  "page_title": "Understanding API rate limits",
+  "body": "how do I avoid hitting rate limits Need this today.",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0187",
+  "channel": "forum",
+  "customer_tier": "free",
+  "title": "Which regions are available for data residency",
+  "body": "Hi team, which regions are available for data residency Any docs on this?",
+  "intent": "data_residency",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-009"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0188",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "How can i export my project data to csv",
+  "body": "Hi team, how can I export my project data to CSV\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0189",
+  "channel": "chat",
+  "customer_tier": "pro",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, where can I download invoices Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0190",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Security incident reporting",
+  "body": "Please help: suspicious login from unknown country, account compromised We are on the enterprise plan.",
+  "intent": "security_incident",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_not_auto_respond": true,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0191",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "How do we set up single sign-on for our domain",
+  "body": "Hello, how do we set up single sign-on for our domain This is blocking production.",
+  "intent": "sso_configuration",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0192",
+  "channel": "email",
+  "customer_tier": "pro",
+  "subject": "Export download link expired",
+  "body": "Hello, export download link expired Need this today.\n-- \nSent from my phone",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0193",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hi team, where can I download invoices Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "billing_query",
+  "urgency": "low",
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0194",
+  "channel": "docs_comment",
+  "customer_tier": "pro",
+  "page_title": "Exporting your data",
+  "body": "Hello, need a JSON export of all records",
+  "intent": "data_export",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0195",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "What are the api rate limits on the free plan",
+  "body": "Please help: what are the API rate limits on the free plan",
+  "intent": "rate_limit",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0196",
+  "channel": "email",
+  "customer_tier": "free",
+  "subject": "I forgot my password and the reset email never arrived",
+  "body": "I forgot my password and the reset email never arrived Any docs on this?\n-- \nSent from my phone",
+  "intent": "password_reset",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0197",
+  "channel": "chat",
+  "customer_tier": "free",
+  "messages": [
+   {
+    "role": "customer",
+    "text": "Hello, deployment failed with a build error Thanks."
+   },
+   {
+    "role": "agent",
+    "text": "Let me check that for you."
+   }
+  ],
+  "intent": "deployment_failure",
+  "urgency": "medium",
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": true
+ },
+ {
+  "ticket_id": "DEV-0198",
+  "channel": "docs_comment",
+  "customer_tier": "enterprise",
+  "page_title": "Understanding API rate limits",
+  "body": "what are the API rate limits on the free plan This is blocking production.",
+  "intent": "rate_limit",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ },
+ {
+  "ticket_id": "DEV-0199",
+  "channel": "forum",
+  "customer_tier": "enterprise",
+  "title": "Need a new api key, old one was revoked",
+  "body": "Quick question - need a new API key, old one was revoked This is blocking production.",
+  "intent": "api_key_issue",
+  "urgency": "high",
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_not_auto_respond": false,
+  "answerable": false
+ }
+]

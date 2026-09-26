@@ -1,0 +1,437 @@
+[
+ {
+  "ticket": {
+   "ticket_id": "DEV-0000",
+   "channel": "email",
+   "customer_tier": "free",
+   "subject": "Health check timeout on deploy",
+   "body": "Urgent: health check timeout on deploy Need this today.\n-- \nSent from my phone"
+  },
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_mention": [
+   "deployment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0001",
+   "channel": "chat",
+   "customer_tier": "free",
+   "messages": [
+    {
+     "role": "customer",
+     "text": "Hello, SAML assertion error when logging in with Okta We are on the enterprise plan."
+    },
+    {
+     "role": "agent",
+     "text": "Let me check that for you."
+    }
+   ]
+  },
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_mention": [
+   "settings",
+   "authentication"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0002",
+   "channel": "docs_comment",
+   "customer_tier": "free",
+   "page_title": "Resetting your password",
+   "body": "Urgent: I forgot my password and the reset email never arrived Any docs on this?"
+  },
+  "expected_doc_ids": [
+   "KB-001"
+  ],
+  "must_mention": [
+   "sign-in",
+   "password"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0003",
+   "channel": "forum",
+   "customer_tier": "free",
+   "title": "Getting 429 too many requests errors",
+   "body": "Quick question - getting 429 too many requests errors Any docs on this?"
+  },
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_mention": [
+   "retry-after",
+   "exponentially"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0004",
+   "channel": "email",
+   "customer_tier": "pro",
+   "subject": "Getting 429 too many requests errors",
+   "body": "Quick question - getting 429 too many requests errors We are on the enterprise plan.\n-- \nSent from my phone"
+  },
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_mention": [
+   "retry-after",
+   "exponentially"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0005",
+   "channel": "chat",
+   "customer_tier": "pro",
+   "messages": [
+    {
+     "role": "customer",
+     "text": "Quick question - getting 429 too many requests errors Thanks."
+    },
+    {
+     "role": "agent",
+     "text": "Let me check that for you."
+    }
+   ]
+  },
+  "expected_doc_ids": [
+   "KB-004"
+  ],
+  "must_mention": [
+   "retry-after",
+   "exponentially"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0006",
+   "channel": "docs_comment",
+   "customer_tier": "enterprise",
+   "page_title": "Rotating API keys",
+   "body": "Quick question - API returns 401 unauthorized after key rotation This is blocking production."
+  },
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_mention": [
+   "developer",
+   "settings"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0007",
+   "channel": "forum",
+   "customer_tier": "enterprise",
+   "title": "Api returns 401 unauthorized after key rotation",
+   "body": "Quick question - API returns 401 unauthorized after key rotation We are on the enterprise plan."
+  },
+  "expected_doc_ids": [
+   "KB-003"
+  ],
+  "must_mention": [
+   "developer",
+   "settings"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0008",
+   "channel": "email",
+   "customer_tier": "free",
+   "subject": "Deployment failed with a build error",
+   "body": "Quick question - deployment failed with a build error Need this today.\n-- \nSent from my phone"
+  },
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_mention": [
+   "deployment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0009",
+   "channel": "chat",
+   "customer_tier": "enterprise",
+   "messages": [
+    {
+     "role": "customer",
+     "text": "Urgent: suspicious login from unknown country, account compromised Need this today."
+    },
+    {
+     "role": "agent",
+     "text": "Let me check that for you."
+    }
+   ]
+  },
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_mention": [
+   "security",
+   "reports"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0010",
+   "channel": "docs_comment",
+   "customer_tier": "pro",
+   "page_title": "Connecting to managed databases",
+   "body": "Urgent: how do I enable SSL for the database connection We are on the enterprise plan."
+  },
+  "expected_doc_ids": [
+   "KB-007"
+  ],
+  "must_mention": [
+   "application",
+   "database"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0011",
+   "channel": "forum",
+   "customer_tier": "enterprise",
+   "title": "My deploy keeps failing at the build step",
+   "body": "Hi team, my deploy keeps failing at the build step Thanks."
+  },
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_mention": [
+   "deployment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0012",
+   "channel": "email",
+   "customer_tier": "pro",
+   "subject": "How do we set up single sign-on for our domain",
+   "body": "Quick question - how do we set up single sign-on for our domain Any docs on this?\n-- \nSent from my phone"
+  },
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_mention": [
+   "settings",
+   "authentication"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0013",
+   "channel": "chat",
+   "customer_tier": "pro",
+   "messages": [
+    {
+     "role": "customer",
+     "text": "how can I export my project data to CSV We are on the enterprise plan."
+    },
+    {
+     "role": "agent",
+     "text": "Let me check that for you."
+    }
+   ]
+  },
+  "expected_doc_ids": [
+   "KB-005"
+  ],
+  "must_mention": [
+   "project",
+   "settings"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0014",
+   "channel": "docs_comment",
+   "customer_tier": "free",
+   "page_title": "Troubleshooting failed deployments",
+   "body": "Urgent: health check timeout on deploy Any docs on this?"
+  },
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_mention": [
+   "deployment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0015",
+   "channel": "forum",
+   "customer_tier": "pro",
+   "title": "How do we set up single sign-on for our domain",
+   "body": "Hello, how do we set up single sign-on for our domain Need this today."
+  },
+  "expected_doc_ids": [
+   "KB-002"
+  ],
+  "must_mention": [
+   "settings",
+   "authentication"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0016",
+   "channel": "email",
+   "customer_tier": "pro",
+   "subject": "Someone accessed our project without permission",
+   "body": "someone accessed our project without permission\n-- \nSent from my phone"
+  },
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_mention": [
+   "security",
+   "reports"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0017",
+   "channel": "chat",
+   "customer_tier": "enterprise",
+   "messages": [
+    {
+     "role": "customer",
+     "text": "how do I update my credit card Need this today."
+    },
+    {
+     "role": "agent",
+     "text": "Let me check that for you."
+    }
+   ]
+  },
+  "expected_doc_ids": [
+   "KB-008"
+  ],
+  "must_mention": [
+   "billing",
+   "payment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0018",
+   "channel": "docs_comment",
+   "customer_tier": "pro",
+   "page_title": "Security incident reporting",
+   "body": "Hello, someone accessed our project without permission Need this today."
+  },
+  "expected_doc_ids": [
+   "KB-010"
+  ],
+  "must_mention": [
+   "security",
+   "reports"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ },
+ {
+  "ticket": {
+   "ticket_id": "DEV-0019",
+   "channel": "forum",
+   "customer_tier": "free",
+   "title": "Deployment failed with a build error",
+   "body": "Urgent: deployment failed with a build error This is blocking production."
+  },
+  "expected_doc_ids": [
+   "KB-006"
+  ],
+  "must_mention": [
+   "deployment"
+  ],
+  "must_not_claim": [
+   "we will refund",
+   "guaranteed"
+  ]
+ }
+]

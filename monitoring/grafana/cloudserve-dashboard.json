@@ -1,0 +1,21 @@
+{
+  "title": "CloudServe Supervised Support",
+  "schemaVersion": 38,
+  "panels": [
+    {"type": "timeseries", "title": "Decisions by route",
+     "targets": [{"expr": "sum by (route) (rate(cloudserve_decisions_total[5m]))"}],
+     "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}},
+    {"type": "stat", "title": "AUTO_RESPOND (should be 0 while release is unauthorised)",
+     "targets": [{"expr": "sum(cloudserve_decisions_total{route=\"AUTO_RESPOND\"})"}],
+     "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}},
+    {"type": "timeseries", "title": "Guardrail blocks",
+     "targets": [{"expr": "sum by (guardrail) (rate(cloudserve_guardrail_blocks_total[5m]))"}],
+     "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}},
+    {"type": "timeseries", "title": "Pipeline P95 latency (s)",
+     "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(cloudserve_pipeline_seconds_bucket[5m])))"}],
+     "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}},
+    {"type": "timeseries", "title": "Handled failures",
+     "targets": [{"expr": "sum by (kind) (rate(cloudserve_failures_total[5m]))"}],
+     "gridPos": {"x": 0, "y": 16, "w": 24, "h": 6}}
+  ]
+}

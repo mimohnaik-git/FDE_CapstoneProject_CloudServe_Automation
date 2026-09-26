@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment
+.venv/
+
+# Environment / local configuration
+.env
+
+# Coverage
+.coverage
+htmlcov/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+python-install.log
+pre_git_root_audit.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime state
+var/
+*.db
+*.sqlite3
+*.sqlite3.fallback.jsonl
+
+# --------------------------------------------------
+# Model artifacts
+# --------------------------------------------------
+# Keep validated model artifacts required by the
+# submitted application.
+#
+# Do NOT ignore the complete artifacts/ directory.
+#
+# Ignore disposable experiment artifacts only.
+artifacts/experiments/
+
+# --------------------------------------------------
+# Evaluation results
+# --------------------------------------------------
+# Ignore newly generated/local evaluation runs by default,
+# while preserving intentional submitted evidence.
+
+evaluation/results/*
+
+# Development-selection evidence
+!evaluation/results/development/
+!evaluation/results/development/**
+!evaluation/results/development/**/*.sqlite3
+
+# Frozen canonical Validation-80 evidence
+!evaluation/results/final_c1_validation80_20260926_191933/
+!evaluation/results/final_c1_validation80_20260926_191933/**
+!evaluation/results/final_c1_validation80_20260926_191933/**/*.sqlite3
+
+# Retained final provenance evidence
+!evaluation/results/final_capstone/
+!evaluation/results/final_capstone/**
+!evaluation/results/final_capstone/**/*.sqlite3
+
+# Final verification evidence
+!evaluation/results/final_clean_verification/
+!evaluation/results/final_clean_verification/**
+!evaluation/results/final_clean_verification/**/*.sqlite3
+
+# Controlled operational demonstration evidence
+!evaluation/results/operational_demo/
+!evaluation/results/operational_demo/**
+!evaluation/results/operational_demo/**/*.sqlite3
+
+# Preserve referenced C1 development OOF evidence
+!evaluation/results/final_c1_development_oof.json
+!evaluation/results/final_c1_development_oof_gated.json

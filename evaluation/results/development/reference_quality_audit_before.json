@@ -1,0 +1,582 @@
+{
+  "failed_cases": 25,
+  "rows": [
+    {
+      "ticket_id": "DEV-0071",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0183",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0431",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0125",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0047",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Resolving invalid credential errors on login):\n\n1. Confirm whether the account is locked by checking the security page of the console. A locked account displays a red banner and unlocks automatically after thirty minutes.\n2. Clear cookies for the CloudServe domain, or open a private browsing window, then attempt the login again.\n3. If the CLI is failing, run `cloudserve auth logout` followed by `cloudserve auth login` to discard the cached token.\n4. Where the account remains locked and the customer needs immediate access, an administrator on the account can release the lock from the team members page. [DOC-AUTH-001#Resolution]",
+      "citations": [
+        "DOC-AUTH-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0335",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001",
+        "DOC-AUTH-002"
+      ],
+      "top_doc_id": "DOC-AUTH-002",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Multi-factor authentication setup and recovery):\n\n1. Ask the user to check that automatic time synchronisation is enabled on the device generating the code. Drift is the most common cause by a wide margin.\n2. If the device is lost, the user should sign in with one of their recovery codes and then re-enrol a new device from the security page.\n3. Where no recovery codes are available, an account administrator can reset multi-factor authentication for that user from the team members page.\n4. If the user is the sole administrator and has no recovery codes, identity verification through support is required and takes up to one business day. [DOC-AUTH-002#Resolution]",
+      "citations": [
+        "DOC-AUTH-002#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0362",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0276",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0206",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Resolving invalid credential errors on login):\n\n1. Confirm whether the account is locked by checking the security page of the console. A locked account displays a red banner and unlocks automatically after thirty minutes.\n2. Clear cookies for the CloudServe domain, or open a private browsing window, then attempt the login again.\n3. If the CLI is failing, run `cloudserve auth logout` followed by `cloudserve auth login` to discard the cached token.\n4. Where the account remains locked and the customer needs immediate access, an administrator on the account can release the lock from the team members page. [DOC-AUTH-001#Resolution]",
+      "citations": [
+        "DOC-AUTH-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0008",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0479",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001",
+        "DOC-AUTH-002"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0221",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0394",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0075",
+      "intent": "deployment_failure",
+      "expected_doc_ids": [
+        "DOC-DEPLOY-001"
+      ],
+      "top_doc_id": "DOC-DEPLOY-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "port",
+          "raw_match": false
+        },
+        {
+          "expected": "initial delay",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Build failures caused by dependency resolution):\n\n1. Pin your dependencies with exact versions and commit the lock file. Unpinned dependencies are the cause in the large majority of cases of this kind.\n2. Compare the runtime version declared in your build configuration against the version you use locally.\n3. Clear the build cache from the settings page and trigger a fresh build to rule out a corrupted artefact.\n4. If a specific dependency is failing to resolve, check whether its registry is reachable from the build network. [DOC-DEPLOY-003#Resolution]",
+      "citations": [
+        "DOC-DEPLOY-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0306",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0045",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Resolving invalid credential errors on login):\n\n1. Confirm whether the account is locked by checking the security page of the console. A locked account displays a red banner and unlocks automatically after thirty minutes.\n2. Clear cookies for the CloudServe domain, or open a private browsing window, then attempt the login again.\n3. If the CLI is failing, run `cloudserve auth logout` followed by `cloudserve auth login` to discard the cached token.\n4. Where the account remains locked and the customer needs immediate access, an administrator on the account can release the lock from the team members page. [DOC-AUTH-001#Resolution]",
+      "citations": [
+        "DOC-AUTH-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0465",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0029",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0467",
+      "intent": "rate_limit",
+      "expected_doc_ids": [
+        "DOC-API-001"
+      ],
+      "top_doc_id": "DOC-API-001",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "per organisation",
+          "raw_match": false
+        },
+        {
+          "expected": "backoff",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Understanding API rate limits and quota tiers):\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request. [DOC-API-001#Resolution]",
+      "citations": [
+        "DOC-API-001#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0416",
+      "intent": "deployment_failure",
+      "expected_doc_ids": [
+        "DOC-DEPLOY-001"
+      ],
+      "top_doc_id": "DOC-DEPLOY-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "port",
+          "raw_match": false
+        },
+        {
+          "expected": "initial delay",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Build failures caused by dependency resolution):\n\n1. Pin your dependencies with exact versions and commit the lock file. Unpinned dependencies are the cause in the large majority of cases of this kind.\n2. Compare the runtime version declared in your build configuration against the version you use locally.\n3. Clear the build cache from the settings page and trigger a fresh build to rule out a corrupted artefact.\n4. If a specific dependency is failing to resolve, check whether its registry is reachable from the build network. [DOC-DEPLOY-003#Resolution]",
+      "citations": [
+        "DOC-DEPLOY-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0080",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0427",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-INT-002",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Third party monitoring and log forwarding):\n\n1. Check the forwarding status page, which shows the last successful delivery and any error returned by the destination.\n2. Expect a delay of up to two minutes on metrics, since they are aggregated before being sent.\n3. Apply a level filter at source so that debug output is not forwarded, which is usually the reason volume is higher than expected.\n4. Verify the destination credential separately if delivery has stopped entirely, as expired credentials are the most common cause. [DOC-INT-002#Resolution]",
+      "citations": [
+        "DOC-INT-002#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0229",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0117",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-API-003",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "raw_match": false
+        },
+        {
+          "expected": "idempotent",
+          "raw_match": true
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+      "citations": [
+        "DOC-API-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0285",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "raw_match": false
+        },
+        {
+          "expected": "session cookie",
+          "raw_match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Resolution"
+      ]
+    }
+  ]
+}

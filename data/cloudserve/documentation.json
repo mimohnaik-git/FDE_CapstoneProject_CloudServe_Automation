@@ -1,0 +1,350 @@
+[
+  {
+    "doc_id": "DOC-AUTH-001",
+    "title": "Resolving invalid credential errors on login",
+    "category": "authentication",
+    "applies_to": "Console, CLI, SDK",
+    "content": "# Resolving invalid credential errors on login\n\n**Applies to:** Console, CLI, SDK\n\n## Symptoms\n\n- The console returns 'Invalid credentials' despite a correct password\n- Login succeeds in one browser but fails in another\n- The CLI reports authentication failure after a working period\n\n## Common causes\n\n- The account is locked after five consecutive failed attempts\n- A stale session cookie is being sent alongside new credentials\n- The password was changed in another session and the client cached the old one\n\n## Resolution\n\n1. Confirm whether the account is locked by checking the security page of the console. A locked account displays a red banner and unlocks automatically after thirty minutes.\n2. Clear cookies for the CloudServe domain, or open a private browsing window, then attempt the login again.\n3. If the CLI is failing, run `cloudserve auth logout` followed by `cloudserve auth login` to discard the cached token.\n4. Where the account remains locked and the customer needs immediate access, an administrator on the account can release the lock from the team members page.\n\n## Notes\n\nRepeated lockouts within a short period usually indicate an automated process still using an old password rather than a user error.",
+    "related_docs": [
+      "DOC-AUTH-002",
+      "DOC-AUTH-004"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-AUTH-002",
+    "title": "Multi-factor authentication setup and recovery",
+    "category": "authentication",
+    "applies_to": "All plans",
+    "content": "# Multi-factor authentication setup and recovery\n\n**Applies to:** All plans\n\n## Symptoms\n\n- The authenticator code is rejected as invalid\n- A user has lost the device holding their authenticator\n- Recovery codes were never downloaded\n\n## Common causes\n\n- Device clock drift of more than thirty seconds invalidates time-based codes\n- The authenticator was enrolled against a different account\n- Recovery codes were regenerated, invalidating the older set\n\n## Resolution\n\n1. Ask the user to check that automatic time synchronisation is enabled on the device generating the code. Drift is the most common cause by a wide margin.\n2. If the device is lost, the user should sign in with one of their recovery codes and then re-enrol a new device from the security page.\n3. Where no recovery codes are available, an account administrator can reset multi-factor authentication for that user from the team members page.\n4. If the user is the sole administrator and has no recovery codes, identity verification through support is required and takes up to one business day.\n\n## Notes\n\nSupport cannot disable multi-factor authentication without identity verification, regardless of urgency.",
+    "related_docs": [
+      "DOC-AUTH-001",
+      "DOC-SEC-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-AUTH-003",
+    "title": "Single sign-on configuration with SAML providers",
+    "category": "authentication",
+    "applies_to": "Business and Enterprise plans",
+    "content": "# Single sign-on configuration with SAML providers\n\n**Applies to:** Business and Enterprise plans\n\n## Symptoms\n\n- Users are redirected to the identity provider and returned to an error page\n- SSO works for some users and not others\n- New users are not provisioned automatically\n\n## Common causes\n\n- The assertion consumer service URL does not match the value registered with CloudServe\n- The email attribute in the assertion does not match the CloudServe account email\n- Just-in-time provisioning is disabled on the connection\n\n## Resolution\n\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out.\n\n## Notes\n\nSAML changes take effect immediately for new sessions but existing sessions remain valid until they expire.",
+    "related_docs": [
+      "DOC-AUTH-002",
+      "DOC-ACCT-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-AUTH-004",
+    "title": "API key rotation and scope management",
+    "category": "authentication",
+    "applies_to": "All plans",
+    "content": "# API key rotation and scope management\n\n**Applies to:** All plans\n\n## Symptoms\n\n- A previously working key returns 401 Unauthorized\n- A key works for some endpoints and not others\n- A key needs replacing after accidental exposure\n\n## Common causes\n\n- The key was revoked or reached its configured expiry\n- The key was issued with a scope that excludes the endpoint being called\n- The key belongs to a deleted user and was removed with the account\n\n## Resolution\n\n1. Check the API keys page for the key's status and expiry. Revoked and expired keys are listed with the date and the user who acted.\n2. Review the scopes attached to the key. Read-only keys cannot write, and project-scoped keys cannot reach organisation endpoints.\n3. To rotate without downtime, create the replacement key first, deploy it, confirm traffic has moved, then revoke the old key.\n4. If a key has been exposed publicly, revoke it immediately rather than waiting for the rotation window.\n\n## Notes\n\nKeys issued to individual users are removed when that user is deleted. Use service accounts for anything running in production.",
+    "related_docs": [
+      "DOC-API-001",
+      "DOC-SEC-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DEPLOY-001",
+    "title": "Container deployments failing during the health check phase",
+    "category": "deployment",
+    "applies_to": "Container Service",
+    "content": "# Container deployments failing during the health check phase\n\n**Applies to:** Container Service\n\n## Symptoms\n\n- The deployment reaches running and then rolls back\n- Logs show repeated health check timeouts\n- The service works locally but not when deployed\n\n## Common causes\n\n- The health endpoint takes longer to respond than the configured timeout\n- The container listens on a different port than the service declares\n- A required environment variable is absent in the deployed environment\n\n## Resolution\n\n1. Confirm the container is listening on the port declared in the service definition. A mismatch here produces a health check failure that looks like a timeout.\n2. Increase the initial delay if the application needs time to warm up before it can answer. Thirty seconds is a reasonable starting point for services that load models or caches.\n3. Compare the environment variables present in the deployment against those the application requires. Missing configuration frequently causes a silent startup failure.\n4. Inspect the container logs from the failed revision rather than the running one; the rollback replaces the logs shown by default.\n\n## Notes\n\nA health check must return within the timeout using only local state. Endpoints that call a database will fail during a database incident and take the service down with them.",
+    "related_docs": [
+      "DOC-DEPLOY-002",
+      "DOC-DEPLOY-004"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DEPLOY-002",
+    "title": "Rolling back a failed release",
+    "category": "deployment",
+    "applies_to": "Container Service, Functions",
+    "content": "# Rolling back a failed release\n\n**Applies to:** Container Service, Functions\n\n## Symptoms\n\n- A release has introduced errors and must be reverted\n- The previous revision is needed while a fix is prepared\n\n## Common causes\n\n- A defect reached production that testing did not catch\n- A configuration change had unintended effects\n\n## Resolution\n\n1. Open the revisions page for the service and identify the last revision that was healthy.\n2. Select roll back on that revision. Traffic moves within roughly thirty seconds and no rebuild takes place.\n3. If the release included a database migration, roll the migration back before the service, or the older code will encounter a schema it does not expect.\n4. Record the incident and the reason for the rollback before deploying a fix, while the detail is still fresh.\n\n## Notes\n\nRollback restores the container image and its configuration together. It does not restore data.",
+    "related_docs": [
+      "DOC-DEPLOY-001",
+      "DOC-DATA-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DEPLOY-003",
+    "title": "Build failures caused by dependency resolution",
+    "category": "deployment",
+    "applies_to": "Build Service",
+    "content": "# Build failures caused by dependency resolution\n\n**Applies to:** Build Service\n\n## Symptoms\n\n- Builds that previously succeeded now fail without code changes\n- The build works locally but fails in the pipeline\n- Dependency resolution takes far longer than usual\n\n## Common causes\n\n- An unpinned dependency released a new incompatible version\n- The build environment uses a different language runtime than the local machine\n- The dependency cache holds a partially written artefact\n\n## Resolution\n\n1. Pin your dependencies with exact versions and commit the lock file. Unpinned dependencies are the cause in the large majority of cases of this kind.\n2. Compare the runtime version declared in your build configuration against the version you use locally.\n3. Clear the build cache from the settings page and trigger a fresh build to rule out a corrupted artefact.\n4. If a specific dependency is failing to resolve, check whether its registry is reachable from the build network.\n\n## Notes\n\nBuild logs retain the full resolution output for thirty days, which is usually enough to identify which version changed.",
+    "related_docs": [
+      "DOC-DEPLOY-001",
+      "DOC-PERF-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DEPLOY-004",
+    "title": "Configuring environment variables and secrets",
+    "category": "deployment",
+    "applies_to": "All compute services",
+    "content": "# Configuring environment variables and secrets\n\n**Applies to:** All compute services\n\n## Symptoms\n\n- The application cannot read a variable that appears to be set\n- A secret value appears in plain text in the logs\n- Configuration differs between environments unexpectedly\n\n## Common causes\n\n- The variable was set at project scope but read at service scope\n- The application logs its configuration at startup\n- An environment override exists that is not visible on the main settings page\n\n## Resolution\n\n1. Check the scope at which the variable was defined. Service scope overrides project scope, and project scope overrides organisation defaults.\n2. Store anything sensitive as a secret rather than a variable. Secrets are masked in logs and are not readable through the API after creation.\n3. Review the environment overrides page, which lists values that differ from the defaults for each environment.\n4. Redeploy after changing configuration. Running containers do not pick up new values without a restart.\n\n## Notes\n\nA secret that has been printed to logs should be treated as exposed and rotated, even if the logs are private.",
+    "related_docs": [
+      "DOC-DEPLOY-001",
+      "DOC-SEC-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-API-001",
+    "title": "Understanding API rate limits and quota tiers",
+    "category": "api",
+    "applies_to": "All plans",
+    "content": "# Understanding API rate limits and quota tiers\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Requests return 429 Too Many Requests\n- Throughput drops sharply at a predictable point\n- Limits appear lower than the documented figure\n\n## Common causes\n\n- The limit applies per organisation rather than per key\n- Burst capacity was consumed and the sustained rate now applies\n- The endpoint being called has a lower limit than the general one\n\n## Resolution\n\n1. Read the rate limit headers returned with every response. They give the limit, the remaining allowance and the reset time, which is more reliable than inferring the limit from behaviour.\n2. Confirm whether the endpoint has a specific limit. Search and export endpoints are more expensive and are limited more tightly than reads.\n3. Implement exponential backoff with jitter on 429 responses rather than retrying immediately, which prolongs the throttling.\n4. Where sustained higher throughput is genuinely required, the limit can be raised on Business and Enterprise plans through an account request.\n\n## Notes\n\nLimits are enforced per organisation. Issuing more keys does not increase the available quota.",
+    "related_docs": [
+      "DOC-API-002",
+      "DOC-BILL-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-API-002",
+    "title": "Pagination and handling large result sets",
+    "category": "api",
+    "applies_to": "All plans",
+    "content": "# Pagination and handling large result sets\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Only the first page of results is returned\n- Iterating through results misses or duplicates records\n- Large queries time out\n\n## Common causes\n\n- The cursor from the previous response was not passed to the next request\n- Offset pagination was used against a changing collection\n- The page size requested exceeds the maximum\n\n## Resolution\n\n1. Use cursor pagination for anything that may change while you iterate. Offset pagination will skip or repeat records when items are inserted mid-iteration.\n2. Pass the next_cursor value from each response as the cursor parameter of the following request, and stop when it is null.\n3. Keep page size at or below two hundred. Larger requests are rejected rather than truncated.\n4. For very large extracts, use the export endpoint, which runs asynchronously and returns a download link.\n\n## Notes\n\nCursors expire after one hour. Long-running iterations should handle expiry by restarting from a recorded checkpoint.",
+    "related_docs": [
+      "DOC-API-001",
+      "DOC-DATA-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-API-003",
+    "title": "Webhook delivery, retries and signature verification",
+    "category": "api",
+    "applies_to": "All plans",
+    "content": "# Webhook delivery, retries and signature verification\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Webhooks are not arriving at the configured endpoint\n- The same event is delivered more than once\n- Signature verification fails\n\n## Common causes\n\n- The endpoint returned a non-2xx status and delivery is being retried\n- The endpoint responded too slowly and the delivery timed out\n- The signature was computed over a parsed body rather than the raw bytes\n\n## Resolution\n\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional.\n\n## Notes\n\nFailed deliveries are retried with backoff for twenty-four hours, after which the endpoint is disabled and the account is notified.",
+    "related_docs": [
+      "DOC-API-001",
+      "DOC-SEC-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-PERF-001",
+    "title": "Diagnosing elevated response latency",
+    "category": "performance",
+    "applies_to": "All compute services",
+    "content": "# Diagnosing elevated response latency\n\n**Applies to:** All compute services\n\n## Symptoms\n\n- Response times have increased without a code change\n- The 95th percentile is far above the median\n- Latency rises at predictable times of day\n\n## Common causes\n\n- The service is running close to its memory limit and spending time in garbage collection\n- A downstream dependency has slowed and the delay is propagating\n- Instance count is not scaling with the load pattern\n\n## Resolution\n\n1. Compare median and 95th percentile latency on the metrics page. A large gap points to contention or queueing rather than a uniformly slower service.\n2. Check memory utilisation across instances. Sustained utilisation above eighty per cent typically shows up as latency before it shows up as failure.\n3. Review the dependency timing breakdown on the trace view to identify whether the time is being spent in your service or waiting on another.\n4. Adjust the autoscaling policy if load is predictable. Scaling on request count responds sooner than scaling on processor utilisation.\n\n## Notes\n\nCold starts affect the first request to a new instance. Frequent scaling events will therefore raise the 95th percentile even when the service itself is healthy.",
+    "related_docs": [
+      "DOC-PERF-002",
+      "DOC-DEPLOY-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-PERF-002",
+    "title": "Autoscaling behaviour and instance limits",
+    "category": "performance",
+    "applies_to": "Container Service",
+    "content": "# Autoscaling behaviour and instance limits\n\n**Applies to:** Container Service\n\n## Symptoms\n\n- The service does not scale up under load\n- Scaling happens later than expected\n- Instance count oscillates\n\n## Common causes\n\n- The maximum instance count has been reached\n- The scaling metric responds more slowly than the load changes\n- The cooldown period is shorter than the time a new instance takes to become ready\n\n## Resolution\n\n1. Check whether the service is sitting at its configured maximum. Scaling stops there regardless of load.\n2. Choose a scaling metric that reflects the pressure you actually face. Request concurrency reacts faster than processor utilisation for request-bound services.\n3. Set the cooldown longer than your startup time so that new instances are counted before another scaling decision is taken.\n4. Set a minimum instance count above zero for latency-sensitive services to avoid cold starts on the first request.\n\n## Notes\n\nScaling decisions are evaluated every fifteen seconds. Very short traffic spikes will finish before scaling responds.",
+    "related_docs": [
+      "DOC-PERF-001",
+      "DOC-BILL-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-PERF-003",
+    "title": "Database connection pool exhaustion",
+    "category": "performance",
+    "applies_to": "Managed Database",
+    "content": "# Database connection pool exhaustion\n\n**Applies to:** Managed Database\n\n## Symptoms\n\n- Errors indicating no connection is available\n- Latency increases sharply as traffic grows\n- The database reports far fewer active queries than the application expects\n\n## Common causes\n\n- The pool size multiplied by the instance count exceeds the database connection limit\n- Connections are not being returned to the pool after use\n- Long-running transactions are holding connections open\n\n## Resolution\n\n1. Calculate the total possible connections as pool size multiplied by maximum instances, and compare it against your plan's connection limit.\n2. Reduce the per-instance pool size rather than raising the limit. A large number of small pools is usually the wrong shape for a scaled service.\n3. Look for queries that hold a transaction open across a network call to another service, which is the most common cause of leaks of this kind.\n4. Consider a connection proxy if the instance count must remain high, so that pooling happens once rather than per instance.\n\n## Notes\n\nThe connection limit is a property of the database plan and is listed on the plan comparison page.",
+    "related_docs": [
+      "DOC-PERF-001",
+      "DOC-DATA-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-BILL-001",
+    "title": "Understanding your invoice and usage breakdown",
+    "category": "billing",
+    "applies_to": "All plans",
+    "content": "# Understanding your invoice and usage breakdown\n\n**Applies to:** All plans\n\n## Symptoms\n\n- The invoice is higher than expected\n- Charges appear for a service that is not in use\n- The billing period does not align with the calendar month\n\n## Common causes\n\n- Usage-based charges accrued beyond the plan allowance\n- A resource was left running in a non-production environment\n- The billing period runs from the subscription date rather than the first of the month\n\n## Resolution\n\n1. Open the usage breakdown for the period, which itemises charges by service and by environment.\n2. Look for resources in staging or development environments, which are billed at the same rate as production.\n3. Check the billing period dates at the top of the invoice. The period runs from the anniversary of the subscription date.\n4. Set a usage alert on the billing page so that unexpected accrual is noticed during the period rather than at the end of it.\n\n## Notes\n\nInvoices are finalised three days after the period ends. Adjustments requested before finalisation appear on the same invoice.",
+    "related_docs": [
+      "DOC-BILL-002",
+      "DOC-BILL-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-BILL-002",
+    "title": "Changing plans, and how proration is calculated",
+    "category": "billing",
+    "applies_to": "All plans",
+    "content": "# Changing plans, and how proration is calculated\n\n**Applies to:** All plans\n\n## Symptoms\n\n- The charge after an upgrade differs from the advertised price\n- A downgrade did not take effect immediately\n- A credit is expected but not visible\n\n## Common causes\n\n- The upgrade was prorated across the remainder of the billing period\n- Downgrades are applied at the end of the current period rather than immediately\n- The credit was applied to the next invoice rather than refunded\n\n## Resolution\n\n1. Upgrades take effect immediately and are prorated for the days remaining in the period. The invoice shows the calculation as a separate line.\n2. Downgrades take effect at the start of the next period so that paid-for capacity is not lost. The scheduled change appears on the subscription page.\n3. Credits from a downgrade or an adjustment are applied against the next invoice by default rather than refunded to the payment method.\n4. Where a refund rather than a credit is required, an account owner should raise the request within thirty days of the invoice.\n\n## Notes\n\nAnnual plans cannot be downgraded mid-term, but capacity can be reduced with effect from the renewal date.",
+    "related_docs": [
+      "DOC-BILL-001",
+      "DOC-ACCT-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-BILL-003",
+    "title": "Usage limits, overage and spend controls",
+    "category": "billing",
+    "applies_to": "All plans",
+    "content": "# Usage limits, overage and spend controls\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Service was throttled after a traffic increase\n- Overage charges appeared unexpectedly\n- A spend cap stopped a production workload\n\n## Common causes\n\n- Plan allowance was consumed before the end of the period\n- A spend cap was configured and reached\n- Overage protection is disabled, so usage continued beyond the allowance\n\n## Resolution\n\n1. Check the current period usage against the plan allowance on the billing page.\n2. Decide deliberately between a hard spend cap, which stops the service, and overage, which continues at the listed rate. Production workloads generally need the second.\n3. Configure alerts at fifty, eighty and ninety-five per cent of allowance rather than relying on the cap as a warning.\n4. Where a cap has stopped a production service, an account owner can raise it immediately from the billing page and service resumes within a minute.\n\n## Notes\n\nSpend caps apply per organisation and cannot currently be set per project.",
+    "related_docs": [
+      "DOC-API-001",
+      "DOC-BILL-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DATA-001",
+    "title": "Exporting account data and scheduled extracts",
+    "category": "data",
+    "applies_to": "All plans",
+    "content": "# Exporting account data and scheduled extracts\n\n**Applies to:** All plans\n\n## Symptoms\n\n- An export has not completed\n- The download link has expired\n- The export is missing recent records\n\n## Common causes\n\n- Large exports are queued and processed asynchronously\n- Download links are valid for twenty-four hours\n- The export captured a snapshot taken when the job started\n\n## Resolution\n\n1. Check the exports page for job status. Jobs covering more than a million records commonly take several minutes.\n2. Request a fresh link from the exports page if the original has expired. The underlying file is retained for seven days.\n3. Note that the export reflects the moment the job began, so records created during processing are not included.\n4. For recurring needs, configure a scheduled export delivered to object storage rather than generating them manually.\n\n## Notes\n\nExports containing personal data are logged in the audit trail with the requesting user and the fields included.",
+    "related_docs": [
+      "DOC-API-002",
+      "DOC-SEC-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DATA-002",
+    "title": "Backups, retention and point-in-time restore",
+    "category": "data",
+    "applies_to": "Managed Database",
+    "content": "# Backups, retention and point-in-time restore\n\n**Applies to:** Managed Database\n\n## Symptoms\n\n- Data was deleted and needs recovering\n- A restore is taking longer than expected\n- A backup is older than expected\n\n## Common causes\n\n- Automated backups run daily and retention depends on the plan\n- Restore time scales with database size\n- Point-in-time recovery is available only where continuous archiving is enabled\n\n## Resolution\n\n1. Identify the point you need to restore to. Point-in-time recovery covers any moment within the retention window rather than only backup times.\n2. Restore into a new database instance rather than over the existing one, so the current state is preserved while you verify the restore.\n3. Allow roughly ten minutes per hundred gigabytes for the restore, and considerably longer where the instance is also under load.\n4. Verify the restored data before switching traffic, and keep the original instance until that verification is complete.\n\n## Notes\n\nRetention is seven days on Standard, thirty days on Business and ninety days on Enterprise plans.",
+    "related_docs": [
+      "DOC-DEPLOY-002",
+      "DOC-PERF-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-DATA-003",
+    "title": "Data residency and regional storage",
+    "category": "data",
+    "applies_to": "Business and Enterprise plans",
+    "content": "# Data residency and regional storage\n\n**Applies to:** Business and Enterprise plans\n\n## Symptoms\n\n- A customer requires data to remain in a specific region\n- Latency is high for users far from the primary region\n- A compliance review has asked where data is held\n\n## Common causes\n\n- The organisation was created in a region that no longer suits the requirement\n- Read traffic is being served from the primary region only\n- Backups are replicated to a second region by default\n\n## Resolution\n\n1. Check the region shown on the organisation settings page. This is fixed at creation and determines where primary data is stored.\n2. Enable read replicas in additional regions to reduce latency for distant users without moving primary storage.\n3. Review the backup replication setting if a single-region requirement applies, since cross-region replication is enabled by default.\n4. Migrating an organisation between regions requires a planned migration with support and involves a maintenance window.\n\n## Notes\n\nMetadata such as account names and billing records is stored centrally regardless of the data region.",
+    "related_docs": [
+      "DOC-SEC-003",
+      "DOC-DATA-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-SEC-001",
+    "title": "Responding to a suspected account compromise",
+    "category": "security",
+    "applies_to": "All plans",
+    "content": "# Responding to a suspected account compromise\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Unrecognised activity appears in the audit log\n- A user reports credentials may have been exposed\n- Resources were created that nobody claims\n\n## Common causes\n\n- Credentials were reused from a service that suffered a breach\n- An API key was committed to a public repository\n- A former team member retained access after leaving\n\n## Resolution\n\n1. Revoke all API keys for the affected account immediately. This is disruptive and it is the correct first action.\n2. Force a password reset and terminate active sessions for the affected users from the team members page.\n3. Review the audit log for the period in question, filtering by the affected user, and record anything unexpected before it ages out.\n4. Enable multi-factor authentication for all users if it is not already mandatory for the organisation.\n\n## Notes\n\nAudit logs are retained for ninety days on Business plans and one year on Enterprise. Export them promptly during an investigation.",
+    "related_docs": [
+      "DOC-AUTH-004",
+      "DOC-SEC-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-SEC-002",
+    "title": "Handling exposed secrets and credential rotation",
+    "category": "security",
+    "applies_to": "All plans",
+    "content": "# Handling exposed secrets and credential rotation\n\n**Applies to:** All plans\n\n## Symptoms\n\n- A key has been committed to a repository\n- A secret appears in application logs\n- A third party has reported finding a credential\n\n## Common causes\n\n- Configuration was committed rather than referenced from the environment\n- The application prints its configuration during startup\n- A key was shared in a support ticket or a chat message\n\n## Resolution\n\n1. Revoke the exposed credential first. Removing it from the repository does not help, because it remains in the history.\n2. Issue a replacement with the narrowest scope that still works, rather than recreating the original permissions by default.\n3. Search the audit log for use of the exposed credential from unfamiliar addresses during the exposure window.\n4. Add secret scanning to your pipeline so that the next occurrence is caught before it reaches a remote branch.\n\n## Notes\n\nNever send a live credential to support. Support will never ask for one, and any credential shared in a ticket must be treated as exposed.",
+    "related_docs": [
+      "DOC-AUTH-004",
+      "DOC-SEC-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-SEC-003",
+    "title": "Audit logging and compliance evidence",
+    "category": "security",
+    "applies_to": "Business and Enterprise plans",
+    "content": "# Audit logging and compliance evidence\n\n**Applies to:** Business and Enterprise plans\n\n## Symptoms\n\n- An auditor has requested access records\n- An event that should be logged cannot be found\n- Log retention is shorter than a policy requires\n\n## Common causes\n\n- The event predates the retention window\n- The event type is not covered by the audit log\n- The organisation is on a plan with shorter retention\n\n## Resolution\n\n1. Filter the audit log by actor, resource and date range. Every administrative action carries the user, the address and the outcome.\n2. Export the relevant period to object storage for anything needed beyond the retention window. Exports are not subject to retention limits.\n3. Configure continuous export to your own storage if a policy requires retention longer than the plan provides.\n4. Note that read access to resources is not logged on Business plans, only administrative and configuration changes.\n\n## Notes\n\nAudit log exports are themselves audited, including the fields selected and the destination.",
+    "related_docs": [
+      "DOC-DATA-003",
+      "DOC-SEC-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-ACCT-001",
+    "title": "Managing team members, roles and permissions",
+    "category": "account",
+    "applies_to": "All plans",
+    "content": "# Managing team members, roles and permissions\n\n**Applies to:** All plans\n\n## Symptoms\n\n- A user cannot access a project they should be able to\n- A departing user needs removing\n- Permissions need narrowing after a review\n\n## Common causes\n\n- The role was granted at project scope rather than organisation scope\n- The invitation was never accepted and the account does not exist\n- A group membership grants broader access than the direct role suggests\n\n## Resolution\n\n1. Check the effective permissions view for the user, which resolves direct roles and group memberships together.\n2. Confirm the invitation was accepted. Pending invitations appear in a separate section and expire after seven days.\n3. Remove a departing user rather than only changing their password, and revoke any API keys they created.\n4. Prefer group membership to direct role assignment, so that access can be reviewed in one place.\n\n## Notes\n\nRemoving the last account owner is not permitted. Transfer ownership before removing the account.",
+    "related_docs": [
+      "DOC-AUTH-003",
+      "DOC-SEC-001"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-ACCT-002",
+    "title": "Organisation setup and project structure",
+    "category": "account",
+    "applies_to": "All plans",
+    "content": "# Organisation setup and project structure\n\n**Applies to:** All plans\n\n## Symptoms\n\n- Resources are difficult to separate for billing\n- Environments are sharing configuration unintentionally\n- A project needs moving between organisations\n\n## Common causes\n\n- Environments were created as folders within one project rather than as separate projects\n- Configuration was set at organisation scope and inherited everywhere\n- Projects cannot move between organisations without a migration\n\n## Resolution\n\n1. Use a separate project per environment where isolation of configuration and billing matters. Folders within a project share configuration by design.\n2. Set shared values at organisation scope and override at project scope, rather than repeating values in every project.\n3. Plan project structure around who should be able to see what, since permissions are granted at project scope most naturally.\n4. Contact support for a project migration between organisations, which requires a short maintenance window.\n\n## Notes\n\nProject names appear in resource identifiers and cannot be changed after creation.",
+    "related_docs": [
+      "DOC-ACCT-001",
+      "DOC-DEPLOY-004"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-INT-001",
+    "title": "Connecting continuous integration pipelines",
+    "category": "integration",
+    "applies_to": "All plans",
+    "content": "# Connecting continuous integration pipelines\n\n**Applies to:** All plans\n\n## Symptoms\n\n- The pipeline cannot authenticate against CloudServe\n- Deployments succeed manually but fail from the pipeline\n- The pipeline has broader access than intended\n\n## Common causes\n\n- A personal key was used rather than a service account\n- The pipeline environment lacks the configuration present locally\n- The service account was granted an organisation-wide role\n\n## Resolution\n\n1. Create a service account for the pipeline rather than using a personal key, so that access survives staff changes.\n2. Grant the service account only the projects and permissions the pipeline needs, and review that grant when the pipeline changes.\n3. Store the credential as an encrypted secret in your pipeline provider, never in the repository.\n4. Test the pipeline credential separately from the deployment logic, so that authentication failures are distinguishable from deployment failures.\n\n## Notes\n\nService account keys do not expire by default. Set an expiry and rotate on a schedule.",
+    "related_docs": [
+      "DOC-AUTH-004",
+      "DOC-SEC-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-INT-002",
+    "title": "Third party monitoring and log forwarding",
+    "category": "integration",
+    "applies_to": "Business and Enterprise plans",
+    "content": "# Third party monitoring and log forwarding\n\n**Applies to:** Business and Enterprise plans\n\n## Symptoms\n\n- Logs are not arriving at the external destination\n- Metrics are delayed compared with the console\n- Forwarded volume is higher than expected\n\n## Common causes\n\n- The destination rejected the payload and forwarding paused\n- Aggregation introduces a delay before metrics are forwarded\n- Debug-level logs are being forwarded along with the rest\n\n## Resolution\n\n1. Check the forwarding status page, which shows the last successful delivery and any error returned by the destination.\n2. Expect a delay of up to two minutes on metrics, since they are aggregated before being sent.\n3. Apply a level filter at source so that debug output is not forwarded, which is usually the reason volume is higher than expected.\n4. Verify the destination credential separately if delivery has stopped entirely, as expired credentials are the most common cause.\n\n## Notes\n\nForwarding pauses after one hour of consecutive failures and must be resumed manually once the destination is healthy.",
+    "related_docs": [
+      "DOC-PERF-001",
+      "DOC-SEC-003"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-ONB-001",
+    "title": "First deployment: a walkthrough",
+    "category": "onboarding",
+    "applies_to": "All plans",
+    "content": "# First deployment: a walkthrough\n\n**Applies to:** All plans\n\n## Symptoms\n\n- A new user does not know where to begin\n- The first deployment fails for unclear reasons\n\n## Common causes\n\n- Required configuration has not been set\n- The project structure does not match what the build expects\n\n## Resolution\n\n1. Create a project, then a service within it. Resources belong to services and services belong to projects.\n2. Connect a repository or push a container image. The build service detects common project layouts automatically.\n3. Set any environment variables the application needs before the first deployment rather than after it.\n4. Deploy, then watch the logs for the first sixty seconds. Most first-deployment problems are visible immediately in startup output.\n\n## Notes\n\nThe free tier includes one service and is sufficient for evaluating the platform.",
+    "related_docs": [
+      "DOC-DEPLOY-001",
+      "DOC-ACCT-002"
+    ],
+    "last_reviewed_days_ago": 0
+  },
+  {
+    "doc_id": "DOC-ONB-002",
+    "title": "Migrating an existing application to CloudServe",
+    "category": "onboarding",
+    "applies_to": "All plans",
+    "content": "# Migrating an existing application to CloudServe\n\n**Applies to:** All plans\n\n## Symptoms\n\n- An existing application needs moving with minimal downtime\n- The application depends on services not yet available\n\n## Common causes\n\n- Configuration is embedded in the application rather than externalised\n- The application depends on local state that will not survive scaling\n\n## Resolution\n\n1. Externalise configuration before migrating. Anything read from a file on disk should move to environment variables or secrets.\n2. Identify local state such as uploaded files or session data and move it to object storage or the managed database first.\n3. Run in parallel with the existing deployment and shift a small share of traffic before committing to the move.\n4. Plan the database migration separately from the application migration; attempting both at once makes any failure hard to diagnose.\n\n## Notes\n\nApplications that write to the local filesystem will lose that data on every deployment and every scaling event.",
+    "related_docs": [
+      "DOC-ONB-001",
+      "DOC-DATA-002"
+    ],
+    "last_reviewed_days_ago": 0
+  }
+]

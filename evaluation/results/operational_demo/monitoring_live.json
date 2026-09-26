@@ -1,0 +1,30 @@
+{
+  "observed_at": "2026-09-26T10:34:29.8464458Z",
+  "prometheus_target": {
+    "health": "up",
+    "scrape_url": "http://127.0.0.1:8000/metrics",
+    "last_error": ""
+  },
+  "grafana": {
+    "version": "13.2.2",
+    "datasource": "CloudServe Prometheus",
+    "datasource_health": "OK",
+    "dashboard_url": "http://127.0.0.1:3000/d/cloudserve-live/cloudserve-supervised-support"
+  },
+  "before": {
+    "decisions": "8",
+    "auto": "2",
+    "escalate": "6",
+    "blocks": "2",
+    "failures": "1",
+    "latency_count": "8"
+  },
+  "after": {
+    "decisions": "12",
+    "auto": "3",
+    "escalate": "9",
+    "blocks": "3",
+    "failures": "2",
+    "latency_count": "12"
+  }
+}

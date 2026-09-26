@@ -1,0 +1,21 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python -m pip install -r requirements.txt
+      - name: Tests (A12)
+        run: python -m pytest
+      - name: Unattended evaluation (A9/A10) + must-not-auto gate
+        run: |
+          python -m evaluation.harness --input data/cloudserve/validation_tickets.json \
+            --output evaluation/results/ci \
+            --references data/cloudserve/ground_truth_responses.json \
+            --reference-tickets data/cloudserve/development_tickets.json \
+            --retrieval-backend tfidf --enable-auto-policy --fail-on-must-not-auto
+      - uses: actions/upload-artifact@v4
+        with: { name: metrics, path: evaluation/results/ci }

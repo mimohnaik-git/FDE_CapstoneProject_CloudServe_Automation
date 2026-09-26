@@ -1,0 +1,224 @@
+{
+ "articles": [
+  {
+   "doc_id": "KB-001",
+   "title": "Resetting your password",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Users cannot sign in after forgetting their password or the reset email does not arrive."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Open the sign-in page and select Forgot password, then enter the account email address."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Check the spam folder for the reset email; reset links expire after 30 minutes and a new link can be requested."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-002",
+   "title": "Configuring single sign-on (SSO)",
+   "plans": [
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "SAML assertion errors or redirect loops appear when signing in through the identity provider."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "In Admin settings open Authentication and upload the identity provider metadata XML file."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Confirm the ACS URL and entity ID match exactly, then enable SSO for the selected domains."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-003",
+   "title": "Rotating API keys",
+   "plans": [
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Requests fail with 401 unauthorized after an API key is revoked or expires."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Open Developer settings, select API keys, and create a new key before revoking the old one."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Update the key in every client and environment variable, then revoke the old key."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-004",
+   "title": "Understanding API rate limits",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Requests fail with 429 too many requests during bursts of traffic."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Read the retry-after header and back off exponentially before retrying the request."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Batch requests where possible; higher rate limits are available on the pro and enterprise plans."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-005",
+   "title": "Exporting your data",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Customers need a copy of their project data in CSV or JSON format."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Open Project settings, select Export, choose CSV or JSON, and start the export job."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "A download link is emailed when the export completes; links remain valid for seven days."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-006",
+   "title": "Troubleshooting failed deployments",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "A deployment stops with a build error or health check timeout."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Open the deployment log and locate the first error line in the build step."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Verify the start command and health check path, then redeploy from the dashboard."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-007",
+   "title": "Connecting to managed databases",
+   "plans": [
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Applications report connection refused or timeout errors to the managed database."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Add the application IP range to the database allow list under Networking."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Use the connection string from the database overview page and enable SSL mode require."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-008",
+   "title": "Updating billing details",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Customers need to change a card, billing address, or download invoices."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Open Billing, select Payment methods, and add the new card before removing the old one."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Invoices can be downloaded from Billing history as PDF files."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-009",
+   "title": "Data residency regions",
+   "plans": [
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Customers ask where their data is stored and how to choose a region."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Choose the storage region when creating a project; available regions are listed in Project settings."
+    },
+    {
+     "heading": "Resolution 2",
+     "text": "Existing projects cannot change region; create a new project in the target region and migrate data."
+    }
+   ]
+  },
+  {
+   "doc_id": "KB-010",
+   "title": "Security incident reporting",
+   "plans": [
+    "free",
+    "pro",
+    "enterprise"
+   ],
+   "sections": [
+    {
+     "heading": "Symptoms",
+     "text": "Customers suspect unauthorised access or a compromised account."
+    },
+    {
+     "heading": "Resolution 1",
+     "text": "Security reports are handled by the security team; support agents escalate every report immediately."
+    }
+   ]
+  }
+ ]
+}

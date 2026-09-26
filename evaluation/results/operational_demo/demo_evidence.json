@@ -1,0 +1,804 @@
+{
+  "observed_at": "2026-09-26T10:15:25.4434886Z",
+  "health": {
+    "status": "ok",
+    "retrieval_backend": "tfidf",
+    "customer_release_authorized": true,
+    "emergency_auto_response_disabled": false,
+    "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de"
+  },
+  "auto": {
+    "api": {
+      "ticket_id": "DEMO-AUTO",
+      "route": "AUTO_RESPOND",
+      "reasons": [
+        "all_gates_passed"
+      ],
+      "intent": {
+        "label": "api_usage_question",
+        "confidence": 0.8634,
+        "alternatives": [
+          [
+            "rate_limit",
+            0.0091
+          ],
+          [
+            "data_export",
+            0.0087
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.5247,
+        "alternatives": [
+          [
+            "low",
+            0.3686
+          ],
+          [
+            "high",
+            0.1067
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.8294,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.1706
+          ]
+        ]
+      },
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de",
+      "answer": "- The cursor from the previous response was not passed to the next request\n- Offset pagination was used against a changing collection\n- The page size requested exceeds the maximum [DOC-API-002#Common causes]\n1. Use cursor pagination for anything that may change while you iterate. Offset pagination will skip or repeat records when items are inserted mid-iteration.\n2. Pass the next_cursor value from each response as the cursor parameter of the following request, and stop when it is null.\n3. Keep page size at or below two hundred. Larger requests are rejected rather than truncated.\n4. For very large extracts, use the export endpoint, which runs asynchronously and returns a download link. [DOC-API-002#Resolution]",
+      "citations": [
+        "DOC-API-002#Common causes",
+        "DOC-API-002#Resolution"
+      ]
+    },
+    "decision": {
+      "ticket_id": "DEMO-AUTO",
+      "route": "AUTO_RESPOND",
+      "reasons": [
+        "all_gates_passed"
+      ],
+      "intent": {
+        "label": "api_usage_question",
+        "confidence": 0.8634,
+        "alternatives": [
+          [
+            "rate_limit",
+            0.0091
+          ],
+          [
+            "data_export",
+            0.0087
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.5247,
+        "alternatives": [
+          [
+            "low",
+            0.3686
+          ],
+          [
+            "high",
+            0.1067
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.8294,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.1706
+          ]
+        ]
+      },
+      "passages": [
+        {
+          "doc_id": "DOC-API-002",
+          "title": "Pagination and handling large result sets",
+          "section": "Notes",
+          "text": "Cursors expire after one hour. Long-running iterations should handle expiry by restarting from a recorded checkpoint.",
+          "score": 0.2423,
+          "plans": []
+        }
+      ],
+      "supporting_passages": [
+        {
+          "doc_id": "DOC-API-002",
+          "title": "Pagination and handling large result sets",
+          "section": "Notes",
+          "text": "Cursors expire after one hour. Long-running iterations should handle expiry by restarting from a recorded checkpoint.",
+          "score": 0.2423,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-API-002",
+          "title": "Pagination and handling large result sets",
+          "section": "Common causes",
+          "text": "- The cursor from the previous response was not passed to the next request\n- Offset pagination was used against a changing collection\n- The page size requested exceeds the maximum",
+          "score": 0.0,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-API-002",
+          "title": "Pagination and handling large result sets",
+          "section": "Resolution",
+          "text": "1. Use cursor pagination for anything that may change while you iterate. Offset pagination will skip or repeat records when items are inserted mid-iteration.\n2. Pass the next_cursor value from each response as the cursor parameter of the following request, and stop when it is null.\n3. Keep page size at or below two hundred. Larger requests are rejected rather than truncated.\n4. For very large extracts, use the export endpoint, which runs asynchronously and returns a download link.",
+          "score": 0.0,
+          "plans": []
+        }
+      ],
+      "evidence": {
+        "status": "SELF_SERVICE_CANDIDATE",
+        "sufficient": true,
+        "plan_applicable": null,
+        "flags": [],
+        "policy": "evidence-sufficiency-v1-fail-closed"
+      },
+      "draft": {
+        "status": "EVIDENCE_ASSEMBLY_COMPLETE",
+        "text": "Suggested reply (internal draft, based on Pagination and handling large result sets):\n\n- The cursor from the previous response was not passed to the next request\n- Offset pagination was used against a changing collection\n- The page size requested exceeds the maximum [DOC-API-002#Common causes]\n1. Use cursor pagination for anything that may change while you iterate. Offset pagination will skip or repeat records when items are inserted mid-iteration.\n2. Pass the next_cursor value from each response as the cursor parameter of the following request, and stop when it is null.\n3. Keep page size at or below two hundred. Larger requests are rejected rather than truncated.\n4. For very large extracts, use the export endpoint, which runs asynchronously and returns a download link. [DOC-API-002#Resolution]",
+        "citations": [
+          "DOC-API-002#Common causes",
+          "DOC-API-002#Resolution"
+        ],
+        "doc_id": "DOC-API-002",
+        "internal_only": false
+      },
+      "guardrails": {
+        "passed": true,
+        "blocks": [],
+        "details": {
+          "lexical_grounding": 1.0
+        },
+        "checks": {
+          "private_data_or_secret": {
+            "status": "PASS"
+          },
+          "prompt_injection": {
+            "status": "PASS"
+          },
+          "unsupported_commitment": {
+            "status": "PASS"
+          },
+          "citation_integrity": {
+            "status": "PASS"
+          },
+          "grounding": {
+            "status": "PASS",
+            "lexical_overlap": 1.0
+          }
+        }
+      },
+      "channel": "chat",
+      "customer_tier": "standard",
+      "customer_region": null,
+      "language_fluency": null,
+      "trace": {
+        "requirement_ids": [
+          "A2",
+          "A3",
+          "A4",
+          "A5",
+          "A6",
+          "A7",
+          "A8"
+        ],
+        "prompt_version": "generation-v1.0.0",
+        "eligibility_policy": "evidence-sufficiency-v1-fail-closed",
+        "intent_threshold": 0.8,
+        "answerability_threshold": 0.75,
+        "auto_eligible_intents": [
+          "api_usage_question",
+          "data_export",
+          "onboarding"
+        ],
+        "retrieval_threshold": 0.1,
+        "retrieval_backend": "tfidf",
+        "retrieval_configuration": "field-weighted-word-char-unique-docs-v1",
+        "input_sha256": "8633ad5fd8949e830bb7364371a3bb99108ef217085bf7b30d34347615f82e01"
+      },
+      "stage_latency_s": {
+        "ingest": 4.8E-05,
+        "classify": 0.026801,
+        "retrieve": 0.004884,
+        "assess": 5.5E-05,
+        "generate": 1.7E-05,
+        "guardrails": 0.000366
+      },
+      "total_latency_s": 0.032235,
+      "error": null,
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de",
+      "run_id": null,
+      "decision_timestamp": "2026-09-26T15:45:52.740714+05:30"
+    }
+  },
+  "escalate": {
+    "api": {
+      "ticket_id": "DEMO-ESCALATE",
+      "route": "ESCALATE",
+      "reasons": [
+        "never_automate_intent",
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold"
+      ],
+      "intent": {
+        "label": "security_incident",
+        "confidence": 0.2317,
+        "alternatives": [
+          [
+            "authentication_failure",
+            0.111
+          ],
+          [
+            "api_key_issue",
+            0.0627
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.3972,
+        "alternatives": [
+          [
+            "high",
+            0.3855
+          ],
+          [
+            "low",
+            0.2173
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.8269,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.1731
+          ]
+        ]
+      },
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de"
+    },
+    "decision": {
+      "ticket_id": "DEMO-ESCALATE",
+      "route": "ESCALATE",
+      "reasons": [
+        "never_automate_intent",
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold"
+      ],
+      "intent": {
+        "label": "security_incident",
+        "confidence": 0.2317,
+        "alternatives": [
+          [
+            "authentication_failure",
+            0.111
+          ],
+          [
+            "api_key_issue",
+            0.0627
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.3972,
+        "alternatives": [
+          [
+            "high",
+            0.3855
+          ],
+          [
+            "low",
+            0.2173
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.8269,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.1731
+          ]
+        ]
+      },
+      "passages": [
+        {
+          "doc_id": "DOC-SEC-001",
+          "title": "Responding to a suspected account compromise",
+          "section": "Symptoms",
+          "text": "- Unrecognised activity appears in the audit log\n- A user reports credentials may have been exposed\n- Resources were created that nobody claims",
+          "score": 0.2242,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-AUTH-003",
+          "title": "Single sign-on configuration with SAML providers",
+          "section": "Resolution",
+          "text": "1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out.",
+          "score": 0.1175,
+          "plans": [
+            "business",
+            "enterprise"
+          ]
+        }
+      ],
+      "supporting_passages": [
+        {
+          "doc_id": "DOC-SEC-001",
+          "title": "Responding to a suspected account compromise",
+          "section": "Symptoms",
+          "text": "- Unrecognised activity appears in the audit log\n- A user reports credentials may have been exposed\n- Resources were created that nobody claims",
+          "score": 0.2242,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-AUTH-003",
+          "title": "Single sign-on configuration with SAML providers",
+          "section": "Resolution",
+          "text": "1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out.",
+          "score": 0.1175,
+          "plans": [
+            "business",
+            "enterprise"
+          ]
+        },
+        {
+          "doc_id": "DOC-SEC-001",
+          "title": "Responding to a suspected account compromise",
+          "section": "Common causes",
+          "text": "- Credentials were reused from a service that suffered a breach\n- An API key was committed to a public repository\n- A former team member retained access after leaving",
+          "score": 0.0,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-SEC-001",
+          "title": "Responding to a suspected account compromise",
+          "section": "Resolution",
+          "text": "1. Revoke all API keys for the affected account immediately. This is disruptive and it is the correct first action.\n2. Force a password reset and terminate active sessions for the affected users from the team members page.\n3. Review the audit log for the period in question, filtering by the affected user, and record anything unexpected before it ages out.\n4. Enable multi-factor authentication for all users if it is not already mandatory for the organisation.",
+          "score": 0.0,
+          "plans": []
+        }
+      ],
+      "evidence": {
+        "status": "SELF_SERVICE_CANDIDATE",
+        "sufficient": true,
+        "plan_applicable": null,
+        "flags": [],
+        "policy": "evidence-sufficiency-v1-fail-closed"
+      },
+      "draft": {
+        "status": "EVIDENCE_ASSEMBLY_COMPLETE",
+        "text": "Suggested reply (internal draft, based on Responding to a suspected account compromise):\n\n- Credentials were reused from a service that suffered a breach\n- An API key was committed to a public repository\n- A former team member retained access after leaving [DOC-SEC-001#Common causes]\n1. Revoke all API keys for the affected account immediately. This is disruptive and it is the correct first action.\n2. Force a password reset and terminate active sessions for the affected users from the team members page.\n3. Review the audit log for the period in question, filtering by the affected user, and record anything unexpected before it ages out.\n4. Enable multi-factor authentication for all users if it is not already mandatory for the organisation. [DOC-SEC-001#Resolution]",
+        "citations": [
+          "DOC-SEC-001#Common causes",
+          "DOC-SEC-001#Resolution"
+        ],
+        "doc_id": "DOC-SEC-001",
+        "internal_only": true
+      },
+      "guardrails": {
+        "passed": true,
+        "blocks": [],
+        "details": {
+          "lexical_grounding": 1.0
+        },
+        "checks": {
+          "private_data_or_secret": {
+            "status": "PASS"
+          },
+          "prompt_injection": {
+            "status": "PASS"
+          },
+          "unsupported_commitment": {
+            "status": "PASS"
+          },
+          "citation_integrity": {
+            "status": "PASS"
+          },
+          "grounding": {
+            "status": "PASS",
+            "lexical_overlap": 1.0
+          }
+        }
+      },
+      "channel": "email",
+      "customer_tier": "business",
+      "customer_region": null,
+      "language_fluency": null,
+      "trace": {
+        "requirement_ids": [
+          "A2",
+          "A3",
+          "A4",
+          "A5",
+          "A6",
+          "A7",
+          "A8"
+        ],
+        "prompt_version": "generation-v1.0.0",
+        "eligibility_policy": "evidence-sufficiency-v1-fail-closed",
+        "intent_threshold": 0.8,
+        "answerability_threshold": 0.75,
+        "auto_eligible_intents": [
+          "api_usage_question",
+          "data_export",
+          "onboarding"
+        ],
+        "retrieval_threshold": 0.1,
+        "retrieval_backend": "tfidf",
+        "retrieval_configuration": "field-weighted-word-char-unique-docs-v1",
+        "input_sha256": "2c258084cc2b2d1fa4297f99eb12fbf63dfb36d83c455485072e6f197166d111"
+      },
+      "stage_latency_s": {
+        "ingest": 3.5E-05,
+        "classify": 0.015868,
+        "retrieve": 0.003009,
+        "assess": 6.4E-05,
+        "generate": 1.8E-05,
+        "guardrails": 0.000496
+      },
+      "total_latency_s": 0.019556,
+      "error": null,
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de",
+      "run_id": null,
+      "decision_timestamp": "2026-09-26T15:45:25.324076+05:30"
+    }
+  },
+  "block": {
+    "api": {
+      "ticket_id": "DEMO-BLOCK",
+      "route": "ESCALATE",
+      "reasons": [
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold",
+        "eligibility_review_required",
+        "evidence_sufficiency_not_established",
+        "guardrail_blocked"
+      ],
+      "intent": {
+        "label": "webhook_issue",
+        "confidence": 0.2422,
+        "alternatives": [
+          [
+            "configuration_help",
+            0.086
+          ],
+          [
+            "unclear_request",
+            0.0646
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.476,
+        "alternatives": [
+          [
+            "low",
+            0.2761
+          ],
+          [
+            "high",
+            0.2479
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.7408,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.2592
+          ]
+        ]
+      },
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de"
+    },
+    "decision": {
+      "ticket_id": "DEMO-BLOCK",
+      "route": "ESCALATE",
+      "reasons": [
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold",
+        "eligibility_review_required",
+        "evidence_sufficiency_not_established",
+        "guardrail_blocked"
+      ],
+      "intent": {
+        "label": "webhook_issue",
+        "confidence": 0.2422,
+        "alternatives": [
+          [
+            "configuration_help",
+            0.086
+          ],
+          [
+            "unclear_request",
+            0.0646
+          ]
+        ]
+      },
+      "urgency": {
+        "label": "medium",
+        "confidence": 0.476,
+        "alternatives": [
+          [
+            "low",
+            0.2761
+          ],
+          [
+            "high",
+            0.2479
+          ]
+        ]
+      },
+      "answerability": {
+        "label": "answerable",
+        "confidence": 0.7408,
+        "alternatives": [
+          [
+            "not_answerable",
+            0.2592
+          ]
+        ]
+      },
+      "passages": [
+        {
+          "doc_id": "DOC-API-003",
+          "title": "Webhook delivery, retries and signature verification",
+          "section": "Symptoms",
+          "text": "- Webhooks are not arriving at the configured endpoint\n- The same event is delivered more than once\n- Signature verification fails",
+          "score": 0.265,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-DEPLOY-002",
+          "title": "Rolling back a failed release",
+          "section": "Symptoms",
+          "text": "- A release has introduced errors and must be reverted\n- The previous revision is needed while a fix is prepared",
+          "score": 0.1359,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-ACCT-002",
+          "title": "Organisation setup and project structure",
+          "section": "Notes",
+          "text": "Project names appear in resource identifiers and cannot be changed after creation.",
+          "score": 0.11,
+          "plans": []
+        }
+      ],
+      "supporting_passages": [
+        {
+          "doc_id": "DOC-API-003",
+          "title": "Webhook delivery, retries and signature verification",
+          "section": "Symptoms",
+          "text": "- Webhooks are not arriving at the configured endpoint\n- The same event is delivered more than once\n- Signature verification fails",
+          "score": 0.265,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-DEPLOY-002",
+          "title": "Rolling back a failed release",
+          "section": "Symptoms",
+          "text": "- A release has introduced errors and must be reverted\n- The previous revision is needed while a fix is prepared",
+          "score": 0.1359,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-ACCT-002",
+          "title": "Organisation setup and project structure",
+          "section": "Notes",
+          "text": "Project names appear in resource identifiers and cannot be changed after creation.",
+          "score": 0.11,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-API-003",
+          "title": "Webhook delivery, retries and signature verification",
+          "section": "Common causes",
+          "text": "- The endpoint returned a non-2xx status and delivery is being retried\n- The endpoint responded too slowly and the delivery timed out\n- The signature was computed over a parsed body rather than the raw bytes",
+          "score": 0.0,
+          "plans": []
+        },
+        {
+          "doc_id": "DOC-API-003",
+          "title": "Webhook delivery, retries and signature verification",
+          "section": "Resolution",
+          "text": "1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional.",
+          "score": 0.0,
+          "plans": []
+        }
+      ],
+      "evidence": {
+        "status": "REVIEW_REQUIRED",
+        "sufficient": false,
+        "plan_applicable": null,
+        "flags": [
+          "answerability_not_established"
+        ],
+        "policy": "evidence-sufficiency-v1-fail-closed"
+      },
+      "draft": {
+        "status": "EVIDENCE_ASSEMBLY_COMPLETE",
+        "text": "Suggested reply (internal draft, based on Webhook delivery, retries and signature verification):\n\n- The endpoint returned a non-2xx status and delivery is being retried\n- The endpoint responded too slowly and the delivery timed out\n- The signature was computed over a parsed body rather than the raw bytes [DOC-API-003#Common causes]\n1. Check the webhook delivery log, which records every attempt with the response status and body for the last seven days.\n2. Return 2xx as quickly as possible and process the event asynchronously. Deliveries time out after five seconds.\n3. Compute the signature over the raw request body before any parsing. Re-serialising JSON changes the bytes and invalidates the signature.\n4. Make your handler idempotent using the event identifier. At-least-once delivery means duplicates are expected rather than exceptional. [DOC-API-003#Resolution]",
+        "citations": [
+          "DOC-API-003#Common causes",
+          "DOC-API-003#Resolution"
+        ],
+        "doc_id": "DOC-API-003",
+        "internal_only": true
+      },
+      "guardrails": {
+        "passed": false,
+        "blocks": [
+          "prompt_injection"
+        ],
+        "details": {
+          "lexical_grounding": 1.0
+        },
+        "checks": {
+          "private_data_or_secret": {
+            "status": "PASS"
+          },
+          "prompt_injection": {
+            "status": "BLOCK"
+          },
+          "unsupported_commitment": {
+            "status": "PASS"
+          },
+          "citation_integrity": {
+            "status": "PASS"
+          },
+          "grounding": {
+            "status": "PASS",
+            "lexical_overlap": 1.0
+          }
+        }
+      },
+      "channel": "email",
+      "customer_tier": "business",
+      "customer_region": null,
+      "language_fluency": null,
+      "trace": {
+        "requirement_ids": [
+          "A2",
+          "A3",
+          "A4",
+          "A5",
+          "A6",
+          "A7",
+          "A8"
+        ],
+        "prompt_version": "generation-v1.0.0",
+        "eligibility_policy": "evidence-sufficiency-v1-fail-closed",
+        "intent_threshold": 0.8,
+        "answerability_threshold": 0.75,
+        "auto_eligible_intents": [
+          "api_usage_question",
+          "data_export",
+          "onboarding"
+        ],
+        "retrieval_threshold": 0.1,
+        "retrieval_backend": "tfidf",
+        "retrieval_configuration": "field-weighted-word-char-unique-docs-v1",
+        "input_sha256": "7d10cd04b6fe368faf71f6fd0acc6c17f088623479d60eb1fd32ec4fed0800d3"
+      },
+      "stage_latency_s": {
+        "ingest": 3.3E-05,
+        "classify": 0.015503,
+        "retrieve": 0.002957,
+        "assess": 4.2E-05,
+        "generate": 1.1E-05,
+        "guardrails": 0.00031
+      },
+      "total_latency_s": 0.018904,
+      "error": null,
+      "config_fingerprint": "619f95b1fe1ce349d8be29e7e5627b44d16f0ca5d834daffd98ff1b7e99148de",
+      "run_id": null,
+      "decision_timestamp": "2026-09-26T15:45:25.381993+05:30"
+    }
+  },
+  "review": {
+    "before": {
+      "ticket_id": "DEMO-ESCALATE",
+      "route": "ESCALATE",
+      "eligibility_status": "SELF_SERVICE_CANDIDATE",
+      "document_id": "DOC-SEC-001",
+      "customer_tier": "business",
+      "plan_applicable": null,
+      "blocking_flags": [],
+      "escalation_reasons": [
+        "never_automate_intent",
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold"
+      ],
+      "draft": {
+        "status": "EVIDENCE_ASSEMBLY_COMPLETE",
+        "text": "Suggested reply (internal draft, based on Responding to a suspected account compromise):\n\n- Credentials were reused from a service that suffered a breach\n- An API key was committed to a public repository\n- A former team member retained access after leaving [DOC-SEC-001#Common causes]\n1. Revoke all API keys for the affected account immediately. This is disruptive and it is the correct first action.\n2. Force a password reset and terminate active sessions for the affected users from the team members page.\n3. Review the audit log for the period in question, filtering by the affected user, and record anything unexpected before it ages out.\n4. Enable multi-factor authentication for all users if it is not already mandatory for the organisation. [DOC-SEC-001#Resolution]",
+        "citations": [
+          "DOC-SEC-001#Common causes",
+          "DOC-SEC-001#Resolution"
+        ],
+        "doc_id": "DOC-SEC-001",
+        "internal_only": true
+      },
+      "internal_only": true,
+      "reviews": []
+    },
+    "action": {
+      "recorded": true,
+      "customer_message_sent": false
+    },
+    "after": {
+      "ticket_id": "DEMO-ESCALATE",
+      "route": "ESCALATE",
+      "eligibility_status": "SELF_SERVICE_CANDIDATE",
+      "document_id": "DOC-SEC-001",
+      "customer_tier": "business",
+      "plan_applicable": null,
+      "blocking_flags": [],
+      "escalation_reasons": [
+        "never_automate_intent",
+        "intent_not_auto_eligible",
+        "intent_below_confidence_threshold"
+      ],
+      "draft": {
+        "status": "EVIDENCE_ASSEMBLY_COMPLETE",
+        "text": "Suggested reply (internal draft, based on Responding to a suspected account compromise):\n\n- Credentials were reused from a service that suffered a breach\n- An API key was committed to a public repository\n- A former team member retained access after leaving [DOC-SEC-001#Common causes]\n1. Revoke all API keys for the affected account immediately. This is disruptive and it is the correct first action.\n2. Force a password reset and terminate active sessions for the affected users from the team members page.\n3. Review the audit log for the period in question, filtering by the affected user, and record anything unexpected before it ages out.\n4. Enable multi-factor authentication for all users if it is not already mandatory for the organisation. [DOC-SEC-001#Resolution]",
+        "citations": [
+          "DOC-SEC-001#Common causes",
+          "DOC-SEC-001#Resolution"
+        ],
+        "doc_id": "DOC-SEC-001",
+        "internal_only": true
+      },
+      "internal_only": true,
+      "reviews": [
+        {
+          "reviewer": "demo-reviewer",
+          "action": "edit",
+          "note": "Clarify escalation context before any human-approved reply.",
+          "created_at": "2026-09-26T15:45:25.410246+05:30"
+        }
+      ]
+    }
+  },
+  "metrics_excerpt": [
+    "cloudserve_decisions_total{channel=\"chat\",route=\"ESCALATE\"} 1.0",
+    "cloudserve_decisions_total{channel=\"email\",route=\"ESCALATE\"} 2.0",
+    "cloudserve_guardrail_blocks_total{guardrail=\"prompt_injection\"} 1.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.01\"} 0.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.025\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.05\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.1\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.2\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"0.5\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"1.0\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"2.0\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"5.0\"} 3.0",
+    "cloudserve_pipeline_seconds_bucket{le=\"+Inf\"} 3.0",
+    "cloudserve_pipeline_seconds_count 3.0",
+    "cloudserve_pipeline_seconds_sum 0.058256",
+    "cloudserve_pipeline_seconds_created 1.7904176986051097e+09"
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "failed_cases": 7,
+  "rows": [
+    {
+      "ticket_id": "DEV-0335",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001",
+        "DOC-AUTH-002"
+      ],
+      "top_doc_id": "DOC-AUTH-002",
+      "top_doc_match": true,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "match": false
+        },
+        {
+          "expected": "session cookie",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Multi-factor authentication setup and recovery):\n\n- Device clock drift of more than thirty seconds invalidates time-based codes\n- The authenticator was enrolled against a different account\n- Recovery codes were regenerated, invalidating the older set [DOC-AUTH-002#Common causes]\n1. Ask the user to check that automatic time synchronisation is enabled on the device generating the code. Drift is the most common cause by a wide margin.\n2. If the device is lost, the user should sign in with one of their recovery codes and then re-enrol a new device from the security page.\n3. Where no recovery codes are available, an account administrator can reset multi-factor authentication for that user from the team members page.\n4. If the user is the sole administrator and has no recovery codes, identity verification through support is required and takes up to one business day. [DOC-AUTH-002#Resolution]",
+      "citations": [
+        "DOC-AUTH-002#Common causes",
+        "DOC-AUTH-002#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0008",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "match": false
+        },
+        {
+          "expected": "session cookie",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n- The assertion consumer service URL does not match the value registered with CloudServe\n- The email attribute in the assertion does not match the CloudServe account email\n- Just-in-time provisioning is disabled on the connection [DOC-AUTH-003#Common causes]\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Common causes",
+        "DOC-AUTH-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0479",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001",
+        "DOC-AUTH-002"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "match": false
+        },
+        {
+          "expected": "session cookie",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n- The assertion consumer service URL does not match the value registered with CloudServe\n- The email attribute in the assertion does not match the CloudServe account email\n- Just-in-time provisioning is disabled on the connection [DOC-AUTH-003#Common causes]\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Common causes",
+        "DOC-AUTH-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0075",
+      "intent": "deployment_failure",
+      "expected_doc_ids": [
+        "DOC-DEPLOY-001"
+      ],
+      "top_doc_id": "DOC-DEPLOY-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "port",
+          "match": false
+        },
+        {
+          "expected": "initial delay",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Build failures caused by dependency resolution):\n\n- An unpinned dependency released a new incompatible version\n- The build environment uses a different language runtime than the local machine\n- The dependency cache holds a partially written artefact [DOC-DEPLOY-003#Common causes]\n1. Pin your dependencies with exact versions and commit the lock file. Unpinned dependencies are the cause in the large majority of cases of this kind.\n2. Compare the runtime version declared in your build configuration against the version you use locally.\n3. Clear the build cache from the settings page and trigger a fresh build to rule out a corrupted artefact.\n4. If a specific dependency is failing to resolve, check whether its registry is reachable from the build network. [DOC-DEPLOY-003#Resolution]",
+      "citations": [
+        "DOC-DEPLOY-003#Common causes",
+        "DOC-DEPLOY-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0416",
+      "intent": "deployment_failure",
+      "expected_doc_ids": [
+        "DOC-DEPLOY-001"
+      ],
+      "top_doc_id": "DOC-DEPLOY-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "port",
+          "match": false
+        },
+        {
+          "expected": "initial delay",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Build failures caused by dependency resolution):\n\n- An unpinned dependency released a new incompatible version\n- The build environment uses a different language runtime than the local machine\n- The dependency cache holds a partially written artefact [DOC-DEPLOY-003#Common causes]\n1. Pin your dependencies with exact versions and commit the lock file. Unpinned dependencies are the cause in the large majority of cases of this kind.\n2. Compare the runtime version declared in your build configuration against the version you use locally.\n3. Clear the build cache from the settings page and trigger a fresh build to rule out a corrupted artefact.\n4. If a specific dependency is failing to resolve, check whether its registry is reachable from the build network. [DOC-DEPLOY-003#Resolution]",
+      "citations": [
+        "DOC-DEPLOY-003#Common causes",
+        "DOC-DEPLOY-003#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0427",
+      "intent": "webhook_issue",
+      "expected_doc_ids": [
+        "DOC-API-003"
+      ],
+      "top_doc_id": "DOC-INT-002",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "raw body",
+          "match": false
+        },
+        {
+          "expected": "idempotent",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Third party monitoring and log forwarding):\n\n- The destination rejected the payload and forwarding paused\n- Aggregation introduces a delay before metrics are forwarded\n- Debug-level logs are being forwarded along with the rest [DOC-INT-002#Common causes]\n1. Check the forwarding status page, which shows the last successful delivery and any error returned by the destination.\n2. Expect a delay of up to two minutes on metrics, since they are aggregated before being sent.\n3. Apply a level filter at source so that debug output is not forwarded, which is usually the reason volume is higher than expected.\n4. Verify the destination credential separately if delivery has stopped entirely, as expired credentials are the most common cause. [DOC-INT-002#Resolution]",
+      "citations": [
+        "DOC-INT-002#Common causes",
+        "DOC-INT-002#Resolution"
+      ]
+    },
+    {
+      "ticket_id": "DEV-0285",
+      "intent": "authentication_failure",
+      "expected_doc_ids": [
+        "DOC-AUTH-001"
+      ],
+      "top_doc_id": "DOC-AUTH-003",
+      "top_doc_match": false,
+      "must_mentions": [
+        {
+          "expected": "account lock",
+          "match": false
+        },
+        {
+          "expected": "session cookie",
+          "match": false
+        }
+      ],
+      "draft_text": "Suggested reply (internal draft, based on Single sign-on configuration with SAML providers):\n\n- The assertion consumer service URL does not match the value registered with CloudServe\n- The email attribute in the assertion does not match the CloudServe account email\n- Just-in-time provisioning is disabled on the connection [DOC-AUTH-003#Common causes]\n1. Compare the assertion consumer service URL in your identity provider against the value shown on the SSO settings page. They must match exactly, including the trailing path.\n2. Inspect a failing assertion and confirm the NameID is the user's email address in lower case.\n3. Enable just-in-time provisioning if new users should be created on first login, and set a default role for provisioned users.\n4. Keep at least one administrator account with password access while testing, so a misconfiguration does not lock the whole organisation out. [DOC-AUTH-003#Resolution]",
+      "citations": [
+        "DOC-AUTH-003#Common causes",
+        "DOC-AUTH-003#Resolution"
+      ]
+    }
+  ]
+}
