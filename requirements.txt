@@ -32,6 +32,4 @@ threadpoolctl==3.7.0
 typing_extensions==4.16.0
 typing-inspection==0.4.4
 uvicorn==0.54.0
-httpx2==2.13.1
-httpcore2==2.13.1
 truststore==0.10.4

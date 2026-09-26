@@ -1,4 +1,4 @@
-﻿# CloudServe Architecture
+# CloudServe Architecture
 
 This document is the single architecture reference for the implemented CloudServe release candidate.
 
@@ -33,3 +33,4 @@ flowchart LR
     KB[CloudServe Documentation] --> R
     KS[Default-Off Release Flag] --> D
     ED[Emergency Disable Latch] --> D
+```

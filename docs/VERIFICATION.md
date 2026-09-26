@@ -13,9 +13,10 @@ the retained clean-directory rehearsal below. The frozen canonical C1 result is
 `evaluation/results/final_c1_validation80_20260926_191933/`. The protected
 hidden evaluation set was not available and was not run.
 
-- Retained clean-directory regression suite: 83 tests passed. The final
-  pre-Git sanity check passed 90 tests. One third-party Starlette deprecation
-  warning was emitted in the earlier run; it did not fail the run.
+- Retained clean-directory regression suite: 83 tests passed. The earlier
+  pre-Git sanity check passed 90 tests, and the 27 September 2026 final
+  pre-submission sanity check passed 92 tests. One third-party Starlette
+  deprecation warning was emitted in the earlier run; it did not fail the run.
 - Earlier clean-directory rehearsal: environment creation, dependency installation,
   training, the then-current 72 tests, and the 80-ticket unattended run completed.
   The run logged 80 of 80 decisions and produced zero false automatic responses.

@@ -1,9 +1,10 @@
 """Official-KB retrieval (A4).
 
-Deterministic cosine similarity over section-level passages. Default
-embedding backend is all-MiniLM-L6-v2; a TF-IDF backend is used when
-sentence-transformers is unavailable and fallback is allowed. The backend
-in use is always reported so metrics are never silently mixed."""
+Deterministic cosine similarity over section-level passages. The submitted
+runtime selects TF-IDF explicitly. MiniLM remains available only when selected
+explicitly and its optional dependency is installed; backend selection never
+changes silently. The backend in use is always reported so metrics are not
+mixed."""
 from __future__ import annotations
 
 import json

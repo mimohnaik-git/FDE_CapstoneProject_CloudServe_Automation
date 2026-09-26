@@ -1,8 +1,9 @@
 """Evidence eligibility (diagnostic only).
 
 Answers: 'from the ticket and retrieved docs alone, is there a
-resolution-complete, plan-applicable passage?' It never asserts release
-authority: `sufficient` stays None under the fail-closed policy."""
+resolution-complete, plan-applicable passage?' A true `sufficient` value records
+that evidence result only; it never asserts customer-release authority, which
+is enforced independently by the router."""
 from __future__ import annotations
 
 import re

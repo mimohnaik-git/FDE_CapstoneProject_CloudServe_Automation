@@ -70,7 +70,8 @@ class Passage:
 @dataclass
 class EvidenceAssessment:
     status: Eligibility
-    # Never True: release authority has not been proven. None = "not established".
+    # Evidence sufficiency only. Customer-release authority is a separate,
+    # explicit routing gate; None means evidence sufficiency was not established.
     sufficient: Any = None
     plan_applicable: Any = None
     flags: list = field(default_factory=list)

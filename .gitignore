@@ -10,6 +10,8 @@ __pycache__/
 
 # Environment / local configuration
 .env
+.env.*
+!.env.example
 
 # Coverage
 .coverage

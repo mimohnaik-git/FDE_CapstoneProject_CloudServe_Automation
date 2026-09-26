@@ -104,7 +104,7 @@ Production AUTO remains disabled.
 
 | ID | Authoritative requirement | Implementation and evidence | Result | Status |
 |---|---|---|---|---|
-| A1 | Run from clean checkout using README | Python 3.12 and `requirements.txt`; clean rehearsal plus final 90-test sanity check | Setup reproduced; final source changes pass locally | MET |
+| A1 | Run from clean checkout using README | Python 3.12 and `requirements.txt`; clean rehearsal plus final 92-test sanity check | Setup reproduced; final source changes pass locally | MET |
 | A2 | Normalize four ticket channels | Typed ingestion plus four-channel tests | All supported channels tested | MET |
 | A3 | Intent and urgency with confidence | Calibrated classifiers and explicit failure fallback | Predictions and numeric confidences recorded | MET |
 | A4 | Retrieve real supplied-document passages | Explicit deterministic TF-IDF and resolvable passage IDs | Hit@1 50/53; citations map to KB | MET |
@@ -115,7 +115,7 @@ Production AUTO remains disabled.
 | A9 | Full arbitrary-size unattended evaluation | CLI accepts input/output paths | Validation-80 completed unattended | MET |
 | A10 | Automatic metrics report | JSON and Markdown reports | Report generated without manual calculation | MET |
 | A11 | Defined failures do not stop processing | Malformed, retrieval, classifier, provider and audit boundaries | Failure-injection tests pass; 0/80 unexpected failures | MET |
-| A12 | One documented test command | `python -m pytest -q` | 90 tests pass in final pre-Git sanity check | MET |
+| A12 | One documented test command | `python -m pytest -q` | 92 tests pass in final pre-submission sanity check | MET |
 
 ## Evaluation Framework reconciliation
 
@@ -126,7 +126,7 @@ Production AUTO remains disabled.
 | Semantic citation accuracy | At least 95% | 200/200 automated resolvability; no frozen-output human semantic review | Automated reference | NOT MEASURED |
 | Pipeline latency p95 | Under 3 seconds | 0.0537 seconds | Validation-80 | MET |
 | Availability | At least 99.5% | Provider/failure behavior tested; production uptime not observed | Unavailable | NOT MEASURED |
-| Confidence calibration | Each band within approximately 5 percentage points | Intent gaps 13.99â€“24.24 pp; urgency maximum 8.40 pp; answerability lower bands 8.46â€“11.44 pp | Validation-80 | NOT MET |
+| Confidence calibration | Each band within approximately 5 percentage points | Intent gaps 13.99–24.24 pp; urgency maximum 8.40 pp; answerability lower bands 8.46–11.44 pp | Validation-80 | NOT MET |
 | FCR target | At least 60% | 10.0% simulated AUTO proxy; no observed production resolution | Simulation only | NOT MEASURED |
 | First response time | Under 5 minutes | Pipeline latency is not customer first-response time | Unavailable | NOT MEASURED |
 | CSAT | At least 4.0/5 | No post-automation customer measurement | Unavailable | NOT MEASURED |
@@ -149,7 +149,7 @@ Production AUTO remains disabled.
 
 ## Historical evidence classification
 
-### HISTORICAL DEVELOPMENT HUMAN EVIDENCE â€” VERIFIED, NOT CURRENT-CANDIDATE EVIDENCE
+### HISTORICAL DEVELOPMENT HUMAN EVIDENCE — VERIFIED, NOT CURRENT-CANDIDATE EVIDENCE
 
 The recovered historical figures are n=50; hallucination 1/50 (2%); semantic
 citation accuracy 49/50 (98%); correctness approximately 3.74/5; usefulness
@@ -160,22 +160,22 @@ reviewer files, and calculation output are present at immutable Git commit
 development evidence, but are not evidence about the frozen candidate. See
 `docs/HISTORICAL_EVIDENCE_REGISTER.md` for exact paths and subgroup analysis.
 
-### HISTORICAL PRE-AUTOMATION BUSINESS BASELINE â€” VERIFIED
+### HISTORICAL PRE-AUTOMATION BUSINESS BASELINE — VERIFIED
 
 The supplied Project Brief records FCR approximately 42%, CSAT approximately
-3.2/5, first-response time approximately 8â€“12 hours, and escalation approximately
+3.2/5, first-response time approximately 8–12 hours, and escalation approximately
 58%. These are historical client baselines, not system outcomes.
 
 ## Submission requirements
 
 | Required item | Observed state | Status |
 |---|---|---|
-| `01_Video` | Required 18â€“22 minute presentation with live demonstration; no final video found | NOT MET |
-| `02_Report` | Required single 20â€“30 page PDF; no final report found | NOT MET |
+| `01_Video` | Required 18–22 minute presentation with live demonstration; no final video found | NOT MET |
+| `02_Report` | Required single 20–30 page PDF; no final report found | NOT MET |
 | `03_Workbooks` | Five completed workbooks plus effort log required; supplied files are blank templates/reference material | NOT MET |
 | `04_Source_Code` | Source, tests, data, CI, documentation and evaluation evidence exist | MET for source contents |
 | Four-folder final archive | Official top-level structure and user-name filename require identity and non-code artifacts | NOT MET |
-| Git history/provenance | Working root is not a Git repository; no history can be fabricated | NOT MET |
+| Git history/provenance | Working root is Git branch `main` at baseline commit `bc9802aefd8a9b2e39c470b3689458e8f2df8c2c`; no remote is configured | MET locally; hosted provenance not established |
 | AI-use declaration | README contains factual AI/reuse attribution | MET |
 
 ## Final conclusion

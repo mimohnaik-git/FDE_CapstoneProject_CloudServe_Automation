@@ -2,20 +2,170 @@
   "title": "CloudServe Supervised Support",
   "schemaVersion": 38,
   "panels": [
-    {"type": "timeseries", "title": "Decisions by route",
-     "targets": [{"expr": "sum by (route) (rate(cloudserve_decisions_total[5m]))"}],
-     "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}},
-    {"type": "stat", "title": "AUTO_RESPOND (should be 0 while release is unauthorised)",
-     "targets": [{"expr": "sum(cloudserve_decisions_total{route=\"AUTO_RESPOND\"})"}],
-     "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}},
-    {"type": "timeseries", "title": "Guardrail blocks",
-     "targets": [{"expr": "sum by (guardrail) (rate(cloudserve_guardrail_blocks_total[5m]))"}],
-     "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}},
-    {"type": "timeseries", "title": "Pipeline P95 latency (s)",
-     "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(cloudserve_pipeline_seconds_bucket[5m])))"}],
-     "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}},
-    {"type": "timeseries", "title": "Handled failures",
-     "targets": [{"expr": "sum by (kind) (rate(cloudserve_failures_total[5m]))"}],
-     "gridPos": {"x": 0, "y": 16, "w": 24, "h": 6}}
+    {
+      "type": "stat",
+      "title": "Tickets processed — last hour",
+      "targets": [
+        {
+          "expr": "sum(increase(cloudserve_decisions_total[1h])) or vector(0)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "type": "stat",
+      "title": "AUTO_RESPOND %",
+      "targets": [
+        {
+          "expr": "100 * sum(increase(cloudserve_decisions_total{route=\"AUTO_RESPOND\"}[1h])) / clamp_min(sum(increase(cloudserve_decisions_total[1h])), 1)"
+        }
+      ],
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "type": "stat",
+      "title": "ESCALATE %",
+      "targets": [
+        {
+          "expr": "100 * sum(increase(cloudserve_decisions_total{route=\"ESCALATE\"}[1h])) / clamp_min(sum(increase(cloudserve_decisions_total[1h])), 1)"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Total AUTO_RESPOND decisions",
+      "targets": [
+        {
+          "expr": "sum(cloudserve_decisions_total{route=\"AUTO_RESPOND\"}) or vector(0)"
+        }
+      ],
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Tickets by channel",
+      "targets": [
+        {
+          "expr": "sum by (channel) (increase(cloudserve_decisions_total[1h]))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Decisions by route",
+      "targets": [
+        {
+          "expr": "sum by (route) (rate(cloudserve_decisions_total[5m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Pipeline P50 latency (s)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(cloudserve_pipeline_seconds_bucket[5m])))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Pipeline P95 latency (s)",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(cloudserve_pipeline_seconds_bucket[5m])))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Guardrail blocks",
+      "targets": [
+        {
+          "expr": "sum by (guardrail) (rate(cloudserve_guardrail_blocks_total[5m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Handled failures",
+      "targets": [
+        {
+          "expr": "sum by (kind) (rate(cloudserve_failures_total[5m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 22,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Prediction confidence distribution",
+      "targets": [
+        {
+          "expr": "sum by (classifier, le) (increase(cloudserve_prediction_confidence_bucket[1h]))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 8
+      }
+    }
   ]
 }
