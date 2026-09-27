@@ -39,7 +39,12 @@ def retriever(kb):
 
 @pytest.fixture
 def settings():
-    return get_settings(db_path=":memory:", kb_path=str(DATA / "kb.json"))
+    # Tests must not inherit an AUTO enable flag from the developer's shell.
+    return get_settings(
+        customer_release_authorized=False,
+        db_path=":memory:",
+        kb_path=str(DATA / "kb.json"),
+    )
 
 
 @pytest.fixture

@@ -18,43 +18,39 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _customer_release_authorized_from_env() -> bool:
+    """Enable requests AUTO release; the explicit disable switch always wins."""
+    enabled = _env_bool("CLOUDSERVE_AUTO_RESPONSE_ENABLED", False)
+    disabled = _env_bool("CLOUDSERVE_AUTO_RESPONSE_DISABLE", False)
+    return enabled and not disabled
+
+
 @dataclass(frozen=True)
 class Settings:
     # Classification
     intent_confidence_threshold: float = 0.60
     answerability_confidence_threshold: float = 0.75
     # Retrieval
-    retrieval_score_threshold: float = 0.30          # calibrated for MiniLM cosine
-    # TF-IDF cosine lives on a different scale; never reuse the MiniLM threshold.
+    retrieval_score_threshold: float = 0.30
     tfidf_retrieval_score_threshold: float = 0.10
     top_k: int = 5
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    # Explicit validated backend. Installed packages never change selection.
     retrieval_backend: str = "tfidf"
     retrieval_configuration: str = "field-weighted-word-char-unique-docs-v1"
-    # Retained for configuration compatibility; explicit backend selection does
-    # not silently fall back.
     allow_tfidf_fallback: bool = True
     # Policy versions
     prompt_version: str = "generation-v1.0.0"
     eligibility_policy: str = "evidence-sufficiency-v1-fail-closed"
-    # Customer release. Kept False: no evidence has authorised automatic
-    # release. The AUTO path exists but cannot fire unless this is flipped
-    # by an explicit, reviewed configuration change.
-    # Operational kill switch. False is the safe default; enabling it requires
-    # an explicit environment/config change and is captured in the fingerprint.
-    customer_release_authorized: bool = field(default_factory=lambda: _env_bool(
-        "CLOUDSERVE_AUTO_RESPONSE_ENABLED", False))
-    # Intents that must never be auto-answered, regardless of confidence.
+    # Customer release is fail-closed. AUTO release requires ENABLED=true and
+    # DISABLE not true. The explicit disable switch wins if both are true.
+    customer_release_authorized: bool = field(
+        default_factory=_customer_release_authorized_from_env
+    )
     never_automate_intents: tuple = (
         "security_incident", "compliance_request", "feature_request",
         "unclear_request", "billing_dispute", "legal_request",
         "account_deletion", "outage_report", "data_breach",
     )
-    # Conservative first release. The group-isolated development replay found
-    # a false AUTO for `rate_limit`; it is therefore intentionally excluded.
-    # Expansion requires a reviewed held-out evaluation and a versioned
-    # configuration change.
     auto_eligible_intents: tuple = (
         "api_usage_question",
         "data_export",
@@ -64,18 +60,12 @@ class Settings:
         "quota_or_overage",
     )
 
-    # Evidence-ambiguity safeguard selected from group-isolated
-    # development OOF policy evaluation.
     evidence_resolution_ratio_min: float = 0.40
     evidence_symptom_margin_max: float = 0.30
-    # Discovery evidence and development labels show these require live
-    # operational state when urgent, even when a related article exists.
     urgent_operational_intents: tuple = (
         "database_issue", "performance_degradation", "outage_report",
     )
-    # Provider (optional LLM). Deterministic assembler is the default.
     provider_timeout_s: float = 8.0
-    # Storage
     db_path: str = field(default_factory=lambda: os.environ.get(
         "CLOUDSERVE_DB", str(ROOT / "var" / "decisions.sqlite3")))
     artifacts_dir: str = field(default_factory=lambda: os.environ.get(
@@ -89,12 +79,8 @@ class Settings:
 
     def fingerprint(self) -> str:
         config = asdict(self)
-
-        # Runtime/storage locations are deployment-specific and must not
-        # change the identity of an otherwise identical decision policy.
         for key in ("db_path", "artifacts_dir", "kb_path"):
             config.pop(key, None)
-
         blob = json.dumps(
             config,
             sort_keys=True,

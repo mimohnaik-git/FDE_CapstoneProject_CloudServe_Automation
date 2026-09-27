@@ -23,8 +23,16 @@ def test_config_fingerprint_changes_for_policy_change():
     assert a.fingerprint() != b.fingerprint()
 
 
-def test_config_fingerprint_changes_for_release_authorization():
+def test_config_fingerprint_changes_for_release_authorization(monkeypatch):
+    monkeypatch.setenv("CLOUDSERVE_AUTO_RESPONSE_ENABLED", "true")
+    monkeypatch.setenv("CLOUDSERVE_AUTO_RESPONSE_DISABLE", "false")
+    enabled = get_settings()
+    assert enabled.customer_release_authorized is True
+
+    monkeypatch.setenv("CLOUDSERVE_AUTO_RESPONSE_DISABLE", "true")
+    disabled = get_settings()
+    assert disabled.customer_release_authorized is False
+
     production = get_settings(customer_release_authorized=False)
     controlled_eval = get_settings(customer_release_authorized=True)
-
     assert production.fingerprint() != controlled_eval.fingerprint()
