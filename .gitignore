@@ -94,3 +94,4 @@ __pycache__/
 *.pyc
 evaluation/results/development/local_verification/
 evaluation/results/development/runner_verification/
+data/01*/

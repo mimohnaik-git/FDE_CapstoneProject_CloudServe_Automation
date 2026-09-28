@@ -65,7 +65,7 @@ Current verified baseline:
 
 ---
 
-# 2. Start the CloudServe API — Terminal 1
+# 2. Start the CloudServe API Ã¢â‚¬â€ Terminal 1
 
 The runner never changes the release controls. Demo Mode and Evaluator Mode require an API that was intentionally started with controlled automatic release enabled.
 
@@ -104,7 +104,7 @@ Enabling the release control does not bypass classification, confidence, evidenc
 
 ---
 
-# 3. Start Prometheus — Terminal 2
+# 3. Start Prometheus Ã¢â‚¬â€ Terminal 2
 
 CloudServe already includes `prometheus-client` through `requirements.txt`.
 
@@ -160,7 +160,7 @@ Only continue after `prometheus --version` succeeds.
 Start Prometheus from the repository root:
 
 ```powershell
-prometheus --config.file=monitoring/prometheus.yml
+prometheus --config.file=monitoring/prometheus.yml --storage.tsdb.path=var/prometheus
 ```
 
 ## macOS / Linux
@@ -168,7 +168,7 @@ prometheus --config.file=monitoring/prometheus.yml
 ```bash
 command -v prometheus
 prometheus --version
-prometheus --config.file=monitoring/prometheus.yml
+prometheus --config.file=monitoring/prometheus.yml --storage.tsdb.path=var/prometheus
 ```
 
 If Prometheus is installed but not on `PATH`, run the installed Prometheus binary directly with the same `--config.file=monitoring/prometheus.yml` argument.
@@ -195,7 +195,7 @@ scrapeUrl: http://127.0.0.1:8000/metrics
 
 ---
 
-# 4. Open Grafana — Browser
+# 4. Open Grafana Ã¢â‚¬â€ Browser
 
 Grafana:
 
@@ -228,7 +228,7 @@ The dashboard covers:
 
 ---
 
-# 5. Demo Mode — Terminal 3
+# 5. Demo Mode Ã¢â‚¬â€ Terminal 3
 
 Run all important feature demonstrations with one command:
 
@@ -251,7 +251,7 @@ Terminal output is vertical and human-readable, followed by a compact PASS/FAIL 
 
 ---
 
-# 6. Evaluator Mode — Terminal 3
+# 6. Evaluator Mode Ã¢â‚¬â€ Terminal 3
 
 Run the configured default evaluation dataset:
 
@@ -290,7 +290,7 @@ Do not overwrite frozen canonical evidence directories.
 | `false` | `false` | OFF |
 | `true` | `false` | ON |
 | `false` | `true` | OFF |
-| `true` | `true` | OFF — `DISABLED` wins |
+| `true` | `true` | OFF Ã¢â‚¬â€ `DISABLED` wins |
 
 The default is fail-closed. `CLOUDSERVE_AUTO_RESPONSE_DISABLED=true` always overrides the enabled switch.
 
