@@ -261,7 +261,7 @@ def evaluate_references(pipeline: Pipeline, refs: list[dict],
 
 
 def to_markdown(report: dict) -> str:
-    lines = [f"# Evaluation report â€” run {report['run']['run_id']}", ""]
+    lines = [f"# Evaluation report — run {report['run']['run_id']}", ""]
     for k, v in report["run"].items():
         lines.append(f"- **{k}**: {v}")
     def fmt(r):
@@ -317,7 +317,7 @@ def to_markdown(report: dict) -> str:
               f"- Tickets blocked: {g['tickets_blocked']}",
               f"- Blocks by guardrail: {g['blocks_by_guardrail']}"]
     lt = sec["latency_s"]
-    lines += ["", "## Latency (pipeline only â€” not customer first-response time)",
+    lines += ["", "## Latency (pipeline only — not customer first-response time)",
               f"- Steady state: {lt['steady_state']}",
               f"- Including warm-up: {lt['including_warmup']}"]
     if "subgroup_routing_gate" in sec:

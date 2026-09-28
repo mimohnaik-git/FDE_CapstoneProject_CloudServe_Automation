@@ -13,10 +13,11 @@ the retained clean-directory rehearsal below. The frozen canonical C1 result is
 `evaluation/results/final_c1_validation80_20260926_191933/`. The protected
 hidden evaluation set was not available and was not run.
 
-- Retained clean-directory regression suite: 83 tests passed. The earlier
-  pre-Git sanity check passed 90 tests, and the 27 September 2026 final
-  pre-submission sanity check passed 92 tests. One third-party Starlette
-  deprecation warning was emitted in the earlier run; it did not fail the run.
+- Current-source verification on 29 September 2026: `python -m pytest -q`
+  collected and passed 99 tests. The restricted audit environment prevented
+  pytest from writing its optional cache, producing one cache warning without
+  affecting test execution or the successful exit code. Earlier 83-, 90-, and
+  92-test runs are historical milestones rather than the current baseline.
 - Earlier clean-directory rehearsal: environment creation, dependency installation,
   training, the then-current 72 tests, and the 80-ticket unattended run completed.
   The run logged 80 of 80 decisions and produced zero false automatic responses.
@@ -50,8 +51,8 @@ hidden evaluation set was not available and was not run.
   There were 40 false escalations, zero false automations, and zero must-not-auto
   violations among 14 must-not-auto tickets.
 - Decision-log coverage: 80/80. Unexpected processing failures: 0/80.
-- Steady-state pipeline latency p50 was 0.0382 seconds and p95 was 0.0537
-  seconds. This is not customer
+- Canonical steady-state pipeline latency p50 was 0.0260 seconds and p95 was
+  0.0468 seconds over 79 post-warm-up tickets. This is not customer
   first-response time.
 - Reference evaluation: citations resolved for 200/200 drafts; must-mention
   coverage was 104/118, with 52/59 reference responses fully satisfying their
@@ -67,8 +68,11 @@ The machine-readable evidence is in
 decisions are in that directory's `results.jsonl` and run-specific SQLite audit
 database named in the report. The report records dataset/training/artifact
 hashes, Python 3.12.10, scikit-learn 1.9.1, the explicit TF-IDF backend,
-thresholds, policy states, configuration fingerprint, and elapsed time. Git SHA
-is `None` because the supplied working directory is not a Git repository.
+thresholds, policy states, configuration fingerprint, and elapsed time. The
+canonical artifact records Git SHA as `None`; its provenance is retained
+separately as source commit
+`a09826071fcd95d0330ffc0e000b6dc73c49ca47` and is not reassigned to the
+later repository-cleanup commit.
 
 ## Analysis and interpretation
 

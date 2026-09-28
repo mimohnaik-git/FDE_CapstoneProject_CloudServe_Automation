@@ -57,7 +57,7 @@ Run the regression suite:
 python -m pytest -q
 ```
 
-Current verified baseline:
+Observed final-audit result (29 September 2026):
 
 ```text
 99 passed
@@ -65,7 +65,7 @@ Current verified baseline:
 
 ---
 
-# 2. Start the CloudServe API Ã¢â‚¬â€ Terminal 1
+# 2. Start the CloudServe API - Terminal 1
 
 The runner never changes the release controls. Demo Mode and Evaluator Mode require an API that was intentionally started with controlled automatic release enabled.
 
@@ -104,7 +104,7 @@ Enabling the release control does not bypass classification, confidence, evidenc
 
 ---
 
-# 3. Start Prometheus Ã¢â‚¬â€ Terminal 2
+# 3. Start Prometheus - Terminal 2
 
 CloudServe already includes `prometheus-client` through `requirements.txt`.
 
@@ -195,7 +195,7 @@ scrapeUrl: http://127.0.0.1:8000/metrics
 
 ---
 
-# 4. Open Grafana Ã¢â‚¬â€ Browser
+# 4. Open Grafana - Browser
 
 Grafana:
 
@@ -217,18 +217,25 @@ monitoring/grafana/cloudserve-dashboard.json
 
 Import the dashboard, select the desired `run_mode`, and keep Grafana open while running Demo Mode or Evaluator Mode in Terminal 3.
 
-The dashboard covers:
+The primary assessment dashboard intentionally contains exactly six panels:
 
-- tickets processed;
-- `AUTO_RESPOND` and `ESCALATE` percentages;
-- decisions by route and tickets by channel;
-- pipeline P50 and P95 latency;
-- guardrail blocks and handled failures; and
-- prediction confidence distributions.
+- Tickets processed (last 1h)
+- Total AUTO_RESPOND decisions
+- Decisions by route
+- Pipeline P95 latency (s)
+- Guardrail blocks
+- Handled failures
+
+Its `run_mode` selector offers `demo` and `evaluator`, with All implemented by
+the `.*` value. The broader historical dashboard is retained at
+`monitoring/grafana/evidence/cloudserve-supervised-support.json`. That extended
+evidence view contains additional panels such as route percentages, tickets by
+channel, P50 latency, and confidence distributions; those panels are not part
+of the primary six-panel dashboard.
 
 ---
 
-# 5. Demo Mode Ã¢â‚¬â€ Terminal 3
+# 5. Demo Mode - Terminal 3
 
 Run all important feature demonstrations with one command:
 
@@ -251,7 +258,7 @@ Terminal output is vertical and human-readable, followed by a compact PASS/FAIL 
 
 ---
 
-# 6. Evaluator Mode Ã¢â‚¬â€ Terminal 3
+# 6. Evaluator Mode - Terminal 3
 
 Run the configured default evaluation dataset:
 
@@ -290,7 +297,7 @@ Do not overwrite frozen canonical evidence directories.
 | `false` | `false` | OFF |
 | `true` | `false` | ON |
 | `false` | `true` | OFF |
-| `true` | `true` | OFF Ã¢â‚¬â€ `DISABLED` wins |
+| `true` | `true` | OFF - `DISABLED` wins |
 
 The default is fail-closed. `CLOUDSERVE_AUTO_RESPONSE_DISABLED=true` always overrides the enabled switch.
 

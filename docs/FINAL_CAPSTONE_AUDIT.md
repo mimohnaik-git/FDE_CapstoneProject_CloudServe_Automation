@@ -93,7 +93,7 @@ Production AUTO remains disabled.
 | Routing | 8 AUTO, 72 escalations; precision 8/8; recall 8/48; 40 false escalations; 0 false AUTO | Validation-80 |
 | Must-not-auto | 0/14 violations | Validation-80 |
 | Operations | 80 processed; 80 logged; 0 processing failures | Validation-80 |
-| Pipeline latency | steady-state p50 0.0382 s; p95 0.0537 s | Validation-80; not customer reply time |
+| Pipeline latency | steady-state p50 0.0260 s; p95 0.0468 s over 79 post-warm-up tickets | Validation-80; not customer reply time |
 | Citation resolvability | 200/200 | Automated reference |
 | Must-mention coverage | 104/118; 52/59 responses fully satisfied | Automated reference |
 | Must-not-claim violations | 0/200 | Automated reference |
@@ -104,7 +104,7 @@ Production AUTO remains disabled.
 
 | ID | Authoritative requirement | Implementation and evidence | Result | Status |
 |---|---|---|---|---|
-| A1 | Run from clean checkout using README | Python 3.12 and `requirements.txt`; clean rehearsal plus final 92-test sanity check | Setup reproduced; final source changes pass locally | MET |
+| A1 | Run from clean checkout using README | Python 3.12 and `requirements.txt`; clean rehearsal plus current 99-test regression | Setup reproduced; current source passes locally | MET |
 | A2 | Normalize four ticket channels | Typed ingestion plus four-channel tests | All supported channels tested | MET |
 | A3 | Intent and urgency with confidence | Calibrated classifiers and explicit failure fallback | Predictions and numeric confidences recorded | MET |
 | A4 | Retrieve real supplied-document passages | Explicit deterministic TF-IDF and resolvable passage IDs | Hit@1 50/53; citations map to KB | MET |
@@ -115,7 +115,7 @@ Production AUTO remains disabled.
 | A9 | Full arbitrary-size unattended evaluation | CLI accepts input/output paths | Validation-80 completed unattended | MET |
 | A10 | Automatic metrics report | JSON and Markdown reports | Report generated without manual calculation | MET |
 | A11 | Defined failures do not stop processing | Malformed, retrieval, classifier, provider and audit boundaries | Failure-injection tests pass; 0/80 unexpected failures | MET |
-| A12 | One documented test command | `python -m pytest -q` | 92 tests pass in final pre-submission sanity check | MET |
+| A12 | One documented test command | `python -m pytest -q` | 99 tests passed in the 29 September 2026 final audit | MET |
 
 ## Evaluation Framework reconciliation
 
@@ -124,7 +124,7 @@ Production AUTO remains disabled.
 | Intent classification precision | At least 85% | Macro precision 100% | Validation-80 | MET |
 | Human hallucination rate | At most 5%, at least 50 responses, two assessors | No traceable review of frozen outputs | Unavailable | NOT MEASURED |
 | Semantic citation accuracy | At least 95% | 200/200 automated resolvability; no frozen-output human semantic review | Automated reference | NOT MEASURED |
-| Pipeline latency p95 | Under 3 seconds | 0.0537 seconds | Validation-80 | MET |
+| Pipeline latency p95 | Under 3 seconds | 0.0468 seconds over 79 post-warm-up tickets | Validation-80 | MET |
 | Availability | At least 99.5% | Provider/failure behavior tested; production uptime not observed | Unavailable | NOT MEASURED |
 | Confidence calibration | Each band within approximately 5 percentage points | Intent gaps 13.99–24.24 pp; urgency maximum 8.40 pp; answerability lower bands 8.46–11.44 pp | Validation-80 | NOT MET |
 | FCR target | At least 60% | 10.0% simulated AUTO proxy; no observed production resolution | Simulation only | NOT MEASURED |
@@ -171,20 +171,22 @@ The supplied Project Brief records FCR approximately 42%, CSAT approximately
 | Required item | Observed state | Status |
 |---|---|---|
 | `01_Video` | Required 18–22 minute presentation with live demonstration; no final video found | NOT MET |
-| `02_Report` | Required single 20–30 page PDF; no final report found | NOT MET |
-| `03_Workbooks` | Five completed workbooks plus effort log required; supplied files are blank templates/reference material | NOT MET |
-| `04_Source_Code` | Source, tests, data, CI, documentation and evaluation evidence exist | MET for source contents |
-| Four-folder final archive | Official top-level structure and user-name filename require identity and non-code artifacts | NOT MET |
-| Git history/provenance | Working root is Git branch `main` at baseline commit `bc9802aefd8a9b2e39c470b3689458e8f2df8c2c`; no remote is configured | MET locally; hosted provenance not established |
-| AI-use declaration | README contains factual AI/reuse attribution | MET |
+| `02_Report` | Required single 20–30 page PDF is present; final audit adds the required AI-use declaration and required filename | MET after final packaging |
+| `03_Workbooks` | Five completed workbooks plus effort log are present and preserve their evidence boundaries | MET after final naming |
+| `04_Source_Code` | Source, tests, data, CI, documentation and retained evaluation evidence are reconciled from current Git-tracked source | MET after final synchronization |
+| Four-folder final archive | Exactly `01_Video`, `02_Report`, `03_Workbooks`, and `04_Source_Code` are present | MET structurally |
+| Git history/provenance | Verified engineering baseline `9149ce8f211800f2600f54720c5c51121d07bf3b`; final repository state is `main` after final documentation/repository cleanup; `origin` is configured and GitHub Actions run 22 succeeded for the baseline commit | MET |
+| AI-use declaration | Final report contains a bounded declaration of AI assistance and retained owner judgement | MET after final report packaging |
 
 ## Final conclusion
 
 The executable acceptance gate is met and the accepted retrieval candidate
 improves retrieval and reference quality without changing Validation-80 routing
-safety. The complete capstone submission is not ready: calibration, frozen-output
-human review, production evidence, Git provenance, report, video, completed
-workbooks, effort log, and official four-folder archive remain unresolved.
+safety. The technical source, report, workbooks, evidence provenance, and
+four-folder package structure are ready after final reconciliation. The
+supplied package's `01_Video` folder remains empty, so submission readiness
+still depends on the required final video. Calibration, frozen-output human
+review, and production outcomes remain explicitly unproven or not measured.
 Production automatic release remains disabled.
 
 ### Final C1 frozen evidence
