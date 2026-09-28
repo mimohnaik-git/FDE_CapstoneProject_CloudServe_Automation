@@ -118,6 +118,7 @@ class Decision:
     error: str | None = None
     config_fingerprint: str = ""
     run_id: str | None = None
+    run_mode: str = "normal"
     decision_timestamp: str | None = None
 
     def to_dict(self) -> dict:

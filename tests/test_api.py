@@ -14,6 +14,7 @@ def client(pipeline):
 def test_health(client):
     r = client.get("/health").json()
     assert r["status"] == "ok" and r["customer_release_authorized"] is False
+    assert r["release_control_precedence"] == "DISABLED overrides ENABLED"
 
 
 def test_submit_and_review(client, email_ticket):
@@ -57,3 +58,24 @@ def test_bad_review_action_rejected(client, email_ticket):
 def test_metrics_endpoint(client, email_ticket):
     client.post("/tickets", json=email_ticket)
     assert b"cloudserve_decisions_total" in client.get("/metrics").content
+
+
+def test_run_mode_is_propagated_to_audit_and_metrics(client, email_ticket):
+    response = client.post(
+        "/tickets",
+        json=email_ticket,
+        headers={"X-CloudServe-Run-Mode": "demo", "X-CloudServe-Run-Id": "demo-test"},
+    )
+    assert response.status_code == 200
+    decision = client.get(f"/decisions/{email_ticket['ticket_id']}").json()
+    assert decision["run_mode"] == "demo"
+    assert decision["run_id"] == "demo-test"
+    assert b'run_mode="demo"' in client.get("/metrics").content
+
+
+def test_invalid_run_mode_is_rejected(client, email_ticket):
+    response = client.post(
+        "/tickets", json=email_ticket,
+        headers={"X-CloudServe-Run-Mode": "ticket-id-would-be-high-cardinality"},
+    )
+    assert response.status_code == 400

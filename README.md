@@ -8,44 +8,22 @@ It classifies support tickets, retrieves reviewed CloudServe documentation, gene
 
 ---
 
-## Quick Flow
+## Operating flow
 
 ```text
-Setup
-→ pip check
-→ tests
-→ Safe Mode
-→ Demo Mode
-→ AUTO demo
-→ escalation demo
-→ guardrail demo
-→ disable-override test
-→ Validation-80 evaluation
-→ Prometheus
-→ Grafana
-→ monitored demos
-→ restore Safe Mode
-→ shutdown
+Terminal 1 -> CloudServe API
+Terminal 2 -> Prometheus
+Terminal 3 -> Demo Mode OR Evaluator Mode
+Browser    -> Grafana
 ```
 
-Use:
-
-```text
-Terminal 1 = CloudServe API
-Terminal 2 = tests / demos
-Terminal 3 = Prometheus
-Browser    = Grafana
-```
-
-Run commands from the cloned repository root.
+Run commands from the cloned repository root. Keep Grafana open while running Demo Mode or Evaluator Mode so the activity is visible on the dashboard.
 
 ---
 
 # 1. Setup
 
 ## Windows PowerShell
-
-Create and activate the virtual environment:
 
 ```powershell
 py -3.12 -m venv .venv
@@ -61,324 +39,151 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## macOS / Linux
 
-Create and activate the virtual environment:
-
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 ```
 
-Install dependencies:
+Install dependencies and verify them:
 
 ```bash
 python -m pip install -r requirements.txt
-pip check
-```
-
-Expected:
-
-```text
-No broken requirements found.
+python -m pip check
 ```
 
 Run the regression suite:
 
 ```bash
 python -m pytest -q
-python -m pytest -q -W error
 ```
 
 Current verified baseline:
 
 ```text
-92 passed
-92 passed
+99 passed
 ```
 
 ---
 
-# 2. CloudServe Safe Mode
+# 2. Start the CloudServe API — Terminal 1
 
-Safe Mode keeps customer `AUTO_RESPOND` release disabled.
-
-## Windows PowerShell — Terminal 1
-
-```powershell
-$Host.UI.RawUI.WindowTitle = "CloudServe SAFE MODE - API"
-Write-Host "=== CloudServe SAFE MODE | AUTO DISABLED ==="
-
-$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="false"
-$env:CLOUDSERVE_AUTO_RESPONSE_DISABLE="true"
-
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-## macOS / Linux — Terminal 1
-
-```bash
-export CLOUDSERVE_AUTO_RESPONSE_ENABLED=false
-export CLOUDSERVE_AUTO_RESPONSE_DISABLE=true
-
-echo "=== CloudServe SAFE MODE | AUTO DISABLED ==="
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-Leave Terminal 1 running.
-
-Verify from Terminal 2.
-
-### Windows PowerShell
-
-```powershell
-$h = Invoke-RestMethod http://127.0.0.1:8000/health
-Write-Host "Safe Mode | AUTO enabled:" $h.customer_release_authorized
-```
-
-### macOS / Linux
-
-```bash
-curl -s http://127.0.0.1:8000/health
-```
-
-Expected state:
-
-```text
-customer_release_authorized: false
-```
-
----
-
-# 3. CloudServe Demo Mode
-
-Stop Terminal 1 with `Ctrl+C`.
-
-Demo Mode enables the final customer-release gate. It does **not** bypass policy, confidence, evidence, ambiguity, guardrails, or audit controls.
-
-## Windows PowerShell — Terminal 1
-
-```powershell
-$Host.UI.RawUI.WindowTitle = "CloudServe DEMO MODE - API"
-Write-Host "=== CloudServe DEMO MODE | AUTO ENABLED ==="
-
-$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="true"
-$env:CLOUDSERVE_AUTO_RESPONSE_DISABLE="false"
-
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-## macOS / Linux — Terminal 1
-
-```bash
-export CLOUDSERVE_AUTO_RESPONSE_ENABLED=true
-export CLOUDSERVE_AUTO_RESPONSE_DISABLE=false
-
-echo "=== CloudServe DEMO MODE | AUTO ENABLED ==="
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-Verify:
-
-### Windows PowerShell
-
-```powershell
-$h = Invoke-RestMethod http://127.0.0.1:8000/health
-Write-Host "Demo Mode | AUTO enabled:" $h.customer_release_authorized
-```
-
-### macOS / Linux
-
-```bash
-curl -s http://127.0.0.1:8000/health
-```
-
-Expected state:
-
-```text
-customer_release_authorized: true
-```
-
----
-
-# 4. Demo Features
-
-Run these from Terminal 2 while Demo Mode is running.
-
-## Successful automatic response
-
-```bash
-python -m scripts.demo --case auto
-```
-
-Expected:
-
-```text
-Ticket: VAL-0005
-Decision: Automatic response approved.
-```
-
-## Human escalation
-
-```bash
-python -m scripts.demo --case escalate
-```
-
-Expected:
-
-```text
-Ticket: VAL-0002
-Decision: Escalated for human review.
-```
-
-## Synthetic prompt-injection guardrail
-
-```bash
-python -m scripts.demo --case guardrail
-```
-
-Expected:
-
-```text
-Decision: Escalated for human review.
-
-Safety controls that blocked release:
-- prompt injection
-```
-
----
-
-# 5. Verify the Disable Override
-
-Stop Terminal 1 with `Ctrl+C`.
-
-Set both controls to `true`. `DISABLE` must win.
-
-## Windows PowerShell — Terminal 1
-
-```powershell
-$Host.UI.RawUI.WindowTitle = "CloudServe DISABLE OVERRIDE - API"
-Write-Host "=== DISABLE OVERRIDE | EXPECT AUTO OFF ==="
-
-$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="true"
-$env:CLOUDSERVE_AUTO_RESPONSE_DISABLE="true"
-
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-## macOS / Linux — Terminal 1
-
-```bash
-export CLOUDSERVE_AUTO_RESPONSE_ENABLED=true
-export CLOUDSERVE_AUTO_RESPONSE_DISABLE=true
-
-echo "=== DISABLE OVERRIDE | EXPECT AUTO OFF ==="
-python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
-```
-
-Verify from Terminal 2:
-
-```bash
-python -m scripts.demo --case auto
-```
-
-Expected:
-
-```text
-Decision: Escalated for human review.
-
-Why:
-- Automatic customer release is currently disabled.
-```
-
----
-
-# 6. Validation-80 Evaluation
-
-Run from Terminal 2.
+The runner never changes the release controls. Demo Mode and Evaluator Mode require an API that was intentionally started with controlled automatic release enabled.
 
 ## Windows PowerShell
 
 ```powershell
-$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$OutputPath = "evaluation/results/local_demo_$Timestamp"
+$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="true"
+$env:CLOUDSERVE_AUTO_RESPONSE_DISABLED="false"
 
-python -m evaluation.harness --input data/cloudserve/validation_tickets.json --output $OutputPath --references data/cloudserve/ground_truth_responses.json --reference-tickets data/cloudserve/development_tickets.json --kb data/cloudserve/documentation.json --retrieval-backend tfidf --enable-auto-policy --fail-on-must-not-auto
-
-Get-Content "$OutputPath\metrics_report.md" -Encoding UTF8
+python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
 ```
 
 ## macOS / Linux
 
 ```bash
-Timestamp=$(date +"%Y%m%d_%H%M%S")
-OutputPath="evaluation/results/local_demo_$Timestamp"
+export CLOUDSERVE_AUTO_RESPONSE_ENABLED=true
+export CLOUDSERVE_AUTO_RESPONSE_DISABLED=false
 
-python -m evaluation.harness --input data/cloudserve/validation_tickets.json --output "$OutputPath" --references data/cloudserve/ground_truth_responses.json --reference-tickets data/cloudserve/development_tickets.json --kb data/cloudserve/documentation.json --retrieval-backend tfidf --enable-auto-policy --fail-on-must-not-auto
-
-cat "$OutputPath/metrics_report.md"
+python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
 ```
 
-Do not overwrite the frozen canonical evidence:
+Verify the API from another terminal:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/health
+```
+
+The controlled run state should include:
 
 ```text
-evaluation/results/final_c1_validation80_20260926_191933/
+status: ok
+customer_release_authorized: true
 ```
+
+Enabling the release control does not bypass classification, confidence, evidence, ambiguity, guardrail, or audit gates.
 
 ---
 
-# 7. Monitoring
+# 3. Start Prometheus — Terminal 2
 
-Restart **Demo Mode** in Terminal 1 before monitoring.
+CloudServe already includes `prometheus-client` through `requirements.txt`.
 
-Verify CloudServe metrics.
+`prometheus-client` is a Python dependency that allows CloudServe to expose `/metrics`; it does **not** install the external Prometheus Server application. Prometheus Server must be installed separately.
 
-## Windows PowerShell — Terminal 2
+## Windows PowerShell PATH troubleshooting
+
+First verify that PowerShell can locate Prometheus:
 
 ```powershell
-$metrics = Invoke-WebRequest http://127.0.0.1:8000/metrics -UseBasicParsing
-Write-Host "Metrics endpoint status:" $metrics.StatusCode
+Get-Command prometheus -ErrorAction SilentlyContinue
 ```
 
-## macOS / Linux — Terminal 2
+Then verify the installed version:
 
-```bash
-curl -I http://127.0.0.1:8000/metrics
+```powershell
+prometheus --version
 ```
 
-Expected:
+If `prometheus` is not recognized, Prometheus may already be installed but the folder containing `prometheus.exe` is not on the current PowerShell PATH.
 
-```text
-HTTP 200
+Locate an existing installation:
+
+```powershell
+Get-ChildItem `
+    "$env:USERPROFILE\Downloads", `
+    "C:\Program Files", `
+    "C:\Program Files (x86)" `
+    -Filter prometheus.exe `
+    -File `
+    -Recurse `
+    -ErrorAction SilentlyContinue |
+    Select-Object -ExpandProperty FullName
 ```
 
-## Start Prometheus — Terminal 3
+Add the directory containing `prometheus.exe` to the current PowerShell session:
 
-Use the existing Prometheus installation:
+```powershell
+$PrometheusDir = "C:\path\to\prometheus-folder"
+$env:Path = "$PrometheusDir;$env:Path"
+```
 
-```bash
+This changes `PATH` only for the current PowerShell session.
+
+Verify again:
+
+```powershell
+prometheus --version
+```
+
+Only continue after `prometheus --version` succeeds.
+
+Start Prometheus from the repository root:
+
+```powershell
 prometheus --config.file=monitoring/prometheus.yml
 ```
 
-If `prometheus` is not on `PATH`, run the installed Prometheus binary directly with the same `--config.file` argument.
+## macOS / Linux
 
-Prometheus:
+```bash
+command -v prometheus
+prometheus --version
+prometheus --config.file=monitoring/prometheus.yml
+```
+
+If Prometheus is installed but not on `PATH`, run the installed Prometheus binary directly with the same `--config.file=monitoring/prometheus.yml` argument.
+
+Prometheus is available at:
 
 ```text
 http://127.0.0.1:9090
 ```
 
-Verify the CloudServe scrape target.
-
-### Windows PowerShell
+Verify the CloudServe scrape target:
 
 ```powershell
 (Invoke-RestMethod "http://127.0.0.1:9090/api/v1/targets").data.activeTargets |
     Select-Object health,scrapeUrl,lastError
-```
-
-### macOS / Linux
-
-```bash
-curl -s http://127.0.0.1:9090/api/v1/targets
 ```
 
 Expected target:
@@ -390,7 +195,7 @@ scrapeUrl: http://127.0.0.1:8000/metrics
 
 ---
 
-# 8. Grafana
+# 4. Open Grafana — Browser
 
 Grafana:
 
@@ -410,110 +215,108 @@ Dashboard file:
 monitoring/grafana/cloudserve-dashboard.json
 ```
 
-Open Grafana:
+Import the dashboard, select the desired `run_mode`, and keep Grafana open while running Demo Mode or Evaluator Mode in Terminal 3.
 
-## Windows PowerShell
+The dashboard covers:
 
-```powershell
-Start-Process "http://127.0.0.1:3000"
-```
-
-## macOS
-
-```bash
-open http://127.0.0.1:3000
-```
-
-## Linux
-
-```bash
-xdg-open http://127.0.0.1:3000
-```
-
-While Grafana is open, run from Terminal 2:
-
-```bash
-python -m scripts.demo --case auto
-python -m scripts.demo --case escalate
-python -m scripts.demo --case guardrail
-```
-
-Wait about 15–30 seconds, then inspect:
-
-```text
-Tickets processed
-AUTO_RESPOND %
-ESCALATE %
-Tickets by channel
-Decisions by route
-Pipeline P50 / P95
-Guardrail blocks
-Handled failures
-Prediction confidence distribution
-```
-
-A zero `Handled failures` value is valid during a clean run.
+- tickets processed;
+- `AUTO_RESPOND` and `ESCALATE` percentages;
+- decisions by route and tickets by channel;
+- pipeline P50 and P95 latency;
+- guardrail blocks and handled failures; and
+- prediction confidence distributions.
 
 ---
 
-# 9. Shutdown
+# 5. Demo Mode — Terminal 3
 
-## Restore Safe Mode
-
-Stop Terminal 1 with `Ctrl+C`.
-
-### Windows PowerShell
-
-```powershell
-$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="false"
-$env:CLOUDSERVE_AUTO_RESPONSE_DISABLE="true"
-
-python -c "from src.config import Settings; print('Automatic customer release enabled:', Settings().customer_release_authorized)"
-```
-
-### macOS / Linux
+Run all important feature demonstrations with one command:
 
 ```bash
-export CLOUDSERVE_AUTO_RESPONSE_ENABLED=false
-export CLOUDSERVE_AUTO_RESPONSE_DISABLE=true
-
-python -c "from src.config import Settings; print('Automatic customer release enabled:', Settings().customer_release_authorized)"
+python -m scripts.run demo mode
 ```
 
-Expected:
+Demo Mode exercises the live production API and pipeline for:
 
-```text
-Automatic customer release enabled: False
-```
+- successful `AUTO_RESPOND`;
+- human escalation;
+- prompt-injection blocking;
+- multi-channel handling;
+- malformed-input handling;
+- ambiguity and review-required behavior;
+- audit persistence and review workflow; and
+- release-control precedence.
 
-Stop Prometheus in Terminal 3 with:
-
-```text
-Ctrl+C
-```
-
-Close the Grafana browser tab.
-
-Exit the virtual environment in Terminal 1 and Terminal 2:
-
-```bash
-deactivate
-```
+Terminal output is vertical and human-readable, followed by a compact PASS/FAIL summary. The requests also generate Prometheus telemetry with `run_mode="demo"`.
 
 ---
 
-# AUTO Control Reference
+# 6. Evaluator Mode — Terminal 3
 
-| ENABLED | DISABLE | AUTO release |
+Run the configured default evaluation dataset:
+
+```bash
+python -m scripts.run evaluator mode
+```
+
+Run the same live-API evaluator with a user-supplied labelled dataset:
+
+```bash
+python -m scripts.run evaluator mode --input <dataset.json>
+```
+
+Evaluator Mode verifies API health and the controlled release state before processing. It never silently enables `AUTO_RESPOND`. Every ticket is processed through the live CloudServe API, so evaluator traffic is visible in Prometheus and Grafana with `run_mode="evaluator"`.
+
+Ticket totals, progress, route percentages, classification metrics, retrieval metrics, guardrail counts, and latency statistics are calculated dynamically from the loaded dataset. The evaluator is not tied to a fixed dataset size.
+
+The terminal presents compact, human-readable progress and an aggregate summary. Detailed JSON and JSONL are the authoritative evidence and are stored in a new directory for each run:
+
+```text
+evaluation/results/evaluator_<timestamp>/
+  run_metadata.json
+  results.jsonl
+  metrics_report.json
+  metrics_report.md
+```
+
+Do not overwrite frozen canonical evidence directories.
+
+---
+
+# 7. AUTO_RESPOND control reference
+
+| `CLOUDSERVE_AUTO_RESPONSE_ENABLED` | `CLOUDSERVE_AUTO_RESPONSE_DISABLED` | AUTO release |
 |---|---|---|
 | `false` | `false` | OFF |
 | `true` | `false` | ON |
 | `false` | `true` | OFF |
-| `true` | `true` | OFF — DISABLE wins |
+| `true` | `true` | OFF — `DISABLED` wins |
+
+The default is fail-closed. `CLOUDSERVE_AUTO_RESPONSE_DISABLED=true` always overrides the enabled switch.
+
+To restore Safe Mode, stop the API and restart it with:
+
+## Windows PowerShell
+
+```powershell
+$env:CLOUDSERVE_AUTO_RESPONSE_ENABLED="false"
+$env:CLOUDSERVE_AUTO_RESPONSE_DISABLED="true"
+
+python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
+```
+
+## macOS / Linux
+
+```bash
+export CLOUDSERVE_AUTO_RESPONSE_ENABLED=false
+export CLOUDSERVE_AUTO_RESPONSE_DISABLED=true
+
+python -m uvicorn src.api:app --host 127.0.0.1 --port 8000
+```
 
 ---
 
-# Architecture
+# 8. Architecture
 
 ```text
 Ticket
@@ -540,7 +343,7 @@ Default release state:  OFF
 
 ---
 
-# Evaluation Provenance
+# 9. Historical evaluation provenance
 
 Canonical Validation-80 evidence was produced by:
 
@@ -553,3 +356,13 @@ Canonical evidence:
 ```text
 evaluation/results/final_c1_validation80_20260926_191933/
 ```
+
+This historical statement identifies the retained canonical evaluation. Current evaluator operation remains dataset-size agnostic.
+
+---
+
+# 10. Shutdown
+
+- Stop the CloudServe API and Prometheus with `Ctrl+C` in their terminals.
+- Close the Grafana browser tab.
+- Exit the virtual environment with `deactivate`.

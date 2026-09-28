@@ -98,8 +98,12 @@ def expected_route(t: dict) -> str | None:
     return None
 
 
-def evaluate(pipeline: Pipeline, tickets: list[dict], run_id: str) -> tuple[list, dict]:
-    decisions = [pipeline.process(strip_labels(t), run_id=run_id).to_dict() for t in tickets]
+def analyze_decisions(tickets: list[dict], decisions: list[dict]) -> dict:
+    """Calculate evaluator metrics for decisions produced by any transport.
+
+    The offline harness and live-API runner share this function so metric
+    definitions cannot drift.
+    """
     labelled = [(t, d) for t, d in zip(tickets, decisions) if isinstance(t, dict)]
     rep: dict = {}
 
@@ -192,7 +196,12 @@ def evaluate(pipeline: Pipeline, tickets: list[dict], run_id: str) -> tuple[list
                                          for d in decisions),
         "routes": dict(Counter(d["route"] for d in decisions)),
     }
-    return decisions, rep
+    return rep
+
+
+def evaluate(pipeline: Pipeline, tickets: list[dict], run_id: str) -> tuple[list, dict]:
+    decisions = [pipeline.process(strip_labels(t), run_id=run_id).to_dict() for t in tickets]
+    return decisions, analyze_decisions(tickets, decisions)
 
 
 def ratio_err(decisions):

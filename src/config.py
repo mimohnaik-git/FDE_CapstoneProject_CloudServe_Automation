@@ -21,7 +21,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 def _customer_release_authorized_from_env() -> bool:
     """Enable requests AUTO release; the explicit disable switch always wins."""
     enabled = _env_bool("CLOUDSERVE_AUTO_RESPONSE_ENABLED", False)
-    disabled = _env_bool("CLOUDSERVE_AUTO_RESPONSE_DISABLE", False)
+    disabled = _env_bool("CLOUDSERVE_AUTO_RESPONSE_DISABLED", False)
     return enabled and not disabled
 
 

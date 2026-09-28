@@ -115,7 +115,8 @@ class Pipeline:
             > self.settings.evidence_symptom_margin_max
         )
 
-    def process(self, raw: dict, run_id: str | None = None) -> Decision:
+    def process(self, raw: dict, run_id: str | None = None,
+                run_mode: str = "normal") -> Decision:
         t0 = time.perf_counter()
         stages: dict[str, float] = {}
         tid = str((raw or {}).get("ticket_id") or (raw or {}).get("id") or "UNKNOWN") \
@@ -131,7 +132,7 @@ class Pipeline:
             except IngestError as e:
                 lap("ingest", s)
                 d = self._escalate(tid, "malformed_input", t0, stages, f"IngestError:{e}")
-                return self._finalise(d, run_id)
+                return self._finalise(d, run_id, run_mode)
             lap("ingest", s)
 
             s = time.perf_counter()
@@ -156,7 +157,7 @@ class Pipeline:
                                    f"RetrievalError:{e}", intent=intent, urgency=urgency,
                                    channel=ticket.channel.value,
                                    customer_tier=ticket.customer_tier)
-                return self._finalise(d, run_id)
+                return self._finalise(d, run_id, run_mode)
             lap("retrieve", s)
 
             s = time.perf_counter()
@@ -239,14 +240,16 @@ class Pipeline:
                          error=perr, config_fingerprint=self.fingerprint)
             if d.draft is not None:
                 d.draft.internal_only = decision_route is not Route.AUTO_RESPOND
-            return self._finalise(d, run_id)
+            return self._finalise(d, run_id, run_mode)
         except Exception as e:  # last-resort fail-closed
             d = self._escalate(tid, "unhandled_error", t0, stages,
                                f"{type(e).__name__}:{e}")
-            return self._finalise(d, run_id)
+            return self._finalise(d, run_id, run_mode)
 
-    def _finalise(self, d: Decision, run_id: str | None) -> Decision:
+    def _finalise(self, d: Decision, run_id: str | None,
+                  run_mode: str = "normal") -> Decision:
         d.run_id = run_id
+        d.run_mode = run_mode if run_mode in {"normal", "demo", "evaluator"} else "normal"
         d.decision_timestamp = datetime.now(timezone.utc).isoformat()
         payload = d.to_dict()
         try:
@@ -263,5 +266,5 @@ class Pipeline:
                 self.audit.write_fallback(payload)
             except Exception:
                 pass
-        monitoring.observe(payload)
+        monitoring.observe(payload, d.run_mode)
         return d

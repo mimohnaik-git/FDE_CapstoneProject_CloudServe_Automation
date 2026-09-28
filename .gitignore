@@ -84,3 +84,13 @@ evaluation/results/*
 # Preserve referenced C1 development OOF evidence
 !evaluation/results/final_c1_development_oof.json
 !evaluation/results/final_c1_development_oof_gated.json
+
+# Prometheus local TSDB runtime
+data/chunks_head/
+data/wal/
+data/lock
+data/queries.active
+__pycache__/
+*.pyc
+evaluation/results/development/local_verification/
+evaluation/results/development/runner_verification/

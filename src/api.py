@@ -4,7 +4,7 @@ sends anything to a customer.
 Run: uvicorn src.api:app --port 8000"""
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
@@ -48,12 +48,19 @@ def health():
     return {"status": "ok", "retrieval_backend": p.retriever.backend_name,
             "customer_release_authorized": p.settings.customer_release_authorized,
             "emergency_auto_response_disabled": p.emergency_disabled,
+            "release_control_precedence": "DISABLED overrides ENABLED",
             "config_fingerprint": p.fingerprint}
 
 
 @app.post("/tickets")
-def submit(ticket: TicketIn):
-    d = get_pipeline().process(ticket.model_dump(exclude_none=True)).to_dict()
+def submit(ticket: TicketIn,
+           run_mode: str = Header("normal", alias="X-CloudServe-Run-Mode"),
+           run_id: str | None = Header(None, alias="X-CloudServe-Run-Id")):
+    if run_mode not in {"normal", "demo", "evaluator"}:
+        raise HTTPException(400, "run mode must be normal, demo, or evaluator")
+    d = get_pipeline().process(
+        ticket.model_dump(exclude_none=True), run_id=run_id, run_mode=run_mode
+    ).to_dict()
     response = {"ticket_id": d["ticket_id"], "route": d["route"],
                 "reasons": d["reasons"], "intent": d["intent"],
                 "urgency": d["urgency"], "answerability": d["answerability"],

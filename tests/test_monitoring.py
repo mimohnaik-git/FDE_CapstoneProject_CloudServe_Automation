@@ -43,3 +43,17 @@ def test_confidence_histogram_has_all_classifier_labels():
     assert b'classifier="intent"' in body
     assert b'classifier="urgency"' in body
     assert b'classifier="answerability"' in body
+
+
+def test_run_mode_is_low_cardinality_and_unknown_values_fall_back():
+    decision = {
+        "route": "ESCALATE", "channel": "email", "total_latency_s": 0.01,
+        "intent": None, "urgency": None, "answerability": None,
+        "guardrails": {"blocks": []}, "error": None,
+    }
+    monitoring.observe(decision, "evaluator")
+    monitoring.observe(decision, "unbounded-user-value")
+    body = monitoring.exposition()
+    assert b'run_mode="evaluator"' in body
+    assert b'run_mode="normal"' in body
+    assert b"unbounded-user-value" not in body
