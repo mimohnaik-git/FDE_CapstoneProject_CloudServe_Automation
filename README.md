@@ -176,7 +176,7 @@ If Prometheus is installed but not on `PATH`, run the installed Prometheus binar
 Prometheus is available at:
 
 ```text
-http://127.0.0.1:9090
+Start-Process "http://127.0.0.1:9090"
 ```
 
 Verify the CloudServe scrape target:
