@@ -206,7 +206,7 @@ Start-Process "http://127.0.0.1:3000"
 Prometheus data source:
 
 ```text
-http://127.0.0.1:9090
+Start-Process "http://127.0.0.1:9090"
 ```
 
 Dashboard file:
