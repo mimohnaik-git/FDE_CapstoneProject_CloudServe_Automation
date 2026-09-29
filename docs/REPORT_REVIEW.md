@@ -1,9 +1,11 @@
 # Final report review
 
-This review applies to the final submission report and the verified engineering
-baseline at commit `9149ce8f211800f2600f54720c5c51121d07bf3b`, together with
-the retained canonical Validation-80 evidence produced at
-`a09826071fcd95d0330ffc0e000b6dc73c49ca47`.
+This review applies to the final submission report and current packaged Git
+HEAD on `main`. Commit `43a3b60594539af59b3ace388b319653de7e24dd` is retained
+as the historical pre-documentation source baseline, and commit
+`9149ce8f211800f2600f54720c5c51121d07bf3b` remains the previous verified
+engineering baseline. The retained canonical Validation-80 evidence was
+produced at `a09826071fcd95d0330ffc0e000b6dc73c49ca47`.
 
 ## Verified structure and layout
 
@@ -18,9 +20,9 @@ the retained canonical Validation-80 evidence produced at
 
 ## Verified evidence boundaries
 
-- The verified engineering baseline and its 99-test regression are attributed
-  to `9149ce8`; the final repository state is `main` after final
-  documentation/repository cleanup.
+- The final packaged source is the clean Git HEAD of `main`; `43a3b60` is a
+  historical pre-documentation baseline and `9149ce8` is the previous verified
+  engineering baseline.
 - Canonical Validation-80 metrics remain attributed to `a098260` and are not
   described as current-source evaluation output.
 - Historical human development review is labelled historical and is kept

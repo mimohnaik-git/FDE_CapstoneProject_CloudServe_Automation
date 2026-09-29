@@ -170,12 +170,12 @@ The supplied Project Brief records FCR approximately 42%, CSAT approximately
 
 | Required item | Observed state | Status |
 |---|---|---|
-| `01_Video` | Required 18–22 minute presentation with live demonstration; no final video found | NOT MET |
+| `01_Video` | Final presentation is present as `MimohNaik_Capstone_Video.mp4` | MET |
 | `02_Report` | Required single 20–30 page PDF is present; final audit adds the required AI-use declaration and required filename | MET after final packaging |
 | `03_Workbooks` | Five completed workbooks plus effort log are present and preserve their evidence boundaries | MET after final naming |
 | `04_Source_Code` | Source, tests, data, CI, documentation and retained evaluation evidence are reconciled from current Git-tracked source | MET after final synchronization |
 | Four-folder final archive | Exactly `01_Video`, `02_Report`, `03_Workbooks`, and `04_Source_Code` are present | MET structurally |
-| Git history/provenance | Verified engineering baseline `9149ce8f211800f2600f54720c5c51121d07bf3b`; final repository state is `main` after final documentation/repository cleanup; `origin` is configured and GitHub Actions run 22 succeeded for the baseline commit | MET |
+| Git history/provenance | Final packaged source is the clean Git HEAD of `main`; `43a3b60594539af59b3ace388b319653de7e24dd` is the historical pre-documentation baseline; `9149ce8f211800f2600f54720c5c51121d07bf3b` remains the previous verified engineering baseline; `origin` is configured | MET |
 | AI-use declaration | Final report contains a bounded declaration of AI assistance and retained owner judgement | MET after final report packaging |
 
 ## Final conclusion
@@ -184,9 +184,8 @@ The executable acceptance gate is met and the accepted retrieval candidate
 improves retrieval and reference quality without changing Validation-80 routing
 safety. The technical source, report, workbooks, evidence provenance, and
 four-folder package structure are ready after final reconciliation. The
-supplied package's `01_Video` folder remains empty, so submission readiness
-still depends on the required final video. Calibration, frozen-output human
-review, and production outcomes remain explicitly unproven or not measured.
+supplied package includes the required final video. Calibration, frozen-output
+human review, and production outcomes remain explicitly unproven or not measured.
 Production automatic release remains disabled.
 
 ### Final C1 frozen evidence

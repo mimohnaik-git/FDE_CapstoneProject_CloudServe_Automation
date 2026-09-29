@@ -203,11 +203,10 @@ Grafana:
 Start-Process "http://127.0.0.1:3000"
 ```
 
-Prometheus data source:
-
-```text
-Start-Process "http://127.0.0.1:9090"
-```
+In Grafana, open **Connections > Data sources > Add new data source**, select
+**Prometheus**, set the server URL to `http://127.0.0.1:9090`, and select
+**Save & test**. When importing the dashboard below, choose that Prometheus
+data source for the dashboard input.
 
 Dashboard file:
 
